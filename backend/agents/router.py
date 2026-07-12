@@ -5,9 +5,10 @@ capabilities, availability, priority, and custom routing rules.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from agents.base import BaseAgent
@@ -50,9 +51,9 @@ class RouteRule:
 
     name: str
     rule_id: str = field(default_factory=lambda: str(uuid4()))
-    target_agent_id: Optional[str] = None
-    capabilities: List[AgentCapability] = field(default_factory=list)
-    condition: Optional[Callable[[ExecutionContext], bool]] = None
+    target_agent_id: str | None = None
+    capabilities: list[AgentCapability] = field(default_factory=list)
+    condition: Callable[[ExecutionContext], bool] | None = None
     priority: int = 50
     enabled: bool = True
 
@@ -71,12 +72,11 @@ class RouteDecision:
     """
 
     outcome: RouteOutcome
-    agent: Optional[BaseAgent] = None
-    rule_id: Optional[str] = None
-    alternatives: List[str] = field(default_factory=list)
+    agent: BaseAgent | None = None
+    rule_id: str | None = None
+    alternatives: list[str] = field(default_factory=list)
     reason: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class AgentRouter(ABC):
@@ -140,7 +140,7 @@ class AgentRouter(ABC):
         ...
 
     @abstractmethod
-    def list_rules(self) -> List[RouteRule]:
+    def list_rules(self) -> list[RouteRule]:
         """List all active routing rules."""
         ...
 
@@ -154,9 +154,7 @@ class AgentRouter(ABC):
         ...
 
     @abstractmethod
-    async def get_candidates(
-        self, context: ExecutionContext
-    ) -> List[BaseAgent]:
+    async def get_candidates(self, context: ExecutionContext) -> list[BaseAgent]:
         """Get all candidate agents for a task (without selecting).
 
         Args:

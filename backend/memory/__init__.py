@@ -49,16 +49,35 @@ Usage:
 """
 
 # --- Core Types ---
-from .types import (
-    MemoryEntry,
-    MemoryPriority,
-    MemoryQuery,
-    MemoryScope,
-    MemorySearchResult,
-    MemoryStats,
-    MemoryTag,
-    MemoryType,
+# --- Base Store ---
+from .base import MemoryStore
+
+# --- Consolidation ---
+from .consolidation import (
+    ConsolidationResult,
+    ConsolidationStatus,
+    ConsolidationStrategy,
+    ConsolidationTask,
+    MemoryConsolidator,
 )
+
+# --- Context Assembly ---
+from .context import (
+    AssembledMemoryContext,
+    MemoryContextAssembler,
+    MemoryContextConfig,
+    MemoryContextEntry,
+)
+from .conversation import (
+    Conversation,
+    ConversationConfig,
+    ConversationMemory,
+    ConversationMessage,
+)
+from .episodic import Episode, EpisodicConfig, EpisodicMemory
+
+# --- Events ---
+from .events import MemoryEvent, MemoryEvents
 
 # --- Exceptions ---
 from .exceptions import (
@@ -74,8 +93,45 @@ from .exceptions import (
     MemoryStorageError,
 )
 
-# --- Events ---
-from .events import MemoryEvent, MemoryEvents
+# --- Factory ---
+from .factory import MemoryFactory
+
+# --- Importance ---
+from .importance import (
+    ImportanceDecayStrategy,
+    ImportanceFactor,
+    ImportanceScore,
+    ImportanceScorer,
+)
+
+# --- Index ---
+from .index import (
+    DistanceMetric,
+    IndexConfig,
+    IndexHealth,
+    IndexManager,
+    IndexStats,
+    IndexType,
+    MemoryIndex,
+)
+from .knowledge import (
+    KnowledgeChunk,
+    KnowledgeConfig,
+    KnowledgeDocument,
+    KnowledgeMemory,
+)
+from .long_term import LongTermConfig, LongTermMemory
+
+# --- Manager ---
+from .manager import MemoryManager, MemoryManagerConfig
+
+# --- Metrics ---
+from .metrics import (
+    MemoryMetrics,
+    MemoryOperation,
+    MetricsCollector,
+    OperationMetric,
+)
 
 # --- Policies ---
 from .policies import (
@@ -90,14 +146,10 @@ from .policies import (
     PolicyViolation,
     RetentionPolicy,
 )
+from .project import ProjectConfig, ProjectContext, ProjectMemory
 
-# --- Importance ---
-from .importance import (
-    ImportanceDecayStrategy,
-    ImportanceFactor,
-    ImportanceScore,
-    ImportanceScorer,
-)
+# --- Registry ---
+from .registry import MemoryRegistry, MemoryStoreEntry
 
 # --- Retrieval ---
 from .retrieval import (
@@ -107,14 +159,15 @@ from .retrieval import (
     RetrievalResult,
     SearchStrategy,
 )
+from .semantic import Fact, SemanticConfig, SemanticMemory, SemanticRelation
+from .session import SessionMemory, SessionMemoryConfig, SessionState
+from .short_term import ShortTermConfig, ShortTermMemory
 
-# --- Consolidation ---
-from .consolidation import (
-    ConsolidationResult,
-    ConsolidationStatus,
-    ConsolidationStrategy,
-    ConsolidationTask,
-    MemoryConsolidator,
+# --- State ---
+from .state import (
+    MemoryStateManager,
+    MemorySystemState,
+    MemorySystemStatus,
 )
 
 # --- Summarizer ---
@@ -124,74 +177,19 @@ from .summarizer import (
     SummaryConfig,
     SummaryLevel,
 )
-
-# --- Index ---
-from .index import (
-    DistanceMetric,
-    IndexConfig,
-    IndexHealth,
-    IndexManager,
-    IndexStats,
-    IndexType,
-    MemoryIndex,
+from .types import (
+    MemoryEntry,
+    MemoryPriority,
+    MemoryQuery,
+    MemoryScope,
+    MemorySearchResult,
+    MemoryStats,
+    MemoryTag,
+    MemoryType,
 )
-
-# --- State ---
-from .state import (
-    MemoryStateManager,
-    MemorySystemState,
-    MemorySystemStatus,
-)
-
-# --- Metrics ---
-from .metrics import (
-    MemoryMetrics,
-    MemoryOperation,
-    MetricsCollector,
-    OperationMetric,
-)
-
-# --- Base Store ---
-from .base import MemoryStore
 
 # --- Memory Tier Stores ---
 from .working import EvictionMode, WorkingMemory, WorkingMemoryConfig
-from .short_term import ShortTermConfig, ShortTermMemory
-from .long_term import LongTermConfig, LongTermMemory
-from .episodic import Episode, EpisodicConfig, EpisodicMemory
-from .semantic import Fact, SemanticConfig, SemanticMemory, SemanticRelation
-from .knowledge import (
-    KnowledgeChunk,
-    KnowledgeConfig,
-    KnowledgeDocument,
-    KnowledgeMemory,
-)
-from .conversation import (
-    Conversation,
-    ConversationConfig,
-    ConversationMemory,
-    ConversationMessage,
-)
-from .project import ProjectConfig, ProjectContext, ProjectMemory
-from .session import SessionMemory, SessionMemoryConfig, SessionState
-
-# --- Context Assembly ---
-from .context import (
-    AssembledMemoryContext,
-    MemoryContextAssembler,
-    MemoryContextConfig,
-    MemoryContextEntry,
-)
-
-# --- Registry ---
-from .registry import MemoryRegistry, MemoryStoreEntry
-
-# --- Factory ---
-from .factory import MemoryFactory
-
-# --- Manager ---
-from .manager import MemoryManager, MemoryManagerConfig
-
 
 __all__ = [
     # Core Types

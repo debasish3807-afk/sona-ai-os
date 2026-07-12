@@ -6,7 +6,7 @@ variables — never hardcoded.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from providers.types import ProviderID
 
@@ -27,10 +27,7 @@ class RetryConfig:
     initial_delay_seconds: float = 1.0
     max_delay_seconds: float = 60.0
     exponential_base: float = 2.0
-    retryable_status_codes: List[int] = field(
-        default_factory=lambda: [429, 500, 502, 503, 504]
-    )
-
+    retryable_status_codes: list[int] = field(default_factory=lambda: [429, 500, 502, 503, 504])
 
 
 @dataclass
@@ -80,9 +77,8 @@ class ProviderConfig:
     default_model: str = ""
     enabled: bool = True
     priority: int = 50
-    tags: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    tags: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -129,7 +125,6 @@ class ClaudeConfig(ProviderConfig):
     default_model: str = "claude-sonnet-4-20250514"
 
 
-
 @dataclass
 class GroqConfig(ProviderConfig):
     """Groq-specific configuration."""
@@ -171,7 +166,7 @@ class MistralConfig(ProviderConfig):
 
 
 # Default configurations for all providers
-DEFAULT_PROVIDER_CONFIGS: Dict[ProviderID, type] = {
+DEFAULT_PROVIDER_CONFIGS: dict[ProviderID, type] = {
     ProviderID.OPENAI: OpenAIConfig,
     ProviderID.GEMINI: GeminiConfig,
     ProviderID.OLLAMA: OllamaConfig,

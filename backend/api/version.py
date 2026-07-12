@@ -2,7 +2,7 @@
 
 import platform
 import sys
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter
 
@@ -14,11 +14,11 @@ router = APIRouter(tags=["system"])
 
 @router.get(
     "/version",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Version Information",
     description="Returns application version and system details.",
 )
-async def get_version() -> Dict[str, Any]:
+async def get_version() -> dict[str, Any]:
     """Get application version information.
 
     Returns:

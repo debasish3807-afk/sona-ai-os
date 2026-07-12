@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from .types import MemoryType
 
@@ -117,7 +117,7 @@ class MemoryContextAssembler(ABC):
         self,
         session_id: str,
         query: str,
-        config: Optional[MemoryContextConfig] = None,
+        config: MemoryContextConfig | None = None,
     ) -> AssembledMemoryContext:
         """Assemble a complete context for an AI operation.
 
@@ -138,7 +138,7 @@ class MemoryContextAssembler(ABC):
     async def get_relevant_memories(
         self,
         query: str,
-        memory_types: Optional[list[MemoryType]] = None,
+        memory_types: list[MemoryType] | None = None,
         limit: int = 20,
     ) -> list[MemoryContextEntry]:
         """Get relevant memories from specified tiers without full assembly.

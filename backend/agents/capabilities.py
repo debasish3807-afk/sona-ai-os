@@ -6,7 +6,7 @@ system for routing tasks to the most appropriate agent.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 
 class AgentCapability(str, Enum):
@@ -43,7 +43,6 @@ class AgentCapability(str, Enum):
     VERIFICATION = "verification"
 
 
-
 class CapabilityLevel(str, Enum):
     """Proficiency level for a capability."""
 
@@ -68,8 +67,8 @@ class AgentCapabilityDescriptor:
     capability: AgentCapability
     level: CapabilityLevel = CapabilityLevel.BASIC
     description: str = ""
-    constraints: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    constraints: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -82,12 +81,10 @@ class AgentCapabilitySet:
     """
 
     agent_id: str
-    capabilities: List[AgentCapabilityDescriptor] = field(
-        default_factory=list
-    )
+    capabilities: list[AgentCapabilityDescriptor] = field(default_factory=list)
 
     @property
-    def capability_names(self) -> Set[AgentCapability]:
+    def capability_names(self) -> set[AgentCapability]:
         """Get the set of capability identifiers."""
         return {cap.capability for cap in self.capabilities}
 
@@ -95,24 +92,22 @@ class AgentCapabilitySet:
         """Check if a specific capability is present."""
         return capability in self.capability_names
 
-    def has_all(self, required: List[AgentCapability]) -> bool:
+    def has_all(self, required: list[AgentCapability]) -> bool:
         """Check if all required capabilities are present."""
         return all(self.has_capability(c) for c in required)
 
-    def has_any(self, capabilities: List[AgentCapability]) -> bool:
+    def has_any(self, capabilities: list[AgentCapability]) -> bool:
         """Check if any of the given capabilities are present."""
         return any(self.has_capability(c) for c in capabilities)
 
-    def get_descriptor(
-        self, capability: AgentCapability
-    ) -> Optional[AgentCapabilityDescriptor]:
+    def get_descriptor(self, capability: AgentCapability) -> AgentCapabilityDescriptor | None:
         """Get the descriptor for a specific capability."""
         for desc in self.capabilities:
             if desc.capability == capability:
                 return desc
         return None
 
-    def match_score(self, required: List[AgentCapability]) -> float:
+    def match_score(self, required: list[AgentCapability]) -> float:
         """Calculate match score against requirements (0.0 to 1.0)."""
         if not required:
             return 1.0
@@ -131,10 +126,10 @@ class CapabilityRequirement:
         metadata: Additional requirement context.
     """
 
-    required: List[AgentCapability] = field(default_factory=list)
-    preferred: List[AgentCapability] = field(default_factory=list)
+    required: list[AgentCapability] = field(default_factory=list)
+    preferred: list[AgentCapability] = field(default_factory=list)
     min_level: CapabilityLevel = CapabilityLevel.BASIC
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def is_satisfied_by(self, capability_set: AgentCapabilitySet) -> bool:
         """Check if a capability set satisfies these requirements."""

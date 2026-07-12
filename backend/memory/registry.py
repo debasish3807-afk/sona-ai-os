@@ -13,8 +13,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
 from .types import MemoryType
@@ -38,7 +38,7 @@ class MemoryStoreEntry:
 
     store: MemoryStore
     memory_type: MemoryType
-    registered_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    registered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     enabled: bool = True
     priority: int = 0
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -58,7 +58,7 @@ class MemoryRegistry(ABC):
         memory_type: MemoryType,
         store: MemoryStore,
         priority: int = 0,
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Register a memory store for a specific memory type.
 
@@ -83,7 +83,7 @@ class MemoryRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get_store(self, memory_type: MemoryType) -> Optional[MemoryStore]:
+    async def get_store(self, memory_type: MemoryType) -> MemoryStore | None:
         """Get the registered memory store for a specific type.
 
         Args:

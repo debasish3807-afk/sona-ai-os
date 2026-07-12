@@ -6,9 +6,9 @@ Manages registration, discovery, and lifecycle of AI providers
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -22,7 +22,6 @@ class ProviderType(str, Enum):
     TOOL = "tool"
     MEMORY = "memory"
     SEARCH = "search"
-
 
 
 class ProviderHealth(str, Enum):
@@ -48,8 +47,7 @@ class ProviderCapability:
     name: str
     version: str = "1.0.0"
     description: str = ""
-    parameters: Dict[str, Any] = field(default_factory=dict)
-
+    parameters: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -74,21 +72,18 @@ class ProviderInfo:
     provider_type: ProviderType
     provider_id: str = field(default_factory=lambda: str(uuid4()))
     version: str = "0.0.0"
-    capabilities: List[ProviderCapability] = field(default_factory=list)
+    capabilities: list[ProviderCapability] = field(default_factory=list)
     health: ProviderHealth = ProviderHealth.UNKNOWN
     priority: int = 50
-    config: Dict[str, Any] = field(default_factory=dict)
-    registered_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    last_health_check: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    config: dict[str, Any] = field(default_factory=dict)
+    registered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_health_check: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_healthy(self) -> bool:
         """Check if the provider is in a healthy state."""
         return self.health in (ProviderHealth.HEALTHY, ProviderHealth.DEGRADED)
-
 
 
 class Provider(ABC):
@@ -133,7 +128,6 @@ class Provider(ABC):
         ...
 
 
-
 class ProviderRegistry(ABC):
     """Abstract interface for provider registration and discovery.
 
@@ -171,7 +165,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get_provider(self, provider_id: str) -> Optional[Provider]:
+    async def get_provider(self, provider_id: str) -> Provider | None:
         """Get a registered provider by ID.
 
         Args:
@@ -186,7 +180,7 @@ class ProviderRegistry(ABC):
     async def get_providers_by_type(
         self,
         provider_type: ProviderType,
-    ) -> List[Provider]:
+    ) -> list[Provider]:
         """Get all providers of a specific type.
 
         Args:
@@ -201,7 +195,7 @@ class ProviderRegistry(ABC):
     async def get_providers_by_capability(
         self,
         capability_name: str,
-    ) -> List[Provider]:
+    ) -> list[Provider]:
         """Get providers that offer a specific capability.
 
         Args:
@@ -213,7 +207,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def list_providers(self) -> List[ProviderInfo]:
+    async def list_providers(self) -> list[ProviderInfo]:
         """List all registered providers.
 
         Returns:
@@ -222,7 +216,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def check_health_all(self) -> Dict[str, ProviderHealth]:
+    async def check_health_all(self) -> dict[str, ProviderHealth]:
         """Run health checks on all registered providers.
 
         Returns:
@@ -233,8 +227,8 @@ class ProviderRegistry(ABC):
     @abstractmethod
     async def get_healthy_providers(
         self,
-        provider_type: Optional[ProviderType] = None,
-    ) -> List[Provider]:
+        provider_type: ProviderType | None = None,
+    ) -> list[Provider]:
         """Get all healthy providers, optionally filtered by type.
 
         Args:

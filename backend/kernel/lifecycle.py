@@ -7,9 +7,9 @@ shutdown of all managed components.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class ComponentState(str, Enum):
@@ -48,8 +48,8 @@ class ComponentHealth:
 
     status: HealthStatus = HealthStatus.UNKNOWN
     message: str = ""
-    details: Dict[str, Any] = field(default_factory=dict)
-    last_check: Optional[datetime] = None
+    details: dict[str, Any] = field(default_factory=dict)
+    last_check: datetime | None = None
     consecutive_failures: int = 0
 
     @property
@@ -78,9 +78,9 @@ class ComponentInfo:
     version: str = "0.0.0"
     state: ComponentState = ComponentState.UNINITIALIZED
     health: ComponentHealth = field(default_factory=ComponentHealth)
-    started_at: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    dependencies: List[str] = field(default_factory=list)
+    started_at: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    dependencies: list[str] = field(default_factory=list)
 
 
 class Lifecycle(ABC):
@@ -177,7 +177,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def start_all(self) -> Dict[str, ComponentState]:
+    async def start_all(self) -> dict[str, ComponentState]:
         """Start all registered components respecting dependency order.
 
         Returns:
@@ -186,7 +186,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def stop_all(self) -> Dict[str, ComponentState]:
+    async def stop_all(self) -> dict[str, ComponentState]:
         """Stop all registered components in reverse dependency order.
 
         Returns:
@@ -195,7 +195,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def health_check_all(self) -> Dict[str, ComponentHealth]:
+    async def health_check_all(self) -> dict[str, ComponentHealth]:
         """Run health checks on all registered components.
 
         Returns:
@@ -204,7 +204,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def get_component(self, component_id: str) -> Optional[Lifecycle]:
+    def get_component(self, component_id: str) -> Lifecycle | None:
         """Get a registered component by ID.
 
         Args:
@@ -216,7 +216,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def get_all_components(self) -> List[ComponentInfo]:
+    def get_all_components(self) -> list[ComponentInfo]:
         """Get information about all registered components.
 
         Returns:
@@ -225,7 +225,7 @@ class LifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def get_state(self, component_id: str) -> Optional[ComponentState]:
+    def get_state(self, component_id: str) -> ComponentState | None:
         """Get the current state of a component.
 
         Args:

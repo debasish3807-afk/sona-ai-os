@@ -1,7 +1,7 @@
 """Standardized API response models."""
 
-from datetime import datetime, timezone
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from datetime import UTC, datetime
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -15,15 +15,13 @@ class ApiResponse(BaseModel, Generic[T]):
     """
 
     success: bool = Field(description="Whether the request was successful")
-    data: Optional[T] = Field(default=None, description="Response payload")
-    message: Optional[str] = Field(default=None, description="Human-readable message")
+    data: T | None = Field(default=None, description="Response payload")
+    message: str | None = Field(default=None, description="Human-readable message")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Response timestamp in UTC",
     )
-    meta: Optional[Dict[str, Any]] = Field(
-        default=None, description="Additional metadata"
-    )
+    meta: dict[str, Any] | None = Field(default=None, description="Additional metadata")
 
 
 class SuccessResponse(ApiResponse[T], Generic[T]):
@@ -35,8 +33,8 @@ class SuccessResponse(ApiResponse[T], Generic[T]):
     def create(
         cls,
         data: Any = None,
-        message: Optional[str] = None,
-        meta: Optional[Dict[str, Any]] = None,
+        message: str | None = None,
+        meta: dict[str, Any] | None = None,
     ) -> "SuccessResponse[Any]":
         """Factory method for creating success responses.
 
@@ -56,9 +54,7 @@ class ErrorDetail(BaseModel):
 
     code: str = Field(description="Machine-readable error code")
     message: str = Field(description="Human-readable error message")
-    details: Optional[Dict[str, Any]] = Field(
-        default=None, description="Additional error details"
-    )
+    details: dict[str, Any] | None = Field(default=None, description="Additional error details")
 
 
 class ErrorResponse(BaseModel):
@@ -67,7 +63,7 @@ class ErrorResponse(BaseModel):
     success: bool = False
     error: ErrorDetail = Field(description="Error information")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Response timestamp in UTC",
     )
 
@@ -76,7 +72,7 @@ class ErrorResponse(BaseModel):
         cls,
         code: str,
         message: str,
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> "ErrorResponse":
         """Factory method for creating error responses.
 
@@ -91,22 +87,20 @@ class ErrorResponse(BaseModel):
         return cls(error=ErrorDetail(code=code, message=message, details=details))
 
 
-class PaginatedResponse(ApiResponse[List[T]], Generic[T]):
+class PaginatedResponse(ApiResponse[list[T]], Generic[T]):
     """Paginated list response."""
 
     success: bool = True
-    pagination: Optional[Dict[str, Any]] = Field(
-        default=None, description="Pagination metadata"
-    )
+    pagination: dict[str, Any] | None = Field(default=None, description="Pagination metadata")
 
     @classmethod
     def create(
         cls,
-        items: List[Any],
+        items: list[Any],
         total: int,
         page: int,
         page_size: int,
-        message: Optional[str] = None,
+        message: str | None = None,
     ) -> "PaginatedResponse[Any]":
         """Factory method for creating paginated responses.
 

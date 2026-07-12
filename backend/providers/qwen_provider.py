@@ -4,7 +4,7 @@ Provides access to Alibaba's Qwen models via DashScope API.
 Supports multilingual capabilities with strong Chinese language support.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -33,7 +33,7 @@ class QwenProvider(BaseProvider):
     Notable: Strong multilingual support, vision capabilities.
     """
 
-    def __init__(self, config: Optional[QwenConfig] = None) -> None:
+    def __init__(self, config: QwenConfig | None = None) -> None:
         self._config = config or QwenConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -99,11 +99,11 @@ class QwenProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Qwen embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

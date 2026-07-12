@@ -7,9 +7,9 @@ providers.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from providers.types import ProviderID
 
@@ -30,7 +30,6 @@ class CircuitState(str, Enum):
     CLOSED = "closed"  # Normal operation
     OPEN = "open"  # Failing, rejecting requests
     HALF_OPEN = "half_open"  # Testing recovery
-
 
 
 @dataclass
@@ -67,11 +66,8 @@ class HealthCheckResult:
     state: HealthState
     latency_ms: float = 0.0
     message: str = ""
-    checked_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    details: Dict[str, Any] = field(default_factory=dict)
-
+    checked_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -101,10 +97,10 @@ class ProviderHealthStatus:
     total_requests: int = 0
     total_failures: int = 0
     avg_latency_ms: float = 0.0
-    last_check: Optional[HealthCheckResult] = None
-    last_success: Optional[datetime] = None
-    last_failure: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    last_check: HealthCheckResult | None = None
+    last_success: datetime | None = None
+    last_failure: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_available(self) -> bool:
@@ -120,7 +116,6 @@ class ProviderHealthStatus:
         if self.total_requests == 0:
             return 0.0
         return self.total_failures / self.total_requests
-
 
 
 class HealthMonitor(ABC):
@@ -143,7 +138,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def check_all(self) -> Dict[ProviderID, HealthCheckResult]:
+    async def check_all(self) -> dict[ProviderID, HealthCheckResult]:
         """Perform health checks on all registered providers.
 
         Returns:
@@ -152,9 +147,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def record_success(
-        self, provider_id: ProviderID, latency_ms: float
-    ) -> None:
+    async def record_success(self, provider_id: ProviderID, latency_ms: float) -> None:
         """Record a successful request to a provider.
 
         Args:
@@ -164,9 +157,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def record_failure(
-        self, provider_id: ProviderID, error: Optional[Exception] = None
-    ) -> None:
+    async def record_failure(self, provider_id: ProviderID, error: Exception | None = None) -> None:
         """Record a failed request to a provider.
 
         May trigger circuit breaker state transitions.
@@ -178,9 +169,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def get_status(
-        self, provider_id: ProviderID
-    ) -> Optional[ProviderHealthStatus]:
+    async def get_status(self, provider_id: ProviderID) -> ProviderHealthStatus | None:
         """Get the current health status of a provider.
 
         Args:
@@ -192,7 +181,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def get_all_statuses(self) -> Dict[ProviderID, ProviderHealthStatus]:
+    async def get_all_statuses(self) -> dict[ProviderID, ProviderHealthStatus]:
         """Get health statuses for all tracked providers.
 
         Returns:
@@ -201,7 +190,7 @@ class HealthMonitor(ABC):
         ...
 
     @abstractmethod
-    async def get_available_providers(self) -> List[ProviderID]:
+    async def get_available_providers(self) -> list[ProviderID]:
         """Get list of providers currently available for requests.
 
         Only returns providers with healthy/degraded state and

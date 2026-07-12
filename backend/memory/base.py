@@ -12,7 +12,7 @@ Classes:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from .types import (
     MemoryEntry,
@@ -60,7 +60,7 @@ class MemoryStore(ABC):
         ...
 
     @abstractmethod
-    async def get(self, entry_id: str) -> Optional[MemoryEntry]:
+    async def get(self, entry_id: str) -> MemoryEntry | None:
         """Retrieve a single memory entry by its ID.
 
         Args:
@@ -75,7 +75,7 @@ class MemoryStore(ABC):
         ...
 
     @abstractmethod
-    async def update(self, entry_id: str, **kwargs: Any) -> Optional[MemoryEntry]:
+    async def update(self, entry_id: str, **kwargs: Any) -> MemoryEntry | None:
         """Update fields of an existing memory entry.
 
         Only the specified keyword arguments are updated; unspecified
@@ -129,8 +129,8 @@ class MemoryStore(ABC):
     @abstractmethod
     async def list_entries(
         self,
-        memory_type: Optional[MemoryType] = None,
-        scope: Optional[MemoryScope] = None,
+        memory_type: MemoryType | None = None,
+        scope: MemoryScope | None = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[MemoryEntry]:
@@ -150,8 +150,8 @@ class MemoryStore(ABC):
     @abstractmethod
     async def count(
         self,
-        memory_type: Optional[MemoryType] = None,
-        scope: Optional[MemoryScope] = None,
+        memory_type: MemoryType | None = None,
+        scope: MemoryScope | None = None,
     ) -> int:
         """Count memory entries with optional filtering.
 
@@ -167,8 +167,8 @@ class MemoryStore(ABC):
     @abstractmethod
     async def clear(
         self,
-        memory_type: Optional[MemoryType] = None,
-        scope: Optional[MemoryScope] = None,
+        memory_type: MemoryType | None = None,
+        scope: MemoryScope | None = None,
     ) -> int:
         """Clear (delete) all entries matching the given filters.
 
@@ -254,8 +254,8 @@ class MemoryStore(ABC):
     @abstractmethod
     async def export_entries(
         self,
-        memory_type: Optional[MemoryType] = None,
-        scope: Optional[MemoryScope] = None,
+        memory_type: MemoryType | None = None,
+        scope: MemoryScope | None = None,
     ) -> list[dict[str, Any]]:
         """Export entries as serialized dictionaries for backup/transfer.
 

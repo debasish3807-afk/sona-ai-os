@@ -6,7 +6,7 @@ AI operations throughout Sona AI OS.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.capabilities import CapabilitySet
 from providers.config import ProviderConfig
@@ -105,9 +105,7 @@ class BaseProvider(ABC):
         ...
 
     @abstractmethod
-    async def stream(
-        self, request: ChatRequest
-    ) -> AsyncIterator[StreamChunk]:
+    def stream(self, request: ChatRequest) -> AsyncIterator[StreamChunk]:
         """Execute a streaming chat completion request.
 
         Args:
@@ -122,9 +120,7 @@ class BaseProvider(ABC):
         ...
 
     @abstractmethod
-    async def embeddings(
-        self, request: EmbeddingRequest
-    ) -> EmbeddingResponse:
+    async def embeddings(self, request: EmbeddingRequest) -> EmbeddingResponse:
         """Generate text embeddings.
 
         Args:
@@ -143,7 +139,7 @@ class BaseProvider(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         """List all models available from this provider.
 
         Returns:
@@ -152,7 +148,7 @@ class BaseProvider(ABC):
         ...
 
     @abstractmethod
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """Get information about a specific model.
 
         Args:

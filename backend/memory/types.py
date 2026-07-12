@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum, IntEnum
-from typing import Any, Optional
+from typing import Any
 
 
 class MemoryScope(str, Enum):
@@ -101,7 +101,7 @@ class MemoryTag:
     """
 
     name: str
-    category: Optional[str] = None
+    category: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -139,19 +139,19 @@ class MemoryEntry:
     scope: MemoryScope
     content: str
     entry_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    embedding: Optional[list[float]] = None
+    embedding: list[float] | None = None
     importance_score: float = 0.5
     tags: list[MemoryTag] = field(default_factory=list)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    accessed_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    accessed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
     pinned: bool = False
-    expires_at: Optional[datetime] = None
-    user_id: Optional[str] = None
-    session_id: Optional[str] = None
-    source: Optional[str] = None
-    token_count: Optional[int] = None
+    expires_at: datetime | None = None
+    user_id: str | None = None
+    session_id: str | None = None
+    source: str | None = None
+    token_count: int | None = None
     access_count: int = 0
     priority: MemoryPriority = MemoryPriority.NORMAL
 
@@ -180,16 +180,16 @@ class MemoryQuery:
     """
 
     query_text: str
-    memory_types: Optional[list[MemoryType]] = None
-    scope_filter: Optional[list[MemoryScope]] = None
-    tags_filter: Optional[list[str]] = None
+    memory_types: list[MemoryType] | None = None
+    scope_filter: list[MemoryScope] | None = None
+    tags_filter: list[str] | None = None
     min_importance: float = 0.0
     max_results: int = 20
     include_expired: bool = False
-    user_id: Optional[str] = None
-    session_id: Optional[str] = None
-    time_range_start: Optional[datetime] = None
-    time_range_end: Optional[datetime] = None
+    user_id: str | None = None
+    session_id: str | None = None
+    time_range_start: datetime | None = None
+    time_range_end: datetime | None = None
     include_embeddings: bool = False
 
 
@@ -210,7 +210,7 @@ class MemorySearchResult:
     entry: MemoryEntry
     relevance_score: float
     match_type: str
-    highlights: Optional[list[str]] = None
+    highlights: list[str] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -235,7 +235,7 @@ class MemoryStats:
     by_type: dict[MemoryType, int]
     by_scope: dict[MemoryScope, int]
     total_size_bytes: int
-    oldest_entry: Optional[datetime] = None
-    newest_entry: Optional[datetime] = None
+    oldest_entry: datetime | None = None
+    newest_entry: datetime | None = None
     pinned_count: int = 0
     expired_count: int = 0

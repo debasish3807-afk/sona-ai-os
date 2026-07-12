@@ -19,9 +19,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
-from .types import MemoryEntry, MemoryQuery, MemorySearchResult, MemoryType
+from .types import MemoryQuery, MemorySearchResult, MemoryType
 
 
 class SearchStrategy(str, Enum):
@@ -64,7 +64,7 @@ class RetrievalConfig:
     min_relevance: float = 0.0
     include_metadata: bool = True
     rerank: bool = False
-    rerank_model: Optional[str] = None
+    rerank_model: str | None = None
     diversity_factor: float = 0.0
 
 
@@ -102,7 +102,7 @@ class MemoryRetriever(ABC):
 
     @abstractmethod
     async def search(
-        self, query: MemoryQuery, config: Optional[RetrievalConfig] = None
+        self, query: MemoryQuery, config: RetrievalConfig | None = None
     ) -> RetrievalResult:
         """Execute a memory search with the given query and configuration.
 
@@ -122,7 +122,7 @@ class MemoryRetriever(ABC):
     async def search_by_embedding(
         self,
         embedding: list[float],
-        memory_types: Optional[list[MemoryType]] = None,
+        memory_types: list[MemoryType] | None = None,
         max_results: int = 10,
         min_relevance: float = 0.0,
     ) -> list[MemorySearchResult]:
@@ -145,7 +145,7 @@ class MemoryRetriever(ABC):
     async def search_by_tags(
         self,
         tags: list[str],
-        memory_types: Optional[list[MemoryType]] = None,
+        memory_types: list[MemoryType] | None = None,
         max_results: int = 20,
     ) -> list[MemorySearchResult]:
         """Search for memories that have specific tags.
@@ -165,7 +165,7 @@ class MemoryRetriever(ABC):
         self,
         start: datetime,
         end: datetime,
-        memory_types: Optional[list[MemoryType]] = None,
+        memory_types: list[MemoryType] | None = None,
         max_results: int = 50,
     ) -> list[MemorySearchResult]:
         """Search for memories within a time range.
@@ -208,7 +208,7 @@ class MemoryRetriever(ABC):
         self,
         results: list[MemorySearchResult],
         query: str,
-        max_results: Optional[int] = None,
+        max_results: int | None = None,
     ) -> list[MemorySearchResult]:
         """Re-rank search results using a more sophisticated model.
 

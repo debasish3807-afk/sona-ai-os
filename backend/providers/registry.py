@@ -6,15 +6,13 @@ by ID, type, and capability requirements.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from providers.base import BaseProvider
-from providers.capabilities import Capability, CapabilityRequirement
-from providers.config import ProviderConfig
+from providers.capabilities import CapabilityRequirement
 from providers.health import HealthState
 from providers.types import ProviderID
-
 
 
 @dataclass
@@ -31,13 +29,11 @@ class ProviderEntry:
     """
 
     provider: BaseProvider
-    registered_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    registered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     health_state: HealthState = HealthState.UNKNOWN
     enabled: bool = True
     priority: int = 50
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def provider_id(self) -> ProviderID:
@@ -47,12 +43,7 @@ class ProviderEntry:
     @property
     def is_available(self) -> bool:
         """Check if this entry is available for use."""
-        return (
-            self.enabled
-            and self.health_state
-            in (HealthState.HEALTHY, HealthState.DEGRADED)
-        )
-
+        return self.enabled and self.health_state in (HealthState.HEALTHY, HealthState.DEGRADED)
 
 
 class ProviderRegistry(ABC):
@@ -98,7 +89,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get(self, provider_id: ProviderID) -> Optional[BaseProvider]:
+    async def get(self, provider_id: ProviderID) -> BaseProvider | None:
         """Get a registered provider by ID.
 
         Args:
@@ -110,9 +101,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get_entry(
-        self, provider_id: ProviderID
-    ) -> Optional[ProviderEntry]:
+    async def get_entry(self, provider_id: ProviderID) -> ProviderEntry | None:
         """Get the full registry entry for a provider.
 
         Args:
@@ -124,7 +113,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def list_all(self) -> List[ProviderEntry]:
+    async def list_all(self) -> list[ProviderEntry]:
         """List all registered provider entries.
 
         Returns:
@@ -133,7 +122,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def list_available(self) -> List[BaseProvider]:
+    async def list_available(self) -> list[BaseProvider]:
         """List all available (healthy + enabled) providers.
 
         Returns:
@@ -145,7 +134,7 @@ class ProviderRegistry(ABC):
     async def find_by_capability(
         self,
         requirement: CapabilityRequirement,
-    ) -> List[BaseProvider]:
+    ) -> list[BaseProvider]:
         """Find providers matching capability requirements.
 
         Args:
@@ -158,7 +147,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def find_by_model(self, model_id: str) -> Optional[BaseProvider]:
+    async def find_by_model(self, model_id: str) -> BaseProvider | None:
         """Find the provider that serves a specific model.
 
         Args:
@@ -170,9 +159,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def set_enabled(
-        self, provider_id: ProviderID, enabled: bool
-    ) -> None:
+    async def set_enabled(self, provider_id: ProviderID, enabled: bool) -> None:
         """Enable or disable a provider.
 
         Args:
@@ -182,9 +169,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def update_health(
-        self, provider_id: ProviderID, state: HealthState
-    ) -> None:
+    async def update_health(self, provider_id: ProviderID, state: HealthState) -> None:
         """Update the health state of a provider.
 
         Args:
@@ -194,7 +179,7 @@ class ProviderRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get_by_priority(self) -> List[BaseProvider]:
+    async def get_by_priority(self) -> list[BaseProvider]:
         """Get all available providers ordered by priority.
 
         Returns:

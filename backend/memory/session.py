@@ -15,8 +15,8 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,12 +61,12 @@ class SessionState:
 
     user_id: str
     session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    last_active: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_active: datetime = field(default_factory=lambda: datetime.now(UTC))
     entries: list[str] = field(default_factory=list)
     working_memory_ids: list[str] = field(default_factory=list)
     active: bool = True
-    summary: Optional[str] = None
+    summary: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -78,7 +78,7 @@ class SessionMemory(ABC):
     """
 
     @abstractmethod
-    async def create_session(self, user_id: str, metadata: Optional[dict[str, Any]] = None) -> str:
+    async def create_session(self, user_id: str, metadata: dict[str, Any] | None = None) -> str:
         """Create a new session for a user.
 
         Args:
@@ -91,7 +91,7 @@ class SessionMemory(ABC):
         ...
 
     @abstractmethod
-    async def get_session(self, session_id: str) -> Optional[SessionState]:
+    async def get_session(self, session_id: str) -> SessionState | None:
         """Retrieve session state by session ID.
 
         Args:
@@ -106,8 +106,8 @@ class SessionMemory(ABC):
     async def update_session(
         self,
         session_id: str,
-        entries: Optional[list[str]] = None,
-        metadata: Optional[dict[str, Any]] = None,
+        entries: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Update session state with new entries or metadata.
 

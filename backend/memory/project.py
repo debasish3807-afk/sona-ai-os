@@ -16,8 +16,8 @@ from __future__ import annotations
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
 from .types import MemoryEntry, MemoryQuery
@@ -71,10 +71,10 @@ class ProjectContext:
     files: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
     conventions: list[str] = field(default_factory=list)
-    language: Optional[str] = None
-    framework: Optional[str] = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    language: str | None = None
+    framework: str | None = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -100,7 +100,7 @@ class ProjectMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_project(self, project_id: str) -> Optional[ProjectContext]:
+    async def get_project(self, project_id: str) -> ProjectContext | None:
         """Retrieve a project context by its ID.
 
         Args:
@@ -114,7 +114,7 @@ class ProjectMemory(MemoryStore):
     @abstractmethod
     async def update_project(
         self, project_id: str, updates: dict[str, Any]
-    ) -> Optional[ProjectContext]:
+    ) -> ProjectContext | None:
         """Update a project context with new information.
 
         Args:
@@ -127,9 +127,7 @@ class ProjectMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def add_project_memory(
-        self, project_id: str, entry: MemoryEntry
-    ) -> str:
+    async def add_project_memory(self, project_id: str, entry: MemoryEntry) -> str:
         """Add a memory entry scoped to a specific project.
 
         Args:
@@ -143,7 +141,7 @@ class ProjectMemory(MemoryStore):
 
     @abstractmethod
     async def get_project_memories(
-        self, project_id: str, query: Optional[MemoryQuery] = None
+        self, project_id: str, query: MemoryQuery | None = None
     ) -> list[MemoryEntry]:
         """Get memory entries for a specific project.
 

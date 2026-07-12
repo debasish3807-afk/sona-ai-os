@@ -4,7 +4,8 @@ Handles open-ended chat, summarization, and general analysis tasks
 that do not require specialized domain expertise.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,15 +36,9 @@ class GeneralAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="general_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.CHAT, CapabilityLevel.EXPERT
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.SUMMARIZATION, CapabilityLevel.ADVANCED
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.ANALYSIS, CapabilityLevel.INTERMEDIATE
-                ),
+                AgentCapabilityDescriptor(AgentCapability.CHAT, CapabilityLevel.EXPERT),
+                AgentCapabilityDescriptor(AgentCapability.SUMMARIZATION, CapabilityLevel.ADVANCED),
+                AgentCapabilityDescriptor(AgentCapability.ANALYSIS, CapabilityLevel.INTERMEDIATE),
             ],
         )
 
@@ -63,7 +58,7 @@ class GeneralAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -83,9 +78,7 @@ class GeneralAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("GeneralAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("GeneralAgent streaming not yet implemented")
         yield  # type: ignore[misc]

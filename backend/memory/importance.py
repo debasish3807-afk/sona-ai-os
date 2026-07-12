@@ -19,9 +19,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Optional
 
 from .types import MemoryEntry
 
@@ -69,7 +68,7 @@ class ImportanceScore:
 
     score: float
     factors: dict[ImportanceFactor, float] = field(default_factory=dict)
-    calculated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    calculated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     decay_rate: float = 0.01
     confidence: float = 1.0
 
@@ -116,7 +115,7 @@ class ImportanceScorer(ABC):
         ...
 
     @abstractmethod
-    async def recalculate(self, entry: MemoryEntry, context: Optional[dict] = None) -> ImportanceScore:
+    async def recalculate(self, entry: MemoryEntry, context: dict | None = None) -> ImportanceScore:
         """Recalculate the importance score with updated context.
 
         Used when the scoring context has changed (e.g., new access,
@@ -148,7 +147,7 @@ class ImportanceScorer(ABC):
         ...
 
     @abstractmethod
-    async def get_threshold(self, memory_type: Optional[str] = None) -> float:
+    async def get_threshold(self, memory_type: str | None = None) -> float:
         """Get the minimum importance threshold for retention.
 
         Entries below this threshold are candidates for eviction

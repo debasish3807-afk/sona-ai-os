@@ -5,10 +5,11 @@ delegate tasks, share results, and coordinate activities.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable, Coroutine, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -53,17 +54,15 @@ class AgentMessage:
 
     message_type: MessageType
     sender_id: str
-    content: Dict[str, Any]
-    recipient_id: Optional[str] = None
+    content: dict[str, Any]
+    recipient_id: str | None = None
     message_id: str = field(default_factory=lambda: str(uuid4()))
     priority: MessagePriority = MessagePriority.NORMAL
-    reply_to: Optional[str] = None
-    correlation_id: Optional[str] = None
-    ttl_seconds: Optional[float] = None
-    timestamp: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    reply_to: str | None = None
+    correlation_id: str | None = None
+    ttl_seconds: float | None = None
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_broadcast(self) -> bool:
@@ -76,11 +75,8 @@ class AgentMessage:
         return self.reply_to is not None
 
 
-
 # Type alias for message handlers
-MessageHandler = Callable[
-    [AgentMessage], Coroutine[Any, Any, Optional[AgentMessage]]
-]
+MessageHandler = Callable[[AgentMessage], Coroutine[Any, Any, AgentMessage | None]]
 
 
 class MessageBus(ABC):
@@ -109,8 +105,8 @@ class MessageBus(ABC):
     async def broadcast(
         self,
         sender_id: str,
-        content: Dict[str, Any],
-        target_agents: Optional[List[str]] = None,
+        content: dict[str, Any],
+        target_agents: list[str] | None = None,
     ) -> str:
         """Broadcast a message to multiple agents.
 
@@ -129,7 +125,7 @@ class MessageBus(ABC):
         self,
         message: AgentMessage,
         timeout_seconds: float = 30.0,
-    ) -> Optional[AgentMessage]:
+    ) -> AgentMessage | None:
         """Send a request and wait for a reply.
 
         Args:
@@ -146,7 +142,7 @@ class MessageBus(ABC):
         self,
         agent_id: str,
         handler: MessageHandler,
-        message_types: Optional[List[MessageType]] = None,
+        message_types: list[MessageType] | None = None,
     ) -> str:
         """Subscribe an agent to receive messages.
 
@@ -173,9 +169,7 @@ class MessageBus(ABC):
         ...
 
     @abstractmethod
-    async def get_pending(
-        self, agent_id: str, limit: int = 10
-    ) -> List[AgentMessage]:
+    async def get_pending(self, agent_id: str, limit: int = 10) -> list[AgentMessage]:
         """Get pending messages for an agent.
 
         Args:

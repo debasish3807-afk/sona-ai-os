@@ -7,7 +7,7 @@ based on task requirements, availability, cost, and performance.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class ModelCapability(str, Enum):
@@ -59,7 +59,7 @@ class ModelProfile:
     model_id: str
     provider_id: str
     name: str
-    capabilities: List[ModelCapability] = field(default_factory=list)
+    capabilities: list[ModelCapability] = field(default_factory=list)
     max_context_tokens: int = 8192
     max_output_tokens: int = 4096
     cost_per_input_token: float = 0.0
@@ -68,7 +68,7 @@ class ModelProfile:
     quality_score: float = 0.5
     is_available: bool = True
     rate_limit_rpm: int = 60
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def has_capability(self, capability: ModelCapability) -> bool:
         """Check if the model supports a specific capability."""
@@ -92,16 +92,16 @@ class SelectionCriteria:
         metadata: Additional selection context.
     """
 
-    required_capabilities: List[ModelCapability] = field(default_factory=list)
-    preferred_capabilities: List[ModelCapability] = field(default_factory=list)
+    required_capabilities: list[ModelCapability] = field(default_factory=list)
+    preferred_capabilities: list[ModelCapability] = field(default_factory=list)
     min_context_tokens: int = 0
-    max_cost_per_token: Optional[float] = None
-    max_latency_ms: Optional[float] = None
+    max_cost_per_token: float | None = None
+    max_latency_ms: float | None = None
     min_quality_score: float = 0.0
-    preferred_providers: List[str] = field(default_factory=list)
-    excluded_models: List[str] = field(default_factory=list)
+    preferred_providers: list[str] = field(default_factory=list)
+    excluded_models: list[str] = field(default_factory=list)
     strategy: SelectionStrategy = SelectionStrategy.BEST_MATCH
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -117,10 +117,10 @@ class SelectionResult:
     """
 
     selected_model: ModelProfile
-    fallback_models: List[ModelProfile] = field(default_factory=list)
+    fallback_models: list[ModelProfile] = field(default_factory=list)
     reason: str = ""
     score: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class ModelSelector(ABC):
@@ -134,7 +134,7 @@ class ModelSelector(ABC):
     async def select(
         self,
         criteria: SelectionCriteria,
-    ) -> Optional[SelectionResult]:
+    ) -> SelectionResult | None:
         """Select the best model for the given criteria.
 
         Evaluates available models against the selection criteria
@@ -190,8 +190,8 @@ class ModelSelector(ABC):
     async def update_metrics(
         self,
         model_id: str,
-        latency_ms: Optional[float] = None,
-        quality_score: Optional[float] = None,
+        latency_ms: float | None = None,
+        quality_score: float | None = None,
     ) -> None:
         """Update model performance metrics.
 
@@ -205,8 +205,8 @@ class ModelSelector(ABC):
     @abstractmethod
     async def get_available_models(
         self,
-        capability: Optional[ModelCapability] = None,
-    ) -> List[ModelProfile]:
+        capability: ModelCapability | None = None,
+    ) -> list[ModelProfile]:
         """Get all currently available models.
 
         Args:
@@ -218,7 +218,7 @@ class ModelSelector(ABC):
         ...
 
     @abstractmethod
-    async def get_model(self, model_id: str) -> Optional[ModelProfile]:
+    async def get_model(self, model_id: str) -> ModelProfile | None:
         """Get a specific model profile.
 
         Args:

@@ -6,9 +6,9 @@ and the agent system as a whole.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class AgentStatus(str, Enum):
@@ -33,7 +33,6 @@ class AgentHealth(str, Enum):
     UNKNOWN = "unknown"
 
 
-
 @dataclass
 class AgentMetrics:
     """Runtime metrics for an agent.
@@ -54,7 +53,7 @@ class AgentMetrics:
     avg_execution_ms: float = 0.0
     current_tasks: int = 0
     queued_tasks: int = 0
-    last_active: Optional[datetime] = None
+    last_active: datetime | None = None
 
     @property
     def success_rate(self) -> float:
@@ -84,12 +83,10 @@ class AgentState:
     status: AgentStatus = AgentStatus.UNINITIALIZED
     health: AgentHealth = AgentHealth.UNKNOWN
     metrics: AgentMetrics = field(default_factory=AgentMetrics)
-    started_at: Optional[datetime] = None
-    last_updated: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    started_at: datetime | None = None
+    last_updated: datetime = field(default_factory=lambda: datetime.now(UTC))
+    error_message: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_available(self) -> bool:
@@ -114,21 +111,17 @@ class AgentStateManager(ABC):
     """
 
     @abstractmethod
-    async def get_state(self, agent_id: str) -> Optional[AgentState]:
+    async def get_state(self, agent_id: str) -> AgentState | None:
         """Get the current state of an agent."""
         ...
 
     @abstractmethod
-    async def set_status(
-        self, agent_id: str, status: AgentStatus
-    ) -> None:
+    async def set_status(self, agent_id: str, status: AgentStatus) -> None:
         """Update an agent's operational status."""
         ...
 
     @abstractmethod
-    async def set_health(
-        self, agent_id: str, health: AgentHealth
-    ) -> None:
+    async def set_health(self, agent_id: str, health: AgentHealth) -> None:
         """Update an agent's health status."""
         ...
 
@@ -140,12 +133,12 @@ class AgentStateManager(ABC):
         ...
 
     @abstractmethod
-    async def get_all_states(self) -> List[AgentState]:
+    async def get_all_states(self) -> list[AgentState]:
         """Get states of all registered agents."""
         ...
 
     @abstractmethod
-    async def get_available_agents(self) -> List[str]:
+    async def get_available_agents(self) -> list[str]:
         """Get IDs of agents available for work."""
         ...
 

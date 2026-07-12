@@ -17,8 +17,8 @@ from __future__ import annotations
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
 
@@ -69,10 +69,10 @@ class ConversationMessage:
     role: str
     content: str
     message_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     token_count: int = 0
-    name: Optional[str] = None
-    tool_call_id: Optional[str] = None
+    name: str | None = None
+    tool_call_id: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -99,11 +99,11 @@ class Conversation:
 
     user_id: str
     conversation_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    title: Optional[str] = None
+    title: str | None = None
     messages: list[ConversationMessage] = field(default_factory=list)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    summary: Optional[str] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    summary: str | None = None
     archived: bool = False
     message_count: int = 0
     total_tokens: int = 0
@@ -118,7 +118,7 @@ class ConversationMemory(MemoryStore):
     """
 
     @abstractmethod
-    async def create_conversation(self, user_id: str, title: Optional[str] = None) -> str:
+    async def create_conversation(self, user_id: str, title: str | None = None) -> str:
         """Create a new conversation.
 
         Args:
@@ -131,7 +131,7 @@ class ConversationMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_conversation(self, conversation_id: str) -> Optional[Conversation]:
+    async def get_conversation(self, conversation_id: str) -> Conversation | None:
         """Retrieve a conversation by its ID.
 
         Args:
@@ -143,9 +143,7 @@ class ConversationMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def add_message(
-        self, conversation_id: str, message: ConversationMessage
-    ) -> None:
+    async def add_message(self, conversation_id: str, message: ConversationMessage) -> None:
         """Add a message to an existing conversation.
 
         Updates the conversation's updated_at timestamp and message count.
@@ -164,7 +162,7 @@ class ConversationMemory(MemoryStore):
         self,
         conversation_id: str,
         limit: int = 50,
-        before: Optional[datetime] = None,
+        before: datetime | None = None,
     ) -> list[ConversationMessage]:
         """Get messages from a conversation with pagination.
 

@@ -5,9 +5,10 @@ providers based on task type, capabilities, and routing rules.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Coroutine, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from kernel.task_manager import Task, TaskType
@@ -22,9 +23,8 @@ class RouteStatus(str, Enum):
     BLOCKED = "blocked"
 
 
-
 # Type alias for route handler functions
-RouteHandler = Callable[[Task], Coroutine[Any, Any, Dict[str, Any]]]
+RouteHandler = Callable[[Task], Coroutine[Any, Any, dict[str, Any]]]
 
 
 @dataclass
@@ -44,13 +44,12 @@ class RouteRule:
 
     name: str
     handler_id: str
-    task_types: List[TaskType] = field(default_factory=list)
+    task_types: list[TaskType] = field(default_factory=list)
     rule_id: str = field(default_factory=lambda: str(uuid4()))
     priority: int = 50
-    condition: Optional[Callable[[Task], bool]] = None
+    condition: Callable[[Task], bool] | None = None
     enabled: bool = True
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -67,11 +66,11 @@ class RouteDecision:
     """
 
     status: RouteStatus
-    handler_id: Optional[str] = None
-    rule_id: Optional[str] = None
+    handler_id: str | None = None
+    rule_id: str | None = None
     reason: str = ""
-    alternatives: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    alternatives: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class TaskRouter(ABC):
@@ -153,7 +152,7 @@ class TaskRouter(ABC):
         ...
 
     @abstractmethod
-    async def execute(self, task: Task) -> Dict[str, Any]:
+    async def execute(self, task: Task) -> dict[str, Any]:
         """Route and execute a task.
 
         Combines routing with execution: finds the appropriate
@@ -171,7 +170,7 @@ class TaskRouter(ABC):
         ...
 
     @abstractmethod
-    def list_rules(self) -> List[RouteRule]:
+    def list_rules(self) -> list[RouteRule]:
         """List all registered routing rules.
 
         Returns:
@@ -180,7 +179,7 @@ class TaskRouter(ABC):
         ...
 
     @abstractmethod
-    def list_handlers(self) -> List[str]:
+    def list_handlers(self) -> list[str]:
         """List all registered handler IDs.
 
         Returns:

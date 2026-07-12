@@ -15,9 +15,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class MemoryOperation(str, Enum):
@@ -75,8 +75,8 @@ class OperationMetric:
     min_ms: float = 0.0
     max_ms: float = 0.0
     error_count: int = 0
-    last_operation: Optional[datetime] = None
-    last_error: Optional[datetime] = None
+    last_operation: datetime | None = None
+    last_error: datetime | None = None
 
 
 @dataclass(slots=True)
@@ -106,8 +106,8 @@ class MemoryMetrics:
     total_entries: int = 0
     memory_usage_bytes: int = 0
     uptime_seconds: float = 0.0
-    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    last_reset: Optional[datetime] = None
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_reset: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -125,7 +125,7 @@ class MetricsCollector(ABC):
         operation: MemoryOperation,
         duration_ms: float,
         success: bool = True,
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Record a completed operation with timing information.
 

@@ -9,6 +9,8 @@ Provides a production-ready multi-agent system with:
 - Plugin architecture for custom agents
 """
 
+from agents.android_agent import AndroidAgent
+from agents.automation_agent import AutomationAgent
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
     AgentCapability,
@@ -17,6 +19,7 @@ from agents.capabilities import (
     CapabilityLevel,
     CapabilityRequirement,
 )
+from agents.coding_agent import CodingAgent
 from agents.communication import (
     AgentMessage,
     MessageBus,
@@ -56,12 +59,16 @@ from agents.executor import (
     ExecutionStatus,
 )
 from agents.factory import AgentFactory
+
+# Agent implementations
+from agents.general_agent import GeneralAgent
 from agents.lifecycle import (
     AgentLifecycleManager,
     DependencyNode,
     LifecycleResult,
 )
 from agents.manager import AgentManager, AgentManagerConfig
+from agents.memory_agent import MemoryAgent
 from agents.planner import (
     ExecutionPlan,
     PlanStatus,
@@ -69,7 +76,9 @@ from agents.planner import (
     StepType,
     TaskPlanner,
 )
+from agents.planner_agent import PlannerAgent
 from agents.registry import AgentEntry, AgentRegistry
+from agents.research_agent import ResearchAgent
 from agents.router import (
     AgentRouter,
     RouteDecision,
@@ -77,6 +86,7 @@ from agents.router import (
     RouteRule,
     RouteStrategy,
 )
+from agents.security_agent import SecurityAgent
 from agents.state import (
     AgentHealth,
     AgentMetrics,
@@ -91,6 +101,9 @@ from agents.verifier import (
     VerificationStatus,
     VerificationType,
 )
+from agents.vision_agent import VisionAgent
+from agents.voice_agent import VoiceAgent
+from agents.web_agent import WebAgent
 from agents.workflow import (
     StepStatus,
     WorkflowDefinition,
@@ -99,19 +112,6 @@ from agents.workflow import (
     WorkflowStatus,
     WorkflowStep,
 )
-
-# Agent implementations
-from agents.general_agent import GeneralAgent
-from agents.coding_agent import CodingAgent
-from agents.research_agent import ResearchAgent
-from agents.memory_agent import MemoryAgent
-from agents.planner_agent import PlannerAgent
-from agents.automation_agent import AutomationAgent
-from agents.security_agent import SecurityAgent
-from agents.android_agent import AndroidAgent
-from agents.web_agent import WebAgent
-from agents.vision_agent import VisionAgent
-from agents.voice_agent import VoiceAgent
 
 __all__ = [
     # Base

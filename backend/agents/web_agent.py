@@ -5,7 +5,8 @@ frameworks, backend services, HTML/CSS/JS, and web-related
 code generation and browsing.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -36,15 +37,11 @@ class WebAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="web_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.WEB_DEVELOPMENT, CapabilityLevel.EXPERT
-                ),
+                AgentCapabilityDescriptor(AgentCapability.WEB_DEVELOPMENT, CapabilityLevel.EXPERT),
                 AgentCapabilityDescriptor(
                     AgentCapability.CODE_GENERATION, CapabilityLevel.ADVANCED
                 ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.WEB_BROWSING, CapabilityLevel.ADVANCED
-                ),
+                AgentCapabilityDescriptor(AgentCapability.WEB_BROWSING, CapabilityLevel.ADVANCED),
             ],
         )
 
@@ -64,7 +61,7 @@ class WebAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return ["coding_agent"]
 
@@ -84,9 +81,7 @@ class WebAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("WebAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("WebAgent streaming not yet implemented")
         yield  # type: ignore[misc]

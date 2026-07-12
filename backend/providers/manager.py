@@ -6,11 +6,12 @@ kernel and the provider system.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 
 from providers.base import BaseProvider
-from providers.capabilities import Capability, CapabilityRequirement
+from providers.capabilities import CapabilityRequirement
 from providers.config import ProviderConfig
 from providers.factory import ProviderFactory
 from providers.health import HealthMonitor, ProviderHealthStatus
@@ -24,7 +25,6 @@ from providers.types import (
     ProviderID,
     StreamChunk,
 )
-
 
 
 class SelectionStrategy(str):
@@ -56,9 +56,8 @@ class ProviderManagerConfig:
     max_fallback_attempts: int = 3
     health_check_interval_seconds: int = 30
     auto_discover: bool = True
-    fallback_order: List[ProviderID] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    fallback_order: list[ProviderID] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class ProviderManager(ABC):
@@ -95,9 +94,7 @@ class ProviderManager(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def initialize(
-        self, config: Optional[ProviderManagerConfig] = None
-    ) -> None:
+    async def initialize(self, config: ProviderManagerConfig | None = None) -> None:
         """Initialize the provider manager.
 
         Discovers available providers, registers them, and starts
@@ -121,8 +118,8 @@ class ProviderManager(ABC):
     async def chat(
         self,
         request: ChatRequest,
-        provider_id: Optional[ProviderID] = None,
-        requirements: Optional[CapabilityRequirement] = None,
+        provider_id: ProviderID | None = None,
+        requirements: CapabilityRequirement | None = None,
     ) -> ChatResponse:
         """Execute a chat completion with automatic provider selection.
 
@@ -146,8 +143,8 @@ class ProviderManager(ABC):
     async def stream(
         self,
         request: ChatRequest,
-        provider_id: Optional[ProviderID] = None,
-        requirements: Optional[CapabilityRequirement] = None,
+        provider_id: ProviderID | None = None,
+        requirements: CapabilityRequirement | None = None,
     ) -> AsyncIterator[StreamChunk]:
         """Execute a streaming chat with automatic provider selection.
 
@@ -168,7 +165,7 @@ class ProviderManager(ABC):
     async def embeddings(
         self,
         request: EmbeddingRequest,
-        provider_id: Optional[ProviderID] = None,
+        provider_id: ProviderID | None = None,
     ) -> EmbeddingResponse:
         """Generate embeddings with automatic provider selection.
 
@@ -184,7 +181,6 @@ class ProviderManager(ABC):
         """
         ...
 
-
     # ------------------------------------------------------------------
     # Provider Selection
     # ------------------------------------------------------------------
@@ -192,9 +188,9 @@ class ProviderManager(ABC):
     @abstractmethod
     async def select_provider(
         self,
-        requirements: Optional[CapabilityRequirement] = None,
-        strategy: Optional[str] = None,
-    ) -> Optional[BaseProvider]:
+        requirements: CapabilityRequirement | None = None,
+        strategy: str | None = None,
+    ) -> BaseProvider | None:
         """Select the best provider for given requirements.
 
         Args:
@@ -210,8 +206,8 @@ class ProviderManager(ABC):
     async def get_fallback_chain(
         self,
         primary: ProviderID,
-        requirements: Optional[CapabilityRequirement] = None,
-    ) -> List[BaseProvider]:
+        requirements: CapabilityRequirement | None = None,
+    ) -> list[BaseProvider]:
         """Get the fallback chain for a primary provider.
 
         Args:
@@ -228,9 +224,7 @@ class ProviderManager(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def list_models(
-        self, provider_id: Optional[ProviderID] = None
-    ) -> List[ModelInfo]:
+    async def list_models(self, provider_id: ProviderID | None = None) -> list[ModelInfo]:
         """List available models across all or specific providers.
 
         Args:
@@ -242,7 +236,7 @@ class ProviderManager(ABC):
         ...
 
     @abstractmethod
-    async def get_health_status(self) -> Dict[ProviderID, ProviderHealthStatus]:
+    async def get_health_status(self) -> dict[ProviderID, ProviderHealthStatus]:
         """Get health status for all registered providers.
 
         Returns:
@@ -251,7 +245,7 @@ class ProviderManager(ABC):
         ...
 
     @abstractmethod
-    async def get_available_providers(self) -> List[ProviderID]:
+    async def get_available_providers(self) -> list[ProviderID]:
         """Get list of currently available provider IDs.
 
         Returns:
@@ -267,7 +261,7 @@ class ProviderManager(ABC):
     async def add_provider(
         self,
         provider_id: ProviderID,
-        config: Optional[ProviderConfig] = None,
+        config: ProviderConfig | None = None,
         priority: int = 50,
     ) -> bool:
         """Add and register a new provider.
@@ -295,9 +289,7 @@ class ProviderManager(ABC):
         ...
 
     @abstractmethod
-    async def set_priority(
-        self, provider_id: ProviderID, priority: int
-    ) -> None:
+    async def set_priority(self, provider_id: ProviderID, priority: int) -> None:
         """Update a provider's selection priority.
 
         Args:
@@ -307,7 +299,7 @@ class ProviderManager(ABC):
         ...
 
     @abstractmethod
-    async def set_fallback_order(self, order: List[ProviderID]) -> None:
+    async def set_fallback_order(self, order: list[ProviderID]) -> None:
         """Set the explicit fallback order for providers.
 
         Args:

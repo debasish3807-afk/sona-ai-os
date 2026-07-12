@@ -6,25 +6,23 @@ responses, model selection, and provider management.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, Optional
+from typing import Any
 
-from kernel.context import ContextManager, ContextWindow
+from kernel.context import ContextManager
 from kernel.events import EventBus
 from kernel.model_selector import ModelSelector
 from kernel.prompt_manager import PromptManager
 from kernel.registry import ProviderRegistry
 from kernel.response_manager import (
-    ModelResponse,
-    ProcessedResponse,
     ResponseChunk,
     ResponseManager,
 )
 from kernel.router import TaskRouter
-from kernel.session import Session, SessionManager
+from kernel.session import SessionManager
 from kernel.state import KernelState, StateManager
-from kernel.task_manager import Task, TaskManager, TaskType
-
+from kernel.task_manager import TaskManager, TaskType
 
 
 @dataclass
@@ -45,7 +43,7 @@ class KernelConfig:
     enable_streaming: bool = True
     enable_event_bus: bool = True
     max_sessions: int = 1000
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -66,10 +64,9 @@ class KernelRequest:
     content: str
     task_type: TaskType = TaskType.CHAT
     streaming: bool = False
-    model_preference: Optional[str] = None
-    context_override: Optional[Dict[str, Any]] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    model_preference: str | None = None
+    context_override: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -90,9 +87,9 @@ class KernelResponse:
     task_id: str
     content: str
     model_used: str = ""
-    token_usage: Dict[str, int] = field(default_factory=dict)
+    token_usage: dict[str, int] = field(default_factory=dict)
     latency_ms: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class AIKernel(ABC):
@@ -168,7 +165,6 @@ class AIKernel(ABC):
     def event_bus(self) -> EventBus:
         """Access the event bus."""
         ...
-
 
     @abstractmethod
     async def process(self, request: KernelRequest) -> KernelResponse:

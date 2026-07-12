@@ -1,8 +1,8 @@
 """Health check endpoint."""
 
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter
 
@@ -17,11 +17,11 @@ _start_time: float = time.time()
 
 @router.get(
     "/health",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Health Check",
     description="Returns the current health status of the application.",
 )
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """Perform application health check.
 
     Returns:
@@ -32,7 +32,7 @@ async def health_check() -> Dict[str, Any]:
 
     return {
         "status": STATUS_HEALTHY,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "uptime_seconds": round(uptime_seconds, 2),
         "environment": settings.environment.value,
         "version": settings.app_version,
@@ -47,7 +47,7 @@ async def health_check() -> Dict[str, Any]:
     summary="Ping",
     description="Simple liveness probe.",
 )
-async def ping() -> Dict[str, str]:
+async def ping() -> dict[str, str]:
     """Simple liveness probe.
 
     Returns:

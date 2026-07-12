@@ -5,7 +5,7 @@ through the Google AI API. Supports chat, streaming, embeddings,
 function calling, vision, and multi-modal inputs.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -34,7 +34,7 @@ class GeminiProvider(BaseProvider):
                   vision, multi-modal, long context (1M+ tokens).
     """
 
-    def __init__(self, config: Optional[GeminiConfig] = None) -> None:
+    def __init__(self, config: GeminiConfig | None = None) -> None:
         self._config = config or GeminiConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -104,12 +104,12 @@ class GeminiProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Gemini embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         # TODO: Query Gemini models
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

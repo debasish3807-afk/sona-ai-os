@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 
 class MemoryEvents:
@@ -87,10 +87,10 @@ class MemoryEvent:
 
     event_type: str
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    memory_id: Optional[str] = None
-    memory_type: Optional[str] = None
-    scope: Optional[str] = None
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    memory_id: str | None = None
+    memory_type: str | None = None
+    scope: str | None = None
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     data: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 

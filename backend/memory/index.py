@@ -20,9 +20,9 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from .types import MemoryEntry, MemorySearchResult
 
@@ -96,7 +96,7 @@ class IndexConfig:
     """
 
     index_type: IndexType
-    dimensions: Optional[int] = None
+    dimensions: int | None = None
     distance_metric: DistanceMetric = DistanceMetric.COSINE
     auto_rebuild: bool = True
     rebuild_threshold: int = 10000
@@ -124,7 +124,7 @@ class IndexStats:
     index_type: IndexType
     entry_count: int
     size_bytes: int
-    last_rebuilt: Optional[datetime] = None
+    last_rebuilt: datetime | None = None
     health: IndexHealth = IndexHealth.HEALTHY
     avg_query_ms: float = 0.0
     total_queries: int = 0
@@ -234,7 +234,7 @@ class IndexManager(ABC):
         ...
 
     @abstractmethod
-    async def get_index(self, index_type: IndexType) -> Optional[MemoryIndex]:
+    async def get_index(self, index_type: IndexType) -> MemoryIndex | None:
         """Get an existing index by type.
 
         Args:

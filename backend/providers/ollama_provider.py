@@ -4,7 +4,7 @@ Provides access to locally-hosted models via Ollama (LLaMA, Mistral,
 CodeLlama, etc.). Ideal for privacy-focused deployments and offline use.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -34,7 +34,7 @@ class OllamaProvider(BaseProvider):
     Note: Runs locally — no API key required, no rate limits.
     """
 
-    def __init__(self, config: Optional[OllamaConfig] = None) -> None:
+    def __init__(self, config: OllamaConfig | None = None) -> None:
         self._config = config or OllamaConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -97,12 +97,12 @@ class OllamaProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Ollama embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         # TODO: Query Ollama /api/tags for local models
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

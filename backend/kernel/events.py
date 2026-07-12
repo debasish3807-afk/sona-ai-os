@@ -6,10 +6,11 @@ event handlers with priority ordering.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Set
+from typing import Any
 from uuid import uuid4
 
 
@@ -56,10 +57,10 @@ class Event:
     event_type: str
     source: str
     event_id: str = field(default_factory=lambda: str(uuid4()))
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    data: Dict[str, Any] = field(default_factory=dict)
-    correlation_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    data: dict[str, Any] = field(default_factory=dict)
+    correlation_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -80,7 +81,7 @@ class EventSubscription:
     handler: Callable[..., Coroutine[Any, Any, None]]
     subscription_id: str = field(default_factory=lambda: str(uuid4()))
     priority: EventPriority = EventPriority.NORMAL
-    filter_fn: Optional[Callable[[Event], bool]] = None
+    filter_fn: Callable[[Event], bool] | None = None
     max_retries: int = 0
     active: bool = True
 
@@ -104,7 +105,7 @@ class EventResult:
     handlers_invoked: int = 0
     handlers_succeeded: int = 0
     handlers_failed: int = 0
-    errors: List[Dict[str, Any]] = field(default_factory=list)
+    errors: list[dict[str, Any]] = field(default_factory=list)
     duration_ms: float = 0.0
 
 
@@ -137,7 +138,7 @@ class EventBus(ABC):
         event_type: str,
         handler: Callable[..., Coroutine[Any, Any, None]],
         priority: EventPriority = EventPriority.NORMAL,
-        filter_fn: Optional[Callable[[Event], bool]] = None,
+        filter_fn: Callable[[Event], bool] | None = None,
     ) -> EventSubscription:
         """Subscribe a handler to an event type.
 
@@ -180,7 +181,7 @@ class EventBus(ABC):
         ...
 
     @abstractmethod
-    def get_subscriptions(self, event_type: Optional[str] = None) -> List[EventSubscription]:
+    def get_subscriptions(self, event_type: str | None = None) -> list[EventSubscription]:
         """Get active subscriptions, optionally filtered by event type.
 
         Args:
@@ -192,7 +193,7 @@ class EventBus(ABC):
         ...
 
     @abstractmethod
-    def get_event_types(self) -> Set[str]:
+    def get_event_types(self) -> set[str]:
         """Get all registered event types with active subscriptions.
 
         Returns:
@@ -218,7 +219,7 @@ class EventEmitter(ABC):
         ...
 
     @abstractmethod
-    async def emit(self, event_type: str, data: Optional[Dict[str, Any]] = None) -> None:
+    async def emit(self, event_type: str, data: dict[str, Any] | None = None) -> None:
         """Emit an event through the configured event bus.
 
         Args:

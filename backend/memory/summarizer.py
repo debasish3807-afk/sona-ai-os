@@ -17,9 +17,9 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from .types import MemoryEntry
 
@@ -89,8 +89,8 @@ class MemorySummary:
     level: SummaryLevel
     summary_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     token_count: int = 0
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    key_facts: Optional[list[str]] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    key_facts: list[str] | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -103,7 +103,9 @@ class MemorySummarizer(ABC):
     """
 
     @abstractmethod
-    async def summarize(self, entry: MemoryEntry, config: Optional[SummaryConfig] = None) -> MemorySummary:
+    async def summarize(
+        self, entry: MemoryEntry, config: SummaryConfig | None = None
+    ) -> MemorySummary:
         """Generate a summary of a single memory entry.
 
         Args:
@@ -117,7 +119,7 @@ class MemorySummarizer(ABC):
 
     @abstractmethod
     async def summarize_conversation(
-        self, entries: list[MemoryEntry], config: Optional[SummaryConfig] = None
+        self, entries: list[MemoryEntry], config: SummaryConfig | None = None
     ) -> MemorySummary:
         """Generate a summary of a conversation (multiple ordered entries).
 
@@ -135,7 +137,7 @@ class MemorySummarizer(ABC):
 
     @abstractmethod
     async def summarize_batch(
-        self, entries: list[MemoryEntry], config: Optional[SummaryConfig] = None
+        self, entries: list[MemoryEntry], config: SummaryConfig | None = None
     ) -> MemorySummary:
         """Generate a single summary covering multiple memory entries.
 

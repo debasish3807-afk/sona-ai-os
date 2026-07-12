@@ -7,7 +7,7 @@ quality, correctness, and safety before returning to the user.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from agents.context import ExecutionResult
@@ -51,7 +51,7 @@ class VerificationCheck:
     check_id: str = field(default_factory=lambda: str(uuid4()))
     message: str = ""
     score: float = 1.0
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -69,12 +69,12 @@ class VerificationReport:
     """
 
     result_id: str
-    checks: List[VerificationCheck]
+    checks: list[VerificationCheck]
     report_id: str = field(default_factory=lambda: str(uuid4()))
     overall_status: VerificationStatus = VerificationStatus.PASSED
     overall_score: float = 1.0
-    recommendations: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    recommendations: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def passed(self) -> bool:
@@ -82,12 +82,9 @@ class VerificationReport:
         return self.overall_status == VerificationStatus.PASSED
 
     @property
-    def failed_checks(self) -> List[VerificationCheck]:
+    def failed_checks(self) -> list[VerificationCheck]:
         """Get only the failed checks."""
-        return [
-            c for c in self.checks
-            if c.status == VerificationStatus.FAILED
-        ]
+        return [c for c in self.checks if c.status == VerificationStatus.FAILED]
 
 
 class ResultVerifier(ABC):
@@ -101,7 +98,7 @@ class ResultVerifier(ABC):
     async def verify(
         self,
         result: ExecutionResult,
-        checks: Optional[List[VerificationType]] = None,
+        checks: list[VerificationType] | None = None,
     ) -> VerificationReport:
         """Verify an execution result.
 
@@ -117,9 +114,7 @@ class ResultVerifier(ABC):
         ...
 
     @abstractmethod
-    async def verify_safety(
-        self, result: ExecutionResult
-    ) -> VerificationCheck:
+    async def verify_safety(self, result: ExecutionResult) -> VerificationCheck:
         """Verify the safety of a result.
 
         Args:
@@ -131,9 +126,7 @@ class ResultVerifier(ABC):
         ...
 
     @abstractmethod
-    async def verify_quality(
-        self, result: ExecutionResult
-    ) -> VerificationCheck:
+    async def verify_quality(self, result: ExecutionResult) -> VerificationCheck:
         """Verify the quality of a result.
 
         Args:
@@ -159,9 +152,7 @@ class ResultVerifier(ABC):
         ...
 
     @abstractmethod
-    async def should_reject(
-        self, report: VerificationReport
-    ) -> bool:
+    async def should_reject(self, report: VerificationReport) -> bool:
         """Determine if a result should be rejected.
 
         Args:

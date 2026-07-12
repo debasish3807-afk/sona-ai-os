@@ -18,9 +18,8 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 from .base import MemoryStore
 from .types import MemoryEntry

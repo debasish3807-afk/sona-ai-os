@@ -1,6 +1,6 @@
 """Global exception definitions and handlers."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -23,7 +23,7 @@ class AppException(Exception):
         message: str = "An unexpected error occurred",
         status_code: int = 500,
         error_code: str = "INTERNAL_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         self.message = message
         self.status_code = status_code
@@ -31,9 +31,9 @@ class AppException(Exception):
         self.details = details or {}
         super().__init__(self.message)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize exception to dictionary."""
-        response: Dict[str, Any] = {
+        response: dict[str, Any] = {
             "success": False,
             "error": {
                 "code": self.error_code,
@@ -51,7 +51,7 @@ class BadRequestError(AppException):
     def __init__(
         self,
         message: str = "Bad request",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -67,7 +67,7 @@ class UnauthorizedError(AppException):
     def __init__(
         self,
         message: str = "Authentication required",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -83,7 +83,7 @@ class ForbiddenError(AppException):
     def __init__(
         self,
         message: str = "Access forbidden",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -99,7 +99,7 @@ class NotFoundError(AppException):
     def __init__(
         self,
         message: str = "Resource not found",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -115,7 +115,7 @@ class ValidationError(AppException):
     def __init__(
         self,
         message: str = "Validation failed",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -131,7 +131,7 @@ class InternalServerError(AppException):
     def __init__(
         self,
         message: str = "Internal server error",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -149,9 +149,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     """
 
     @app.exception_handler(AppException)
-    async def app_exception_handler(
-        request: Request, exc: AppException
-    ) -> JSONResponse:
+    async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
         """Handle custom application exceptions."""
         logger.warning(
             "Application error",
@@ -167,9 +165,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(
-        request: Request, exc: StarletteHTTPException
-    ) -> JSONResponse:
+    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         """Handle standard HTTP exceptions."""
         logger.warning(
             "HTTP error",
@@ -223,9 +219,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def unhandled_exception_handler(
-        request: Request, exc: Exception
-    ) -> JSONResponse:
+    async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Catch-all handler for unhandled exceptions."""
         logger.error(
             "Unhandled exception",

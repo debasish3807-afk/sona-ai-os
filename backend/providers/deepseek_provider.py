@@ -4,7 +4,7 @@ Provides access to DeepSeek models specializing in code generation,
 reasoning, and general-purpose chat at competitive pricing.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -33,7 +33,7 @@ class DeepSeekProvider(BaseProvider):
     Notable: Strong coding capabilities, cost-effective.
     """
 
-    def __init__(self, config: Optional[DeepSeekConfig] = None) -> None:
+    def __init__(self, config: DeepSeekConfig | None = None) -> None:
         self._config = config or DeepSeekConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -98,11 +98,11 @@ class DeepSeekProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("DeepSeek embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

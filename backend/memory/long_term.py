@@ -17,8 +17,7 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 from .base import MemoryStore
 from .types import MemoryEntry
@@ -56,9 +55,7 @@ class LongTermMemory(MemoryStore):
     """
 
     @abstractmethod
-    async def get_by_importance(
-        self, min_score: float = 0.5, limit: int = 50
-    ) -> list[MemoryEntry]:
+    async def get_by_importance(self, min_score: float = 0.5, limit: int = 50) -> list[MemoryEntry]:
         """Get entries above a minimum importance score.
 
         Retrieves the most important long-term memories, useful for
@@ -74,9 +71,7 @@ class LongTermMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_by_topic(
-        self, topic: str, limit: int = 20
-    ) -> list[MemoryEntry]:
+    async def get_by_topic(self, topic: str, limit: int = 20) -> list[MemoryEntry]:
         """Get entries related to a specific topic.
 
         Uses semantic matching to find memories relevant to the

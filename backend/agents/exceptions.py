@@ -5,7 +5,7 @@ lifecycle failures, communication errors, execution issues, and
 coordination problems.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class AgentError(Exception):
@@ -22,9 +22,9 @@ class AgentError(Exception):
     def __init__(
         self,
         message: str = "Agent error occurred",
-        agent_id: Optional[str] = None,
+        agent_id: str | None = None,
         error_code: str = "AGENT_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
         retryable: bool = False,
     ) -> None:
         self.message = message
@@ -34,7 +34,7 @@ class AgentError(Exception):
         self.retryable = retryable
         super().__init__(self.message)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dictionary."""
         return {
             "error_code": self.error_code,
@@ -45,15 +45,14 @@ class AgentError(Exception):
         }
 
 
-
 class AgentNotFoundError(AgentError):
     """Requested agent does not exist in the registry."""
 
     def __init__(
         self,
         message: str = "Agent not found",
-        agent_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -70,8 +69,8 @@ class AgentInitializationError(AgentError):
     def __init__(
         self,
         message: str = "Agent initialization failed",
-        agent_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -88,9 +87,9 @@ class AgentExecutionError(AgentError):
     def __init__(
         self,
         message: str = "Agent execution failed",
-        agent_id: Optional[str] = None,
-        task_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        task_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if task_id:
@@ -110,9 +109,9 @@ class AgentTimeoutError(AgentError):
     def __init__(
         self,
         message: str = "Agent operation timed out",
-        agent_id: Optional[str] = None,
-        timeout_seconds: Optional[float] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        timeout_seconds: float | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if timeout_seconds is not None:
@@ -132,9 +131,9 @@ class AgentCommunicationError(AgentError):
     def __init__(
         self,
         message: str = "Agent communication failed",
-        source_agent: Optional[str] = None,
-        target_agent: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        source_agent: str | None = None,
+        target_agent: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if source_agent:
@@ -156,9 +155,9 @@ class AgentDependencyError(AgentError):
     def __init__(
         self,
         message: str = "Agent dependency unavailable",
-        agent_id: Optional[str] = None,
-        missing_dependencies: Optional[List[str]] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        missing_dependencies: list[str] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if missing_dependencies:
@@ -178,9 +177,9 @@ class AgentCapabilityError(AgentError):
     def __init__(
         self,
         message: str = "Agent lacks required capability",
-        agent_id: Optional[str] = None,
-        required_capability: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        agent_id: str | None = None,
+        required_capability: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if required_capability:
@@ -200,9 +199,9 @@ class WorkflowError(AgentError):
     def __init__(
         self,
         message: str = "Workflow execution failed",
-        workflow_id: Optional[str] = None,
-        step_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        workflow_id: str | None = None,
+        step_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if workflow_id:
@@ -223,8 +222,8 @@ class CoordinationError(AgentError):
     def __init__(
         self,
         message: str = "Agent coordination failed",
-        involved_agents: Optional[List[str]] = None,
-        details: Optional[Dict[str, Any]] = None,
+        involved_agents: list[str] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if involved_agents:

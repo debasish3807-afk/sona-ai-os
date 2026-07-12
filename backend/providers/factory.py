@@ -5,12 +5,10 @@ Supports automatic discovery and instantiation of available providers.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Type
 
 from providers.base import BaseProvider
 from providers.config import ProviderConfig
 from providers.types import ProviderID
-
 
 
 class ProviderFactory(ABC):
@@ -25,7 +23,7 @@ class ProviderFactory(ABC):
     def register_class(
         self,
         provider_id: ProviderID,
-        provider_class: Type[BaseProvider],
+        provider_class: type[BaseProvider],
     ) -> None:
         """Register a provider class for instantiation.
 
@@ -54,7 +52,7 @@ class ProviderFactory(ABC):
     def create(
         self,
         provider_id: ProviderID,
-        config: Optional[ProviderConfig] = None,
+        config: ProviderConfig | None = None,
     ) -> BaseProvider:
         """Create a provider instance.
 
@@ -73,7 +71,7 @@ class ProviderFactory(ABC):
         ...
 
     @abstractmethod
-    def create_all_available(self) -> List[BaseProvider]:
+    def create_all_available(self) -> list[BaseProvider]:
         """Create instances of all providers with valid configuration.
 
         Checks environment for required API keys and creates
@@ -85,7 +83,7 @@ class ProviderFactory(ABC):
         ...
 
     @abstractmethod
-    def get_registered_providers(self) -> List[ProviderID]:
+    def get_registered_providers(self) -> list[ProviderID]:
         """List all registered provider IDs.
 
         Returns:
@@ -121,7 +119,7 @@ class ProviderFactory(ABC):
         ...
 
     @abstractmethod
-    def get_config(self, provider_id: ProviderID) -> Optional[ProviderConfig]:
+    def get_config(self, provider_id: ProviderID) -> ProviderConfig | None:
         """Get the configuration for a provider.
 
         Args:

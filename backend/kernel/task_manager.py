@@ -6,9 +6,9 @@ creation, queuing, execution tracking, and completion handling.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -63,11 +63,11 @@ class TaskConfig:
 
     max_retries: int = 2
     timeout_seconds: int = 120
-    model_preference: Optional[str] = None
+    model_preference: str | None = None
     streaming: bool = False
     temperature: float = 0.7
     max_tokens: int = 4096
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -93,18 +93,18 @@ class Task:
 
     session_id: str
     task_type: TaskType
-    input_data: Dict[str, Any]
+    input_data: dict[str, Any]
     task_id: str = field(default_factory=lambda: str(uuid4()))
     config: TaskConfig = field(default_factory=TaskConfig)
     status: TaskStatus = TaskStatus.PENDING
     priority: TaskPriority = TaskPriority.NORMAL
-    result: Optional[Dict[str, Any]] = None
-    error: Optional[Dict[str, Any]] = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    result: dict[str, Any] | None = None
+    error: dict[str, Any] | None = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     attempts: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_terminal(self) -> bool:
@@ -117,7 +117,7 @@ class Task:
         )
 
     @property
-    def duration_ms(self) -> Optional[float]:
+    def duration_ms(self) -> float | None:
         """Calculate task execution duration in milliseconds."""
         if self.started_at and self.completed_at:
             delta = self.completed_at - self.started_at
@@ -145,7 +145,7 @@ class TaskSummary:
     status: TaskStatus
     priority: TaskPriority
     created_at: datetime
-    duration_ms: Optional[float] = None
+    duration_ms: float | None = None
 
 
 class TaskManager(ABC):
@@ -160,8 +160,8 @@ class TaskManager(ABC):
         self,
         session_id: str,
         task_type: TaskType,
-        input_data: Dict[str, Any],
-        config: Optional[TaskConfig] = None,
+        input_data: dict[str, Any],
+        config: TaskConfig | None = None,
         priority: TaskPriority = TaskPriority.NORMAL,
     ) -> Task:
         """Create a new task for execution.
@@ -179,7 +179,7 @@ class TaskManager(ABC):
         ...
 
     @abstractmethod
-    async def get_task(self, task_id: str) -> Optional[Task]:
+    async def get_task(self, task_id: str) -> Task | None:
         """Retrieve a task by ID.
 
         Args:
@@ -195,9 +195,9 @@ class TaskManager(ABC):
         self,
         task_id: str,
         status: TaskStatus,
-        result: Optional[Dict[str, Any]] = None,
-        error: Optional[Dict[str, Any]] = None,
-    ) -> Optional[Task]:
+        result: dict[str, Any] | None = None,
+        error: dict[str, Any] | None = None,
+    ) -> Task | None:
         """Update the status of a task.
 
         Args:
@@ -226,12 +226,12 @@ class TaskManager(ABC):
     @abstractmethod
     async def list_tasks(
         self,
-        session_id: Optional[str] = None,
-        status: Optional[TaskStatus] = None,
-        task_type: Optional[TaskType] = None,
+        session_id: str | None = None,
+        status: TaskStatus | None = None,
+        task_type: TaskType | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> List[TaskSummary]:
+    ) -> list[TaskSummary]:
         """List tasks with optional filtering.
 
         Args:
@@ -247,7 +247,7 @@ class TaskManager(ABC):
         ...
 
     @abstractmethod
-    async def retry_task(self, task_id: str) -> Optional[Task]:
+    async def retry_task(self, task_id: str) -> Task | None:
         """Retry a failed task.
 
         Creates a new execution attempt for a previously

@@ -16,20 +16,19 @@ Classes:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Any
 
-from .base import MemoryStore
 from .consolidation import MemoryConsolidator
 from .context import AssembledMemoryContext, MemoryContextAssembler, MemoryContextConfig
-from .conversation import Conversation, ConversationMessage
+from .conversation import ConversationMessage
 from .importance import ImportanceScorer
 from .knowledge import KnowledgeDocument
-from .metrics import MemoryMetrics, MetricsCollector
+from .metrics import MetricsCollector
 from .policies import MemoryPolicySet, PolicyEngine
 from .registry import MemoryRegistry
 from .retrieval import MemoryRetriever
-from .state import MemoryStateManager, MemorySystemState
+from .state import MemoryStateManager
 from .summarizer import MemorySummarizer
 from .types import (
     MemoryEntry,
@@ -66,7 +65,7 @@ class MemoryManagerConfig:
     health_check_interval_seconds: int = 300
     enable_policies: bool = True
     max_concurrent_operations: int = 100
-    default_policy_set: Optional[MemoryPolicySet] = None
+    default_policy_set: MemoryPolicySet | None = None
 
 
 class MemoryManager(ABC):
@@ -178,7 +177,7 @@ class MemoryManager(ABC):
         ...
 
     @abstractmethod
-    async def get(self, entry_id: str, memory_type: Optional[MemoryType] = None) -> Optional[MemoryEntry]:
+    async def get(self, entry_id: str, memory_type: MemoryType | None = None) -> MemoryEntry | None:
         """Retrieve a memory entry by ID.
 
         If memory_type is specified, searches only that store.
@@ -209,7 +208,7 @@ class MemoryManager(ABC):
         ...
 
     @abstractmethod
-    async def delete(self, entry_id: str, memory_type: Optional[MemoryType] = None) -> bool:
+    async def delete(self, entry_id: str, memory_type: MemoryType | None = None) -> bool:
         """Delete a memory entry.
 
         Args:
@@ -225,7 +224,7 @@ class MemoryManager(ABC):
 
     @abstractmethod
     async def get_context_for_session(
-        self, session_id: str, query: str, config: Optional[MemoryContextConfig] = None
+        self, session_id: str, query: str, config: MemoryContextConfig | None = None
     ) -> AssembledMemoryContext:
         """Assemble memory context for a session.
 
@@ -244,7 +243,7 @@ class MemoryManager(ABC):
 
     @abstractmethod
     async def get_relevant_context(
-        self, query: str, config: Optional[MemoryContextConfig] = None
+        self, query: str, config: MemoryContextConfig | None = None
     ) -> AssembledMemoryContext:
         """Get relevant memory context without session binding.
 
@@ -260,7 +259,7 @@ class MemoryManager(ABC):
     # --- Conversation Operations ---
 
     @abstractmethod
-    async def create_conversation(self, user_id: str, title: Optional[str] = None) -> str:
+    async def create_conversation(self, user_id: str, title: str | None = None) -> str:
         """Create a new conversation.
 
         Args:
@@ -283,9 +282,7 @@ class MemoryManager(ABC):
         ...
 
     @abstractmethod
-    async def get_history(
-        self, conversation_id: str, limit: int = 50
-    ) -> list[ConversationMessage]:
+    async def get_history(self, conversation_id: str, limit: int = 50) -> list[ConversationMessage]:
         """Get conversation message history.
 
         Args:
@@ -365,8 +362,8 @@ class MemoryManager(ABC):
     @abstractmethod
     async def export_all(
         self,
-        memory_types: Optional[list[MemoryType]] = None,
-        scope: Optional[MemoryScope] = None,
+        memory_types: list[MemoryType] | None = None,
+        scope: MemoryScope | None = None,
     ) -> dict[str, list[dict[str, Any]]]:
         """Export all memory entries for backup.
 

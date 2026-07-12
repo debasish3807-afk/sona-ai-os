@@ -4,7 +4,7 @@ Provides access to Mistral AI models (Mistral Large, Medium, Small)
 known for efficiency and strong multilingual capabilities.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -25,7 +25,6 @@ from providers.types import (
 )
 
 
-
 class MistralProvider(BaseProvider):
     """Mistral AI API provider.
 
@@ -35,7 +34,7 @@ class MistralProvider(BaseProvider):
     Notable: Efficient models, strong multilingual, open-weight options.
     """
 
-    def __init__(self, config: Optional[MistralConfig] = None) -> None:
+    def __init__(self, config: MistralConfig | None = None) -> None:
         self._config = config or MistralConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -75,7 +74,6 @@ class MistralProvider(BaseProvider):
         """See base class."""
         return self._initialized
 
-
     async def initialize(self) -> None:
         # TODO: Load API key, create Mistral client
         """See base class."""
@@ -101,11 +99,11 @@ class MistralProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Mistral embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 
