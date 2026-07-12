@@ -41,12 +41,13 @@ ignore = [
     "N818",    # error-suffix-on-exception-name (project uses Error suffix convention)
     "UP046",   # non-pep695-generic-class (not yet adopted)
     "B027",    # empty-method-without-abstract-decorator (hook methods)
+    "SIM105",  # contextlib.suppress pattern (proc.kill() needs inline handling)
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = [
     "app", "api", "config", "core", "kernel",
-    "providers", "agents", "memory",
+    "providers", "agents", "memory", "brain", "tools", "mcp",
 ]
 
 [tool.ruff.format]
