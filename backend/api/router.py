@@ -1,7 +1,8 @@
-"""API router factory - assembles all route modules."""
+"""API router factory — assembles all route modules."""
 
 from fastapi import APIRouter
 
+from api.chat import router as chat_router
 from api.health import router as health_router
 from api.version import router as version_router
 
@@ -17,8 +18,11 @@ def create_api_router() -> APIRouter:
     """
     api_router = APIRouter()
 
-    # Health and system routes (no prefix - accessible at /api/v1/health, etc.)
+    # Health and system routes
     api_router.include_router(health_router)
     api_router.include_router(version_router)
+
+    # AI Brain chat routes
+    api_router.include_router(chat_router)
 
     return api_router
