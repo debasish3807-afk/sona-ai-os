@@ -9,6 +9,7 @@ from api.cognitive import router as cognitive_router
 from api.documents import router as documents_router
 from api.execute import router as execute_router
 from api.executive import router as executive_router
+from api.meta_reasoning import router as meta_reasoning_router
 from api.health import router as health_router
 from api.tools import router as tools_router
 from api.version import router as version_router
@@ -52,5 +53,8 @@ def create_api_router() -> APIRouter:
 
     # Executive Intelligence endpoints
     api_router.include_router(executive_router)
+
+    # Meta Reasoning & Self Reflection endpoints
+    api_router.include_router(meta_reasoning_router)
 
     return api_router
