@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from api.chat import router as chat_router
+from api.documents import router as documents_router
 from api.execute import router as execute_router
 from api.health import router as health_router
 from api.tools import router as tools_router
@@ -32,5 +33,8 @@ def create_api_router() -> APIRouter:
 
     # Execution & function calling routes
     api_router.include_router(execute_router)
+
+    # Knowledge engine (documents & memory search)
+    api_router.include_router(documents_router)
 
     return api_router
