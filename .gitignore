@@ -74,3 +74,5 @@ out/
 *.apk
 *.aab
 *.db
+frontend/web/node_modules/
+frontend/web/dist/
