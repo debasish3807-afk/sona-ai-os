@@ -50,39 +50,49 @@ class AndroidAgent(BaseAgent):
 
     @property
     def info(self) -> AgentInfo:
+        """See base class."""
         return self._info
 
     @property
     def capabilities(self) -> AgentCapabilitySet:
+        """See base class."""
         return self._capabilities
 
     @property
     def status(self) -> AgentStatus:
+        """See base class."""
         return self._status
 
     @property
     def dependencies(self) -> List[str]:
+        """See base class."""
         return ["coding_agent"]
 
     async def initialize(self) -> None:
+        """See base class."""
         self._status = AgentStatus.IDLE
 
     async def start(self) -> None:
+        """See base class."""
         self._status = AgentStatus.IDLE
 
     async def stop(self) -> None:
+        """See base class."""
         self._status = AgentStatus.STOPPED
 
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """See base class."""
         raise NotImplementedError("AndroidAgent execution not yet implemented")
 
     async def execute_stream(
         self, context: ExecutionContext
     ) -> AsyncIterator[Dict[str, Any]]:
+        """See base class."""
         raise NotImplementedError("AndroidAgent streaming not yet implemented")
         yield  # type: ignore[misc]
 
     async def health(self) -> AgentHealth:
+        """See base class."""
         if self._status in (AgentStatus.IDLE, AgentStatus.BUSY):
             return AgentHealth.HEALTHY
         return AgentHealth.UNHEALTHY
