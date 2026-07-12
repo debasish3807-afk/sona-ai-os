@@ -15,6 +15,7 @@ from api.meta_reasoning import router as meta_reasoning_router
 from api.microkernel import router as microkernel_router
 from api.runtime_workflows import router as runtime_workflows_router
 from api.tools import router as tools_router
+from api.v1.router import router as v1_router
 from api.version import router as version_router
 
 
@@ -28,6 +29,11 @@ def create_api_router() -> APIRouter:
         Configured APIRouter instance.
     """
     api_router = APIRouter()
+
+    # ─── Versioned API (v1) — production-grade with Pydantic models ──────
+    api_router.include_router(v1_router)
+
+    # ─── Legacy routes (backward compatible) ─────────────────────────────
 
     # Health and system routes (public)
     api_router.include_router(health_router)
