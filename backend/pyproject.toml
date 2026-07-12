@@ -44,6 +44,8 @@ ignore = [
     "SIM105",  # contextlib.suppress pattern (proc.kill() needs inline handling)
     "SIM102",  # nested if (readability preference in complex conditions)
     "SIM103",  # return condition directly (multi-condition readability)
+    "SIM108",  # ternary (readability in complex conditions)
+    "SIM110",  # reimplemented builtin (explicit loops preferred in some cases)
 ]
 
 [tool.ruff.lint.isort]
