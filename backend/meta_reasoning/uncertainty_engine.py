@@ -37,15 +37,15 @@ class UncertaintyEngine:
             "weak_evidence": weak_evidence,
             "ambiguous_goals": ambiguous_goals,
             "total_issues": (
-                len(unknown_facts) + len(missing_context)
-                + len(weak_evidence) + len(ambiguous_goals)
+                len(unknown_facts)
+                + len(missing_context)
+                + len(weak_evidence)
+                + len(ambiguous_goals)
             ),
         }
 
         assessment["overall_uncertainty"] = self.overall_uncertainty(assessment)
-        logger.info(
-            "uncertainty_assessed", overall=assessment["overall_uncertainty"]
-        )
+        logger.info("uncertainty_assessed", overall=assessment["overall_uncertainty"])
         return assessment
 
     def _detect_unknown_facts(self, plan: dict, context: dict) -> list[str]:
@@ -104,4 +104,4 @@ class UncertaintyEngine:
         # Each issue contributes to uncertainty, capped at 1.0
         base = 0.1
         per_issue = 0.1
-        return min(base + (total_issues * per_issue), 1.0)
+        return float(min(base + (total_issues * per_issue), 1.0))

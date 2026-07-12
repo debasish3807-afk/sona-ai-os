@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import sys
-import time
 import uuid
 
 sys.path.insert(0, "/projects/sandbox/sona-ai-os/backend")
@@ -14,8 +13,8 @@ import pytest
 from meta_reasoning.alternative_generator import AlternativeGenerator
 from meta_reasoning.counterfactual_engine import CounterfactualEngine
 from meta_reasoning.critique_engine import CritiqueEngine
-from meta_reasoning.evidence_engine import EvidenceEngine
 from meta_reasoning.events import MetaReasoningEvent, MetaReasoningEventType
+from meta_reasoning.evidence_engine import EvidenceEngine
 from meta_reasoning.exceptions import (
     DeadlockError,
     MetaReasoningError,
@@ -29,7 +28,7 @@ from meta_reasoning.plan_refiner import PlanRefiner
 from meta_reasoning.plan_validator import PlanValidator
 from meta_reasoning.quality_estimator import QualityEstimator
 from meta_reasoning.reasoning_memory import ReasoningMemory
-from meta_reasoning.reasoning_trace import ReasoningTrace, TraceEntry
+from meta_reasoning.reasoning_trace import ReasoningTrace
 from meta_reasoning.reflection_engine import ReflectionEngine
 from meta_reasoning.schemas import (
     EvidenceLabel,
@@ -42,11 +41,10 @@ from meta_reasoning.schemas import (
 from meta_reasoning.simulation_engine import SimulationEngine
 from meta_reasoning.uncertainty_engine import UncertaintyEngine
 
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_plan(**kwargs) -> dict:
     defaults = {
@@ -134,10 +132,10 @@ def _make_reasoner() -> MetaReasoner:
     )
 
 
-
 # ---------------------------------------------------------------------------
 # TestSchemas
 # ---------------------------------------------------------------------------
+
 
 class TestSchemas:
     def test_reasoning_result_defaults(self):
@@ -198,10 +196,10 @@ class TestSchemas:
         assert EvidenceLabel.VERIFIED == "verified"
 
 
-
 # ---------------------------------------------------------------------------
 # TestReasoningTrace
 # ---------------------------------------------------------------------------
+
 
 class TestReasoningTrace:
     def test_add_and_get_all(self):
@@ -252,10 +250,10 @@ class TestReasoningTrace:
         assert trace.get_all() == []
 
 
-
 # ---------------------------------------------------------------------------
 # TestPlanValidator
 # ---------------------------------------------------------------------------
+
 
 class TestPlanValidator:
     def setup_method(self):
@@ -311,10 +309,10 @@ class TestPlanValidator:
         assert len(issues) >= 2
 
 
-
 # ---------------------------------------------------------------------------
 # TestReflectionEngine
 # ---------------------------------------------------------------------------
+
 
 class TestReflectionEngine:
     def setup_method(self):
@@ -351,10 +349,10 @@ class TestReflectionEngine:
         assert score >= 0.5
 
 
-
 # ---------------------------------------------------------------------------
 # TestCritiqueEngine
 # ---------------------------------------------------------------------------
+
 
 class TestCritiqueEngine:
     def setup_method(self):
@@ -399,10 +397,10 @@ class TestCritiqueEngine:
         assert len(critiques) >= 1
 
 
-
 # ---------------------------------------------------------------------------
 # TestAlternativeGenerator
 # ---------------------------------------------------------------------------
+
 
 class TestAlternativeGenerator:
     def setup_method(self):
@@ -432,10 +430,10 @@ class TestAlternativeGenerator:
         assert alt["execution_mode"] == "hybrid"
 
 
-
 # ---------------------------------------------------------------------------
 # TestHypothesisEngine
 # ---------------------------------------------------------------------------
+
 
 class TestHypothesisEngine:
     def setup_method(self):
@@ -468,10 +466,10 @@ class TestHypothesisEngine:
         assert ranked[0]["confidence"] == 0.9
 
 
-
 # ---------------------------------------------------------------------------
 # TestCounterfactualEngine
 # ---------------------------------------------------------------------------
+
 
 class TestCounterfactualEngine:
     def setup_method(self):
@@ -510,10 +508,10 @@ class TestCounterfactualEngine:
         assert "recommendation" in evaluation
 
 
-
 # ---------------------------------------------------------------------------
 # TestSimulationEngine
 # ---------------------------------------------------------------------------
+
 
 class TestSimulationEngine:
     def setup_method(self):
@@ -527,7 +525,9 @@ class TestSimulationEngine:
         assert result.simulation_id
 
     def test_estimate_latency_sequential(self):
-        plan = _make_plan(execution_mode="sequential", estimated_duration_ms=500, tasks=["t1", "t2"])
+        plan = _make_plan(
+            execution_mode="sequential", estimated_duration_ms=500, tasks=["t1", "t2"]
+        )
         latency = self.se._estimate_latency(plan)
         assert latency > 500
 
@@ -551,10 +551,10 @@ class TestSimulationEngine:
         assert high_p > low_p
 
 
-
 # ---------------------------------------------------------------------------
 # TestEvidenceEngine
 # ---------------------------------------------------------------------------
+
 
 class TestEvidenceEngine:
     def setup_method(self):
@@ -599,10 +599,10 @@ class TestEvidenceEngine:
         assert score < 0.5
 
 
-
 # ---------------------------------------------------------------------------
 # TestPlanRefiner
 # ---------------------------------------------------------------------------
+
 
 class TestPlanRefiner:
     def setup_method(self):
@@ -639,10 +639,10 @@ class TestPlanRefiner:
         assert improvements == []
 
 
-
 # ---------------------------------------------------------------------------
 # TestReasoningMemory
 # ---------------------------------------------------------------------------
+
 
 class TestReasoningMemory:
     def setup_method(self):
@@ -700,10 +700,10 @@ class TestReasoningMemory:
         assert stats["avg_confidence"] == pytest.approx(0.8)
 
 
-
 # ---------------------------------------------------------------------------
 # TestUncertaintyEngine
 # ---------------------------------------------------------------------------
+
 
 class TestUncertaintyEngine:
     def setup_method(self):
@@ -738,17 +738,29 @@ class TestUncertaintyEngine:
         assert len(weak) == 2
 
     def test_overall_uncertainty_scales_with_issues(self):
-        assessment_low = {"total_issues": 0, "unknown_facts": [], "missing_context": [], "weak_evidence": [], "ambiguous_goals": []}
-        assessment_high = {"total_issues": 8, "unknown_facts": [], "missing_context": [], "weak_evidence": [], "ambiguous_goals": []}
+        assessment_low = {
+            "total_issues": 0,
+            "unknown_facts": [],
+            "missing_context": [],
+            "weak_evidence": [],
+            "ambiguous_goals": [],
+        }
+        assessment_high = {
+            "total_issues": 8,
+            "unknown_facts": [],
+            "missing_context": [],
+            "weak_evidence": [],
+            "ambiguous_goals": [],
+        }
         low = UncertaintyEngine.overall_uncertainty(assessment_low)
         high = UncertaintyEngine.overall_uncertainty(assessment_high)
         assert high > low
 
 
-
 # ---------------------------------------------------------------------------
 # TestQualityEstimator
 # ---------------------------------------------------------------------------
+
 
 class TestQualityEstimator:
     def setup_method(self):
@@ -787,10 +799,10 @@ class TestQualityEstimator:
         assert 0.0 <= report.overall <= 1.0
 
 
-
 # ---------------------------------------------------------------------------
 # TestMetaReasoner
 # ---------------------------------------------------------------------------
+
 
 class TestMetaReasoner:
     def setup_method(self):
@@ -866,10 +878,10 @@ class TestMetaReasoner:
         assert "memory_stats" in status
 
 
-
 # ---------------------------------------------------------------------------
 # TestExceptions
 # ---------------------------------------------------------------------------
+
 
 class TestExceptions:
     def test_meta_reasoning_error(self):
@@ -892,6 +904,7 @@ class TestExceptions:
 # ---------------------------------------------------------------------------
 # Additional edge-case / coverage tests
 # ---------------------------------------------------------------------------
+
 
 class TestAdditionalCoverage:
     """Extra tests to push coverage above 80+ total tests."""
@@ -962,8 +975,12 @@ class TestAdditionalCoverage:
 
     def test_simulation_engine_parallel_mode_latency(self):
         se = SimulationEngine()
-        plan_parallel = _make_plan(execution_mode="parallel", estimated_duration_ms=500, tasks=["t1", "t2"])
-        plan_sequential = _make_plan(execution_mode="sequential", estimated_duration_ms=500, tasks=["t1", "t2"])
+        plan_parallel = _make_plan(
+            execution_mode="parallel", estimated_duration_ms=500, tasks=["t1", "t2"]
+        )
+        plan_sequential = _make_plan(
+            execution_mode="sequential", estimated_duration_ms=500, tasks=["t1", "t2"]
+        )
         lat_p = se._estimate_latency(plan_parallel)
         lat_s = se._estimate_latency(plan_sequential)
         assert lat_p < lat_s
@@ -1064,4 +1081,3 @@ class TestAdditionalCoverage:
         refined = pr.refine(plan, [], sim, quality)
         assert refined.get("retry_config") is not None
         assert refined["retry_config"]["max_retries"] >= 3
-

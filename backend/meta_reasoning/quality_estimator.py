@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from config.logging import get_logger
 from meta_reasoning.schemas import EvidenceLabel, QualityReport, SimulationResult
 
@@ -79,9 +77,7 @@ class QualityEstimator:
         """Score how correct the plan is likely to be."""
         if not evidence:
             return 0.5
-        verified_count = sum(
-            1 for label in evidence.values() if label == EvidenceLabel.VERIFIED
-        )
+        verified_count = sum(1 for label in evidence.values() if label == EvidenceLabel.VERIFIED)
         total = len(evidence)
         return min(0.4 + (verified_count / max(total, 1)) * 0.6, 1.0)
 
@@ -109,7 +105,7 @@ class QualityEstimator:
         failure_prob = simulation.failure_probability
         # Lower risk and failure probability = higher safety
         safety = 1.0 - ((risk + failure_prob) / 2.0)
-        return max(min(safety, 1.0), 0.0)
+        return float(max(min(safety, 1.0), 0.0))
 
     def _score_performance(self, simulation: SimulationResult) -> float:
         """Score expected performance of the plan."""

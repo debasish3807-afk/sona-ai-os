@@ -35,9 +35,7 @@ class EvidenceEngine:
         logger.info("evidence_verification_complete", total_claims=len(labels))
         return labels
 
-    def _verify_memory_evidence(
-        self, plan: dict, context: dict
-    ) -> list[tuple[str, EvidenceLabel]]:
+    def _verify_memory_evidence(self, plan: dict, context: dict) -> list[tuple[str, EvidenceLabel]]:
         """Verify claims based on memory/history."""
         results: list[tuple[str, EvidenceLabel]] = []
         plan_id = plan.get("plan_id", "unknown")

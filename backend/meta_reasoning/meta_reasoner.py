@@ -8,8 +8,8 @@ from config.logging import get_logger
 from meta_reasoning.alternative_generator import AlternativeGenerator
 from meta_reasoning.counterfactual_engine import CounterfactualEngine
 from meta_reasoning.critique_engine import CritiqueEngine
-from meta_reasoning.evidence_engine import EvidenceEngine
 from meta_reasoning.events import MetaReasoningEvent, MetaReasoningEventType
+from meta_reasoning.evidence_engine import EvidenceEngine
 from meta_reasoning.exceptions import DeadlockError
 from meta_reasoning.hypothesis_engine import HypothesisEngine
 from meta_reasoning.plan_refiner import PlanRefiner
@@ -90,7 +90,9 @@ class MetaReasoner:
 
         # 1. Validate plan
         valid, issues = self._plan_validator.validate(plan, context)
-        self._trace.add("validation", "observation", f"Validation: valid={valid}, issues={len(issues)}")
+        self._trace.add(
+            "validation", "observation", f"Validation: valid={valid}, issues={len(issues)}"
+        )
 
         if not valid and len(issues) > 5:
             self._emit(MetaReasoningEventType.PLAN_REJECTED, plan_id, {"issues": issues})
@@ -106,7 +108,9 @@ class MetaReasoner:
 
         # 2. Reflect on plan
         reflection = self._reflection_engine.reflect(plan, goal, context)
-        self._trace.add("reflection", "observation", f"Reflection overall: {reflection['overall']:.2f}")
+        self._trace.add(
+            "reflection", "observation", f"Reflection overall: {reflection['overall']:.2f}"
+        )
         self._emit(MetaReasoningEventType.REFLECTION_COMPLETED, plan_id, reflection)
 
         # 3. Generate critique
@@ -117,11 +121,15 @@ class MetaReasoner:
         # 4. Verify evidence
         evidence = self._evidence_engine.verify(plan, context)
         self._trace.add("evidence", "evidence", f"Verified {len(evidence)} evidence claims")
-        self._emit(MetaReasoningEventType.EVIDENCE_VERIFIED, plan_id, {"evidence_count": len(evidence)})
+        self._emit(
+            MetaReasoningEventType.EVIDENCE_VERIFIED, plan_id, {"evidence_count": len(evidence)}
+        )
 
         # 5. Counterfactual analysis
         counterfactuals = self._counterfactual_engine.analyze(plan, context)
-        self._trace.add("counterfactual", "alternative", f"Explored {len(counterfactuals)} scenarios")
+        self._trace.add(
+            "counterfactual", "alternative", f"Explored {len(counterfactuals)} scenarios"
+        )
 
         # 6. Simulate execution
         self._emit(MetaReasoningEventType.SIMULATION_STARTED, plan_id)

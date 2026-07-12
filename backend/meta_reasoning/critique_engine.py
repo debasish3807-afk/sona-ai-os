@@ -91,9 +91,7 @@ class CritiqueEngine:
         tasks = plan.get("tasks", [])
         dependencies = plan.get("dependencies", {})
         if len(tasks) > 3 and not dependencies:
-            missing.append(
-                "Complex plan with no declared dependencies — ordering may be incorrect"
-            )
+            missing.append("Complex plan with no declared dependencies — ordering may be incorrect")
         return missing
 
     def _detect_risky_decisions(self, plan: dict, reflection: dict) -> list[str]:

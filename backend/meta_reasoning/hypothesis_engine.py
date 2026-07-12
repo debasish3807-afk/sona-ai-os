@@ -80,7 +80,7 @@ class HypothesisEngine:
 
         assumptions = hypothesis.get("assumptions", [])
         supported = 0
-        for assumption in assumptions:
+        for _assumption in assumptions:
             for item in evidence:
                 if item.get("supports", False):
                     supported += 1
@@ -119,6 +119,4 @@ class HypothesisEngine:
         Returns:
             Sorted list with highest-confidence hypotheses first.
         """
-        return sorted(
-            hypotheses, key=lambda h: h.get("confidence", 0.0), reverse=True
-        )
+        return sorted(hypotheses, key=lambda h: h.get("confidence", 0.0), reverse=True)

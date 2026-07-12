@@ -50,8 +50,7 @@ class ReasoningMemory:
             List of similar experience dictionaries.
         """
         # Simple similarity: match on task count and execution mode
-        task_count = len(plan.get("tasks", []))
-        exec_mode = plan.get("execution_mode", "sequential")
+        plan.get("execution_mode", "sequential")  # used for similarity context
 
         scored: list[tuple[float, dict[str, Any]]] = []
         for exp in self._experiences:
@@ -85,9 +84,7 @@ class ReasoningMemory:
             List of common failure descriptions.
         """
         failures: list[str] = []
-        rejected = [
-            e for e in self._experiences if e["verdict"] == ReasoningVerdict.REJECTED.value
-        ]
+        rejected = [e for e in self._experiences if e["verdict"] == ReasoningVerdict.REJECTED.value]
         if not rejected:
             return failures
 
@@ -112,9 +109,7 @@ class ReasoningMemory:
             List of successful strategy descriptions.
         """
         strategies: list[str] = []
-        approved = [
-            e for e in self._experiences if e["verdict"] == ReasoningVerdict.APPROVED.value
-        ]
+        approved = [e for e in self._experiences if e["verdict"] == ReasoningVerdict.APPROVED.value]
         if not approved:
             return strategies
 

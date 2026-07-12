@@ -60,15 +60,15 @@ class SimulationEngine:
         mode = plan.get("execution_mode", "sequential")
 
         if mode == "parallel":
-            return base_latency + (task_count * 100.0)
-        return base_latency + (task_count * 200.0)
+            return float(base_latency + (task_count * 100.0))
+        return float(base_latency + (task_count * 200.0))
 
     def _estimate_cost(self, plan: dict) -> float:
         """Estimate total execution cost."""
         cost_info = plan.get("cost", {})
         base_cost = cost_info.get("total_estimated", 0.01)
         tasks = plan.get("tasks", [])
-        return base_cost + (len(tasks) * 0.005)
+        return float(base_cost + (len(tasks) * 0.005))
 
     def _estimate_tokens(self, plan: dict) -> int:
         """Estimate total token usage."""
@@ -85,7 +85,7 @@ class SimulationEngine:
         task_factor = min(len(tasks) * 0.02, 0.3)
         mode = plan.get("execution_mode", "sequential")
         mode_factor = 0.05 if mode == "parallel" else 0.0
-        return min(base_risk + task_factor + mode_factor, 1.0)
+        return float(min(base_risk + task_factor + mode_factor, 1.0))
 
     def _estimate_resource_usage(self, plan: dict) -> dict[str, Any]:
         """Estimate resource usage during execution."""
@@ -126,13 +126,15 @@ class SimulationEngine:
         for i, task in enumerate(tasks):
             step_latency = 200.0
             cumulative_ms += step_latency
-            trace_steps.append({
-                "step": i + 1,
-                "task": task,
-                "status": "simulated_success",
-                "latency_ms": step_latency,
-                "cumulative_ms": cumulative_ms,
-            })
+            trace_steps.append(
+                {
+                    "step": i + 1,
+                    "task": task,
+                    "status": "simulated_success",
+                    "latency_ms": step_latency,
+                    "cumulative_ms": cumulative_ms,
+                }
+            )
 
         return {
             "plan_id": plan.get("plan_id", "unknown"),

@@ -69,9 +69,7 @@ class PlanValidator:
         cost_info = plan.get("cost", {})
         estimated_cost = cost_info.get("total_estimated", 0.0)
         if estimated_cost > budget:
-            issues.append(
-                f"Estimated cost ({estimated_cost:.4f}) exceeds budget ({budget:.4f})"
-            )
+            issues.append(f"Estimated cost ({estimated_cost:.4f}) exceeds budget ({budget:.4f})")
         return issues
 
     def _check_risk_threshold(self, plan: dict, context: dict) -> list[str]:
@@ -81,9 +79,7 @@ class PlanValidator:
         risk_info = plan.get("risk", {})
         overall_risk = risk_info.get("overall_risk", 0.0)
         if overall_risk > max_risk:
-            issues.append(
-                f"Plan risk ({overall_risk:.2f}) exceeds threshold ({max_risk:.2f})"
-            )
+            issues.append(f"Plan risk ({overall_risk:.2f}) exceeds threshold ({max_risk:.2f})")
         return issues
 
     def _check_policies(self, plan: dict) -> list[str]:
