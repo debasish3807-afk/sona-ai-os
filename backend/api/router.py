@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from api.auth import router as auth_router
+from api.capabilities import router as capabilities_router
 from api.chat import router as chat_router
 from api.cognitive import router as cognitive_router
 from api.documents import router as documents_router
@@ -44,5 +45,8 @@ def create_api_router() -> APIRouter:
 
     # Cognitive Kernel endpoints
     api_router.include_router(cognitive_router)
+
+    # Dynamic Capability Fabric endpoints
+    api_router.include_router(capabilities_router)
 
     return api_router

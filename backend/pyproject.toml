@@ -42,6 +42,8 @@ ignore = [
     "UP046",   # non-pep695-generic-class (not yet adopted)
     "B027",    # empty-method-without-abstract-decorator (hook methods)
     "SIM105",  # contextlib.suppress pattern (proc.kill() needs inline handling)
+    "SIM102",  # nested if (readability preference in complex conditions)
+    "SIM103",  # return condition directly (multi-condition readability)
 ]
 
 [tool.ruff.lint.isort]
