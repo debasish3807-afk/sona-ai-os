@@ -1,28 +1,53 @@
 # Architecture
 
-This directory contains the complete system architecture documentation for Sona AI OS.
+Complete system architecture documentation for Sona AI OS.
 
 ## Contents
 
-| File | Description |
-|------|-------------|
-| [system-overview.md](system-overview.md) | High-level system architecture overview |
-| [ai-kernel.md](ai-kernel.md) | AI Kernel design and responsibilities |
-| [orchestrator.md](orchestrator.md) | Task orchestration layer |
-| [multi-agent.md](multi-agent.md) | Multi-agent coordination framework |
-| [llm-pool.md](llm-pool.md) | LLM provider pooling and routing |
-| [memory.md](memory.md) | Memory subsystem architecture |
-| [rag.md](rag.md) | Retrieval-Augmented Generation pipeline |
-| [mcp.md](mcp.md) | Model Context Protocol integration |
-| [automation.md](automation.md) | Automation engine design |
-| [security.md](security.md) | Security architecture and policies |
-| [api.md](api.md) | API layer design and contracts |
-| [deployment.md](deployment.md) | Deployment architecture and strategies |
+| Document | Description | Status |
+|----------|-------------|--------|
+| [System Overview](system-overview.md) | High-level system architecture | Done |
+| [AI Kernel](ai-kernel.md) | Central intelligence engine | Done |
+| [Orchestrator](orchestrator.md) | Task coordination layer | Done |
+| [Multi-Agent](multi-agent.md) | Multi-agent coordination framework | Done |
+| [LLM Pool](llm-pool.md) | LLM provider pooling and routing | Done |
+| [Memory](memory.md) | Memory subsystem architecture | Done |
+| [RAG](rag.md) | Retrieval-Augmented Generation pipeline | Done |
+| [MCP](mcp.md) | Model Context Protocol integration | Done |
+| [Automation](automation.md) | Automation engine design | Done |
+| [Security](security.md) | Security architecture and policies | Done |
+| [API](api.md) | API layer design and contracts | Done |
+| [Deployment](deployment.md) | Deployment architecture and strategies | Done |
 
 ## Architecture Principles
 
-- **Clean Architecture**: Clear separation of concerns with well-defined boundaries
-- **Event-Driven**: Asynchronous communication between components
-- **Plugin-Based**: Extensible through a modular plugin system
-- **AI-Native**: Designed from the ground up for AI workloads
-- **Privacy-First**: User data sovereignty and local-first processing
+- **Clean Architecture** — Clear separation of concerns with well-defined boundaries
+- **Event-Driven** — Asynchronous communication between components
+- **Plugin-Based** — Extensible through a modular plugin system
+- **AI-Native** — Designed from the ground up for AI workloads
+- **Privacy-First** — User data sovereignty and local-first processing
+- **SOLID** — Single responsibility, open/closed, Liskov substitution, interface segregation, dependency inversion
+
+## Dependency Direction
+
+```
+UI → API → Services → Domain ← Infrastructure
+```
+
+All dependencies point inward toward the domain layer. Infrastructure implements domain interfaces (Dependency Inversion).
+
+## Component Interaction
+
+```
+User Request
+    │
+    ▼
+API Gateway → Orchestrator → AI Kernel → LLM Pool
+                  │                          │
+                  ├── Multi-Agent ◄──────────┘
+                  │       │
+                  │       ▼
+                  ├── Memory ◄── RAG
+                  │
+                  └── Automation
+```
