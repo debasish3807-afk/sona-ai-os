@@ -1,0 +1,32 @@
+# Sona AI OS - Backend Dependencies
+# ==================================
+
+# Web Framework
+# fastapi==
+# uvicorn==
+
+# AI & LLM
+# openai==
+# anthropic==
+# langchain==
+
+# Database
+# sqlalchemy==
+# alembic==
+# asyncpg==
+
+# Cache & Memory
+# redis==
+# chromadb==
+
+# Utilities
+# pydantic==
+# python-dotenv==
+# httpx==
+
+# Testing
+# pytest==
+# pytest-asyncio==
+# pytest-cov==
+
+# Note: Uncomment and pin versions when development begins
