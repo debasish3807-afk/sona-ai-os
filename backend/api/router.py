@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from api.adapters import router as adapters_router
 from api.auth import router as auth_router
 from api.capabilities import router as capabilities_router
 from api.chat import router as chat_router
@@ -60,5 +61,8 @@ def create_api_router() -> APIRouter:
 
     # Microkernel runtime endpoints
     api_router.include_router(microkernel_router)
+
+    # Runtime integration (adapters) endpoints
+    api_router.include_router(adapters_router)
 
     return api_router
