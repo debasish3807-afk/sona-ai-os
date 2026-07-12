@@ -25,7 +25,8 @@ def hash_password(password: str) -> str:
     Returns:
         The Argon2 hash string.
     """
-    return _hasher.hash(password)
+    hashed: str = str(_hasher.hash(password))
+    return hashed
 
 
 def verify_password(password: str, password_hash: str) -> bool:
@@ -39,6 +40,7 @@ def verify_password(password: str, password_hash: str) -> bool:
         True if the password matches.
     """
     try:
-        return _hasher.verify(password_hash, password)
+        result: bool = bool(_hasher.verify(password_hash, password))
+        return result
     except VerifyMismatchError:
         return False
