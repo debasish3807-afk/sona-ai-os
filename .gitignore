@@ -18,7 +18,7 @@ build/
 venv/
 .venv/
 env/
-.env
+ENV/
 
 # --- IDE ---
 .vscode/
@@ -26,8 +26,6 @@ env/
 *.swp
 *.swo
 *~
-.DS_Store
-Thumbs.db
 
 # --- Testing ---
 .coverage
@@ -48,6 +46,7 @@ docker-compose.override.yml
 # --- Environment ---
 .env
 .env.local
+.env.*.local
 .env.production
 *.env
 

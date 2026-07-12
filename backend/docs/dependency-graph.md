@@ -1,140 +1,104 @@
-# Dependency Graph
+# Dependency Graph — Sona AI OS Backend
 
-**Project:** Sona AI OS
-**Version:** 0.2-alpha
-**Date:** 2026-07-12
+**Date:** 2026-07-12  
+**Status:** No circular dependencies, no violations
 
 ---
 
-## System-Level Dependency Graph
+## Module Dependency Direction
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        USER INTERFACES                           │
-│              Web    Desktop    Android    Widgets                │
-└─────────────────────┬───────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      API GATEWAY (api/)                          │
-│              REST    WebSocket    SSE    GraphQL                 │
-└─────────────────────┬───────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   SERVICE LAYER (services/)                      │
-│           Use Cases    Orchestration    Validation               │
-└──────┬──────────────────────┬───────────────────┬───────────────┘
-       │                      │                   │
-       ▼                      ▼                   ▼
-┌─────────────┐    ┌──────────────────┐    ┌──────────────┐
-│  AI Kernel  │    │   Orchestrator   │    │  Automation  │
-│  (core/)    │    │   (services/)    │    │(automation/) │
-└──────┬──────┘    └────────┬─────────┘    └──────┬───────┘
-       │                    │                      │
-       ▼                    ▼                      │
-┌─────────────┐    ┌──────────────────┐           │
-│  LLM Pool   │    │  Multi-Agent     │           │
-│(providers/) │◄───│  (agents/)       │◄──────────┘
-└──────┬──────┘    └────────┬─────────┘
-       │                    │
-       ▼                    ▼
-┌─────────────┐    ┌──────────────────┐
-│   Memory    │    │      RAG         │
-│  (memory/)  │◄───│   (services/)    │
-└──────┬──────┘    └──────────────────┘
-       │
-       ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   INFRASTRUCTURE                                  │
-│     Database    Redis    Vector DB    External APIs    MCP       │
-└─────────────────────────────────────────────────────────────────┘
+                    ┌────────────┐
+                    │    app/    │  (Composition Root)
+                    └──────┬─────┘
+                           │ depends on
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+        ┌─────────┐  ┌─────────┐  ┌─────────┐
+        │  api/   │  │ config/ │  │  core/  │
+        └────┬────┘  └─────────┘  └────┬────┘
+             │                          │
+             ▼                          ▼
+        ┌─────────┐              ┌─────────┐
+        │ config/ │              │ config/ │
+        └─────────┘              └─────────┘
+        ┌─────────┐
+        │  core/  │
+        └─────────┘
+
+
+    ┌──────────┐   ┌────────────┐   ┌──────────┐   ┌──────────┐
+    │ kernel/  │   │ providers/ │   │ agents/  │   │ memory/  │
+    │          │   │            │   │          │   │          │
+    │  (self-  │   │   (self-   │   │  (self-  │   │  (self-  │
+    │contained)│   │ contained) │   │contained)│   │contained)│
+    └──────────┘   └────────────┘   └──────────┘   └──────────┘
 ```
 
 ---
 
-## Package Dependency Direction
+## Explicit Dependencies
 
-```
-api/  ──────►  services/  ──────►  core/  ◄──────  providers/
-                   │                  ▲                   │
-                   │                  │                   │
-                   └──────────────────┼───────────────────┘
-                                      │
-                              database/ ────────┘
-```
-
-**Rule:** All dependencies point inward toward `core/`. Infrastructure layers implement interfaces defined in `core/`.
-
----
-
-## Module Dependencies (Planned)
-
-| Module | Depends On | Depended By |
-|--------|-----------|-------------|
-| `core/` | None (pure domain) | All other modules |
-| `services/` | `core/` | `api/` |
-| `api/` | `services/`, `core/` | None (entry point) |
-| `providers/` | `core/` (interfaces) | `services/` (via DI) |
-| `database/` | `core/` (interfaces) | `services/` (via DI) |
-| `agents/` | `core/`, `providers/` | `services/` |
-| `memory/` | `core/`, `database/` | `services/`, `agents/` |
-| `automation/` | `core/`, `services/` | `api/` |
-| `tools/` | `core/` | `agents/`, `services/` |
-| `models/` | None (data schemas) | All modules |
-| `config/` | None (settings) | `app/` |
-| `app/` | All modules | None (composition root) |
+| Source Module | Dependencies | Forbidden Imports |
+|--------------|-------------|-------------------|
+| `config/` | (none — foundation) | core, api, app, kernel, providers, agents, memory |
+| `core/` | config | api, app, kernel, providers, agents, memory |
+| `api/` | config, core | app, kernel, providers, agents, memory |
+| `app/` | api, config, core | kernel, providers, agents, memory (direct) |
+| `kernel/` | (self-contained) | providers, agents, memory, api, app |
+| `providers/` | (self-contained) | kernel, agents, memory, api, app |
+| `agents/` | (self-contained) | kernel, providers, memory, api, app |
+| `memory/` | (self-contained) | kernel, providers, agents, api, app |
 
 ---
 
-## External Dependencies (from requirements.txt)
+## Clean Architecture Layers
 
 ```
-┌─────────────────────────────────────────────┐
-│              APPLICATION                     │
-├─────────────────────────────────────────────┤
-│  FastAPI ──► Uvicorn (ASGI Server)          │
-│  Pydantic (Validation)                       │
-│  python-dotenv (Configuration)               │
-├─────────────────────────────────────────────┤
-│              AI / LLM                        │
-│  openai ──► OpenAI API                      │
-│  anthropic ──► Anthropic API                │
-│  google-generativeai ──► Google AI API      │
-├─────────────────────────────────────────────┤
-│              DATA                            │
-│  SQLAlchemy ──► asyncpg ──► PostgreSQL      │
-│  redis ──► Redis Server                     │
-│  chromadb ──► Vector Storage                │
-├─────────────────────────────────────────────┤
-│              SECURITY                        │
-│  python-jose (JWT)                           │
-│  passlib (Password Hashing)                  │
-├─────────────────────────────────────────────┤
-│              UTILITIES                       │
-│  httpx (HTTP Client)                         │
-│  structlog (Logging)                         │
-│  tenacity (Retry Logic)                      │
-└─────────────────────────────────────────────┘
+Layer 4 (Framework):    app/, api/
+Layer 3 (Interface):    api/ routes, middleware
+Layer 2 (Application):  kernel/, agents/ (orchestration)
+Layer 1 (Domain):       providers/, memory/ (business abstractions)
+Layer 0 (Foundation):   config/, core/ (shared primitives)
 ```
+
+**Rule:** Dependencies point inward only. Inner layers never import from outer layers.
 
 ---
 
-## Circular Dependency Risk Assessment
+## Integration Strategy (Future)
 
-| Risk | Status | Mitigation |
-|------|--------|-----------|
-| agents/ ↔ services/ | Medium | Use dependency injection; agents accessed via interface |
-| memory/ ↔ agents/ | Low | Memory is a service dependency, not a peer |
-| providers/ ↔ core/ | None | One-way dependency (providers → core interfaces) |
-| api/ ↔ services/ | None | One-way dependency (api → services) |
+When the composition root (`app/`) connects these modules at runtime:
+
+```python
+# app/ will use dependency injection to wire:
+# kernel.ProviderRegistry ← adapts → providers.ProviderRegistry
+# kernel.ContextManager   ← adapts → memory.MemoryContextAssembler
+# kernel.TaskRouter       ← routes → agents.AgentRouter
+```
+
+This preserves compile-time independence while enabling runtime collaboration.
 
 ---
 
-## Recommendations
+## Verification Command
 
-1. Enforce dependency rules via import linting (e.g., `import-linter` package)
-2. Use `__init__.py` with explicit `__all__` to control public API surface
-3. Implement dependency injection container in `app/` (composition root)
-4. Never import from outer layers into inner layers
-5. Use Protocol classes in `core/` for infrastructure contracts
+```bash
+cd backend && python3 -c "
+import ast, os
+modules = {'app','config','core','api','kernel','providers','agents','memory'}
+for root, dirs, files in os.walk('.'):
+    dirs[:] = [d for d in dirs if d != '__pycache__']
+    for f in files:
+        if not f.endswith('.py'): continue
+        path = os.path.join(root, f)
+        source = path.split('/')[1] if len(path.split('/')) >= 2 else None
+        if source not in modules: continue
+        tree = ast.parse(open(path).read())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module:
+                target = node.module.split('.')[0]
+                if target in modules and target != source:
+                    print(f'{source} -> {target} ({path})')
+"
+```
