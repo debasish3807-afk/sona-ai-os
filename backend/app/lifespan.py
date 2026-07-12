@@ -1,6 +1,7 @@
 """Application lifespan management.
 
-Handles startup and shutdown events for the FastAPI application.
+Handles startup and shutdown events for the FastAPI application,
+including AI Brain initialization.
 """
 
 from collections.abc import AsyncGenerator
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage application lifespan events.
 
     Handles resource initialization on startup and cleanup on shutdown.
+    Initializes the AI Brain with all providers.
 
     Args:
         app: FastAPI application instance.
@@ -38,10 +40,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         debug=settings.debug,
     )
 
-    # Future: Initialize database connections
-    # Future: Initialize cache connections
-    # Future: Initialize AI providers
-    # Future: Start background tasks
+    # Initialize AI Brain (providers, memory, routing)
+    from brain.orchestrator import initialize_brain
+
+    try:
+        await initialize_brain()
+        logger.info("AI Brain initialized successfully")
+    except Exception as exc:
+        logger.error("AI Brain initialization failed", error=str(exc))
+        # Don't fail startup — Brain can initialize lazily
 
     logger.info("Application started successfully")
 
@@ -50,9 +57,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # === SHUTDOWN ===
     logger.info("Application shutting down")
 
-    # Future: Close database connections
-    # Future: Close cache connections
-    # Future: Cleanup AI provider sessions
-    # Future: Cancel background tasks
+    # Shutdown AI Brain
+    from brain.orchestrator import shutdown_brain
+
+    try:
+        await shutdown_brain()
+        logger.info("AI Brain shut down successfully")
+    except Exception as exc:
+        logger.warning("AI Brain shutdown error", error=str(exc))
 
     logger.info("Application shutdown complete")
