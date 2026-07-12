@@ -4,7 +4,10 @@ Connects all subsystems into a single coherent pipeline:
     Request → Memory Retrieval → Agent Routing → Context Assembly
     → Model Selection → Provider Execution → Memory Storage → Response
 
-This is the beating heart of Sona AI OS.
+Features:
+    - Automatic provider discovery (detects configured API keys)
+    - Failover: if primary provider fails, tries next available
+    - Priority-based provider selection
 """
 
 from __future__ import annotations
@@ -26,8 +29,6 @@ from brain.schemas import (
 )
 from config.logging import get_logger
 from providers.base import BaseProvider
-from providers.config import OllamaConfig
-from providers.ollama_provider import OllamaProvider
 from providers.types import (
     ChatMessage,
     ChatRequest,
@@ -39,12 +40,69 @@ from providers.types import (
 logger = get_logger(__name__)
 
 
+async def _discover_providers() -> dict[str, BaseProvider]:
+    """Auto-discover available providers based on environment variables.
+
+    Initializes each provider. Providers without API keys are skipped.
+    Ollama is always attempted (no key required).
+
+    Returns:
+        Dictionary of initialized providers keyed by provider ID.
+    """
+    from providers.claude_provider import ClaudeProvider
+    from providers.config import (
+        ClaudeConfig,
+        DeepSeekConfig,
+        GeminiConfig,
+        MistralConfig,
+        OllamaConfig,
+        OpenAIConfig,
+        QwenConfig,
+    )
+    from providers.deepseek_provider import DeepSeekProvider
+    from providers.gemini_provider import GeminiProvider
+    from providers.mistral_provider import MistralProvider
+    from providers.ollama_provider import OllamaProvider
+    from providers.openai_provider import OpenAIProvider
+    from providers.qwen_provider import QwenProvider
+
+    # Provider registry ordered by priority (lower = preferred)
+    provider_factories: list[tuple[str, type, type, int]] = [
+        ("openai", OpenAIProvider, OpenAIConfig, 10),
+        ("claude", ClaudeProvider, ClaudeConfig, 20),
+        ("gemini", GeminiProvider, GeminiConfig, 30),
+        ("deepseek", DeepSeekProvider, DeepSeekConfig, 40),
+        ("mistral", MistralProvider, MistralConfig, 50),
+        ("qwen", QwenProvider, QwenConfig, 60),
+        ("ollama", OllamaProvider, OllamaConfig, 90),
+    ]
+
+    providers: dict[str, BaseProvider] = {}
+
+    for name, factory_cls, config_cls, priority in provider_factories:
+        try:
+            provider = factory_cls(config_cls())
+            await provider.initialize()
+            if provider.is_initialized:
+                providers[name] = provider
+                logger.info("Provider discovered and initialized", provider=name, priority=priority)
+            else:
+                logger.debug("Provider not available (no API key?)", provider=name)
+        except Exception as exc:
+            logger.warning("Provider initialization failed", provider=name, error=str(exc))
+
+    return providers
+
+
 class BrainOrchestrator:
     """The AI Brain — orchestrates the complete execution pipeline.
 
-    Manages provider lifecycle, routes requests through the full
-    pipeline (memory → agent → provider → memory), and handles
-    errors gracefully.
+    Features:
+        - Automatic provider discovery on startup
+        - Priority-based provider selection
+        - Automatic failover on provider failure
+        - Memory integration (retrieve/store)
+        - Agent routing (intent detection)
     """
 
     def __init__(self) -> None:
@@ -60,19 +118,20 @@ class BrainOrchestrator:
         return self._providers
 
     async def initialize(self) -> None:
-        """Initialize the Brain and all providers."""
+        """Initialize the Brain with auto-discovered providers."""
         if self._initialized:
             return
 
-        # Initialize Ollama provider (primary/local)
-        ollama = OllamaProvider(OllamaConfig())
-        await ollama.initialize()
-        self._providers["ollama"] = ollama
+        self._providers = await _discover_providers()
+
+        if not self._providers:
+            logger.warning("No AI providers available — Brain will wait for provider configuration")
 
         self._initialized = True
         logger.info(
             "Brain orchestrator initialized",
             providers=list(self._providers.keys()),
+            count=len(self._providers),
         )
 
     async def shutdown(self) -> None:
@@ -89,62 +148,48 @@ class BrainOrchestrator:
     def _select_provider(self, requested_provider: str | None = None) -> BaseProvider:
         """Select the best available provider.
 
-        Args:
-            requested_provider: Explicit provider request (optional).
-
-        Returns:
-            The selected provider instance.
+        Priority: explicit request > first initialized provider (by priority).
 
         Raises:
             RuntimeError: If no providers are available.
         """
         if not self._providers:
-            raise RuntimeError("No AI providers available. Is the Brain initialized?")
+            raise RuntimeError("No AI providers available. Configure at least one API key.")
 
         if requested_provider and requested_provider in self._providers:
             return self._providers[requested_provider]
 
-        # Default: return first available (Ollama)
+        # Return first available (they're ordered by priority in discovery)
         return next(iter(self._providers.values()))
 
+    def _get_failover_providers(self, exclude: str) -> list[BaseProvider]:
+        """Get alternative providers for failover, excluding the failed one."""
+        return [p for name, p in self._providers.items() if name != exclude]
+
     def _select_model(self, provider: BaseProvider, requested_model: str | None) -> str:
-        """Select model for the request.
-
-        Args:
-            provider: The provider to use.
-            requested_model: Explicit model request (optional).
-
-        Returns:
-            Model identifier string.
-        """
+        """Select model for the request."""
         if requested_model:
             return requested_model
         return provider.config.default_model
 
     async def process(self, request: BrainRequest) -> BrainResponse:
-        """Process a chat request through the full AI pipeline.
+        """Process a chat request through the full AI pipeline with failover.
 
         Pipeline:
             1. Retrieve conversation history (memory)
             2. Detect agent type (routing)
             3. Build context window (context assembly)
             4. Select provider + model
-            5. Execute LLM request
+            5. Execute LLM request (with failover on failure)
             6. Save response to memory
             7. Return response
-
-        Args:
-            request: The brain request to process.
-
-        Returns:
-            BrainResponse with generated content.
         """
         start = time.perf_counter()
 
-        # Step 1: Memory — retrieve conversation history
+        # Step 1: Memory
         history = retrieve_conversation_history(request.session_id)
 
-        # Step 2: Agent routing — detect intent
+        # Step 2: Agent routing
         agent = detect_agent(request.messages)
         agent_prompt = get_agent_system_prompt(agent)
 
@@ -160,16 +205,11 @@ class BrainOrchestrator:
         provider = self._select_provider(request.provider)
         model = self._select_model(provider, request.model)
 
-        # Step 5: Build provider request and execute
+        # Step 5: Execute with failover
         chat_messages = [
-            ChatMessage(
-                role=MessageRole(msg.role),
-                content=msg.content,
-                name=msg.name,
-            )
+            ChatMessage(role=MessageRole(msg.role), content=msg.content, name=msg.name)
             for msg in context_messages
         ]
-
         chat_request = ChatRequest(
             messages=chat_messages,
             model=model,
@@ -177,24 +217,53 @@ class BrainOrchestrator:
             max_tokens=request.max_tokens,
         )
 
+        response = None
+        used_provider = provider.provider_id.value
+
         try:
             response = await provider.chat(chat_request)
-        except ConnectionError as exc:
-            raise RuntimeError(f"Provider unavailable: {exc}") from exc
+        except Exception as primary_exc:
+            logger.warning(
+                "Primary provider failed, attempting failover",
+                provider=used_provider,
+                error=str(primary_exc),
+            )
+            # Failover: try other providers
+            for fallback in self._get_failover_providers(used_provider):
+                try:
+                    fallback_model = fallback.config.default_model
+                    fallback_request = ChatRequest(
+                        messages=chat_messages,
+                        model=fallback_model,
+                        temperature=request.temperature,
+                        max_tokens=request.max_tokens,
+                    )
+                    response = await fallback.chat(fallback_request)
+                    used_provider = fallback.provider_id.value
+                    model = fallback_model
+                    logger.info("Failover successful", provider=used_provider)
+                    break
+                except Exception as fb_exc:
+                    logger.warning(
+                        "Failover provider also failed",
+                        provider=fallback.provider_id.value,
+                        error=str(fb_exc),
+                    )
+
+            if response is None:
+                raise RuntimeError(
+                    f"All providers failed. Primary error: {primary_exc}"
+                ) from primary_exc
 
         latency_ms = (time.perf_counter() - start) * 1000
 
         # Step 6: Save to memory
         if request.session_id:
-            # Save user message
             last_user = next((m for m in reversed(request.messages) if m.role == "user"), None)
             if last_user:
                 save_message_to_memory(
-                    session_id=request.session_id,
-                    role="user",
-                    content=last_user.content,
+                    session_id=request.session_id, role="user", content=last_user.content
                 )
-            # Save assistant response
             save_message_to_memory(
                 session_id=request.session_id,
                 role="assistant",
@@ -203,11 +272,11 @@ class BrainOrchestrator:
                 token_count=response.token_usage.completion_tokens,
             )
 
-        # Step 7: Build and return response
+        # Step 7: Build response
         return BrainResponse(
             content=response.content,
             model=response.model,
-            provider=response.provider,
+            provider=used_provider,
             agent=agent,
             finish_reason=response.finish_reason.value,
             token_usage=TokenUsageSchema(
@@ -221,17 +290,7 @@ class BrainOrchestrator:
         )
 
     async def process_stream(self, request: BrainRequest) -> AsyncIterator[BrainStreamChunk]:
-        """Process a streaming chat request through the AI pipeline.
-
-        Same pipeline as process() but yields chunks via SSE.
-
-        Args:
-            request: The brain request to process.
-
-        Yields:
-            BrainStreamChunk instances.
-        """
-        # Step 1-4: Same setup as non-streaming
+        """Process a streaming chat request with failover."""
         history = retrieve_conversation_history(request.session_id)
         agent = detect_agent(request.messages)
         agent_prompt = get_agent_system_prompt(agent)
@@ -247,14 +306,9 @@ class BrainOrchestrator:
         model = self._select_model(provider, request.model)
 
         chat_messages = [
-            ChatMessage(
-                role=MessageRole(msg.role),
-                content=msg.content,
-                name=msg.name,
-            )
+            ChatMessage(role=MessageRole(msg.role), content=msg.content, name=msg.name)
             for msg in context_messages
         ]
-
         chat_request = ChatRequest(
             messages=chat_messages,
             model=model,
@@ -263,9 +317,7 @@ class BrainOrchestrator:
             stream=True,
         )
 
-        # Step 5: Stream from provider
         full_content: list[str] = []
-        final_usage: TokenUsageSchema | None = None
 
         try:
             async for chunk in provider.stream(chat_request):
@@ -277,16 +329,15 @@ class BrainOrchestrator:
                 elif chunk.event == StreamEvent.DONE:
                     prompt_tokens = chunk.metadata.get("prompt_eval_count", 0)
                     eval_count = chunk.metadata.get("eval_count", 0)
-                    final_usage = TokenUsageSchema(
-                        prompt_tokens=prompt_tokens,
-                        completion_tokens=eval_count,
-                        total_tokens=prompt_tokens + eval_count,
-                    )
                     yield BrainStreamChunk(
                         event="done",
                         model=model,
                         finish_reason="stop",
-                        token_usage=final_usage,
+                        token_usage=TokenUsageSchema(
+                            prompt_tokens=prompt_tokens,
+                            completion_tokens=eval_count,
+                            total_tokens=prompt_tokens + eval_count,
+                        ),
                     )
                 elif chunk.event == StreamEvent.ERROR:
                     yield BrainStreamChunk(event="error", content=chunk.content, model=model)
@@ -295,14 +346,12 @@ class BrainOrchestrator:
             yield BrainStreamChunk(event="error", content=str(exc), model=model)
             return
 
-        # Step 6: Save to memory after stream completes
+        # Save to memory
         if request.session_id and full_content:
             last_user = next((m for m in reversed(request.messages) if m.role == "user"), None)
             if last_user:
                 save_message_to_memory(
-                    session_id=request.session_id,
-                    role="user",
-                    content=last_user.content,
+                    session_id=request.session_id, role="user", content=last_user.content
                 )
             save_message_to_memory(
                 session_id=request.session_id,
@@ -320,7 +369,7 @@ class BrainOrchestrator:
                 all_models.extend(models)
             except Exception as exc:
                 logger.warning(
-                    "Failed to list models from provider",
+                    "Failed to list models",
                     provider=provider.provider_id.value,
                     error=str(exc),
                 )
@@ -337,7 +386,7 @@ class BrainOrchestrator:
         return health
 
 
-# Global singleton (initialized at app startup)
+# Global singleton
 _brain: BrainOrchestrator | None = None
 
 
