@@ -403,19 +403,19 @@ Continuous Evolution
 
 ✅ Documentation
 
-⏳ Architecture
+✅ Architecture
 
-⬜ AI Kernel
+⬜ AI Kernel (implementation)
 
-⬜ Orchestrator
+⬜ Orchestrator (implementation)
 
-⬜ Multi-Agent
+⬜ Multi-Agent (implementation)
 
-⬜ LLM Pool
+⬜ LLM Pool (implementation)
 
-⬜ MCP
+⬜ MCP (implementation)
 
-⬜ Memory
+⬜ Memory (implementation)
 
 ⬜ Desktop
 

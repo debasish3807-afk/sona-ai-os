@@ -1,61 +1,87 @@
-# ❓ Frequently Asked Questions (FAQ)
+# Frequently Asked Questions
 
 ---
 
 ## What is Sona AI OS?
 
-Sona AI OS is a next-generation Personal AI Operating System designed to combine the world's best AI models into one intelligent platform.
-
-Instead of depending on a single AI model, Sona AI OS uses an AI Orchestrator that automatically selects the best model for every task.
+Sona AI OS is a next-generation Personal AI Operating System designed to combine the world's best AI models into one intelligent platform. Instead of depending on a single AI model, it uses an AI Orchestrator that automatically selects the best model for every task.
 
 ---
 
 ## Is Sona AI OS a chatbot?
 
-No.
+No. Sona AI OS is an AI Operating System built around:
 
-Sona AI OS is much more than a chatbot.
-
-It is an AI Operating System built around:
-
-- AI Kernel
-- AI Orchestrator
-- Multi-Agent System
-- LLM Pool
-- MCP Integration
-- Long-Term Memory
-- RAG
-- Automation Engine
+- AI Kernel (central intelligence)
+- Orchestrator (task coordination)
+- Multi-Agent System (specialized workers)
+- LLM Pool (multi-model routing)
+- Long-Term Memory (persistent knowledge)
+- RAG (context-aware generation)
+- Automation Engine (workflow automation)
 
 ---
 
 ## What is an AI Orchestrator?
 
-The Orchestrator is the brain of Sona AI OS.
-
-It analyzes every request and decides:
+The Orchestrator analyzes every request and decides:
 
 - Which AI model should answer
-- Which tools should run
+- Which tools should be invoked
 - Which agents should collaborate
-- Whether memory should be used
+- Whether memory context is needed
 - Whether web search is required
 
 ---
 
 ## What is an LLM Pool?
 
-LLM Pool is a collection of multiple AI models working together.
+The LLM Pool is a collection of multiple AI models working together. Supported providers include:
 
-Examples include:
+- OpenAI (GPT-4, GPT-4o)
+- Anthropic (Claude)
+- Google (Gemini)
+- Open-source local models (via Ollama)
 
-- GPT
-- Claude
-- Gemini
-- GLM
-- DeepSeek
-- Qwen
-- Mistral
-- Open-source local models
+The Orchestrator automatically selects the best model based on task type, cost, and performance.
 
-The Orchestrator automatically selects the best model.
+---
+
+## What architecture does the backend use?
+
+The backend follows Clean Architecture with four layers:
+
+1. **Domain** (core/) — Business entities and rules, no external dependencies
+2. **Services** — Application use cases
+3. **API** — HTTP interface adapters
+4. **Infrastructure** (providers/, database/) — External service implementations
+
+---
+
+## What platforms are supported?
+
+- **Web** — Browser-based interface (React + TypeScript)
+- **Desktop** — Native application (Tauri)
+- **Android** — Companion app (Kotlin + Jetpack Compose)
+
+---
+
+## What is the current project status?
+
+The project is in the **Architecture Phase** (v0.2-alpha). All system architecture is documented and the repository structure is defined. Implementation has not yet begun.
+
+---
+
+## How can I contribute?
+
+Contribution guidelines will be published when the project enters the implementation phase. For now, architecture feedback and documentation improvements are welcome.
+
+---
+
+## Version
+
+FAQ v0.2 — Architecture Phase
+
+---
+
+© Sona AI OS
