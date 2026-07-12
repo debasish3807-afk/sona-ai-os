@@ -1,32 +1,20 @@
 # Sona AI OS - Backend Dependencies
 # ==================================
+# Python 3.12+
 
 # Web Framework
-# fastapi==
-# uvicorn==
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.32.0,<1.0.0
 
-# AI & LLM
-# openai==
-# anthropic==
-# langchain==
+# Data Validation & Settings
+pydantic>=2.9.0,<3.0.0
+pydantic-settings>=2.6.0,<3.0.0
 
-# Database
-# sqlalchemy==
-# alembic==
-# asyncpg==
+# Structured Logging
+structlog>=24.4.0,<25.0.0
 
-# Cache & Memory
-# redis==
-# chromadb==
+# HTTP Client (async)
+httpx>=0.27.0,<1.0.0
 
-# Utilities
-# pydantic==
-# python-dotenv==
-# httpx==
-
-# Testing
-# pytest==
-# pytest-asyncio==
-# pytest-cov==
-
-# Note: Uncomment and pin versions when development begins
+# Development
+python-dotenv>=1.0.0,<2.0.0
