@@ -1,251 +1,159 @@
-# 🚀 Features
+# Features
 
-# Sona AI OS Features
+## Sona AI OS — Feature Status
 
-## Introduction
-
-This document lists the planned features of Sona AI OS.
-
-The feature list will continue to evolve throughout development.
+This document tracks the implementation status of all planned features.
 
 ---
 
-# AI Core
+## Implementation Status Legend
 
-- AI Kernel
-- AI Orchestrator
-- Multi-Agent System
-- LLM Pool
-- Dynamic Model Routing
-- AI Reasoning
-- AI Planning
-- AI Verification
-- AI Learning
-- AI Evolution
+| Symbol | Meaning |
+|--------|---------|
+| ✅ | Implemented |
+| 🔄 | In Progress |
+| ⬜ | Planned |
 
 ---
 
-# Chat
+## AI Core
 
-- AI Chat
-- Multi-turn Conversation
-- Long Conversation
-- Context Awareness
-- Multi-language Support
-- Markdown Support
-- Conversation History
-- Chat Export
-- Chat Search
-- Chat Pinning
-
----
-
-# Memory
-
-- Long-Term Memory
-- Short-Term Memory
-- Project Memory
-- Personal Knowledge
-- Notes Memory
-- Memory Search
-- Memory Editing
-- Memory Import
-- Memory Export
-- Memory Backup
+| Feature | Status | Module |
+|---------|--------|--------|
+| AI Kernel | ✅ | `kernel/` |
+| AI Brain Orchestrator | ✅ | `brain/orchestrator.py` |
+| Multi-Agent System | ✅ | `agents/` |
+| LLM Pool (Ollama) | ✅ | `providers/ollama_provider.py` |
+| Dynamic Model Routing | ✅ | `brain/orchestrator.py` |
+| Agent Intent Detection | ✅ | `brain/agent_router.py` |
+| Token Usage Tracking | ✅ | `providers/types.py` |
+| Provider Health Monitoring | ✅ | `providers/health.py` |
+| Cloud Providers (OpenAI, Claude) | 🔄 | Phase 8 |
+| AI Reasoning Chains | ⬜ | Planned |
+| AI Planning | ⬜ | Planned |
+| AI Verification | ⬜ | Planned |
 
 ---
 
-# Coding
+## Chat
 
-- Code Generation
-- Code Review
-- Debugging
-- Refactoring
-- Code Explanation
-- Documentation Generation
-- Project Analysis
-- Repository Analysis
-- Git Support
-- API Generation
-
----
-
-# Research
-
-- Web Search
-- Deep Research
-- Citation Support
-- Academic Search
-- Website Analysis
-- Research Summary
-- Fact Verification
-- Trend Analysis
-- Knowledge Collection
-- Report Generation
+| Feature | Status | Endpoint/Module |
+|---------|--------|-----------------|
+| AI Chat (sync) | ✅ | `POST /api/v1/chat` |
+| Streaming Chat (SSE) | ✅ | `POST /api/v1/chat/stream` |
+| Multi-turn Conversation | ✅ | Memory Bridge |
+| Context Awareness | ✅ | Context injection |
+| Session Isolation | ✅ | `brain/memory_bridge.py` |
+| Model Selection | ✅ | `GET /api/v1/models` |
+| Provider Listing | ✅ | `GET /api/v1/providers` |
+| Conversation History | ✅ | Memory storage |
+| Long Conversations | ✅ | Token-budgeted context |
+| Multi-language Support | ✅ | Via LLM capabilities |
 
 ---
 
-# Documents
+## Memory
 
-- PDF Reader
-- Word Reader
-- Excel Analysis
-- PowerPoint Analysis
-- OCR
-- Image Text Extraction
-- File Search
-- File Summary
-- Folder Analysis
-- Large Document Analysis
-
----
-
-# Voice
-
-- Speech-to-Text
-- Text-to-Speech
-- Voice Conversation
-- Voice Commands
-- Wake Word
-- Voice Translation
-- Voice Notes
+| Feature | Status | Module |
+|---------|--------|--------|
+| Working Memory | ✅ | `memory/working.py` |
+| Short-Term Memory | ✅ | `memory/short_term.py` |
+| Long-Term Memory | ✅ | `memory/long_term.py` |
+| Episodic Memory | ✅ | `memory/episodic.py` |
+| Semantic Memory | ✅ | `memory/semantic.py` |
+| Conversation Memory | ✅ | `memory/conversation.py` |
+| Project Memory | ✅ | `memory/project.py` |
+| Knowledge Base | ✅ | `memory/knowledge.py` |
+| Memory Search | ✅ | `memory/retrieval.py` |
+| Importance Scoring | ✅ | `memory/importance.py` |
+| Eviction Policies | ✅ | `memory/policies.py` |
+| Persistent Storage (Redis/PG) | 🔄 | Phase 8 |
+| Embedding Search | 🔄 | Phase 8 |
 
 ---
 
-# Vision
+## Agents
 
-- Image Analysis
-- OCR
-- Screenshot Analysis
-- Object Detection
-- Scene Understanding
-- Barcode Recognition
-- QR Code Recognition
-- Camera Integration
-
----
-
-# Search
-
-- Google Search
-- Website Search
-- News Search
-- Weather Search
-- Financial Search
-- Academic Search
-- Legal Search
-- Video Search
+| Agent | Status | Module |
+|-------|--------|--------|
+| General Agent | ✅ | `agents/general_agent.py` |
+| Coding Agent | ✅ | `agents/coding_agent.py` |
+| Research Agent | ✅ | `agents/research_agent.py` |
+| Planner Agent | ✅ | `agents/planner_agent.py` |
+| Android Agent | ✅ | `agents/android_agent.py` |
+| Web Agent | ✅ | `agents/web_agent.py` |
+| Memory Agent | ✅ | `agents/memory_agent.py` |
+| Security Agent | ✅ | `agents/security_agent.py` |
+| Automation Agent | ✅ | `agents/automation_agent.py` |
+| Voice Agent | ✅ | `agents/voice_agent.py` |
+| Vision Agent | ✅ | `agents/vision_agent.py` |
 
 ---
 
-# Productivity
+## Provider Support
 
-- Task Planner
-- Calendar Integration
-- Reminder System
-- Notes
-- To-do List
-- Project Planner
-- Time Management
-- Goal Tracking
-
----
-
-# Business
-
-- Business Planning
-- SWOT Analysis
-- Market Research
-- Financial Planning
-- Startup Ideas
-- Business Reports
-- Revenue Analysis
+| Provider | Status | Module |
+|----------|--------|--------|
+| Ollama (Local) | ✅ | `providers/ollama_provider.py` |
+| OpenAI (GPT-4o) | 🔄 | Phase 8 |
+| Anthropic (Claude) | 🔄 | Phase 8 |
+| Google (Gemini) | 🔄 | Phase 8 |
+| Groq | ⬜ | Architecture ready |
+| DeepSeek | ⬜ | Architecture ready |
+| Qwen | ⬜ | Architecture ready |
+| Mistral | ⬜ | Architecture ready |
 
 ---
 
-# Learning
+## Infrastructure
 
-- AI Tutor
-- Personalized Learning
-- Quiz Generation
-- Flashcards
-- Progress Tracking
-- Skill Development
-- Language Learning
-
----
-
-# Automation
-
-- Workflow Automation
-- Email Automation
-- File Automation
-- Task Automation
-- Browser Automation
-- AI Scheduling
-- Smart Notifications
+| Feature | Status | Location |
+|---------|--------|----------|
+| CI Pipeline (lint, type-check, test) | ✅ | `.github/workflows/ci.yml` |
+| Dev Deployment (auto) | ✅ | `.github/workflows/deploy-dev.yml` |
+| Prod Deployment (tags) | ✅ | `.github/workflows/deploy-prod.yml` |
+| Environment Config | ✅ | `config/settings.py` |
+| Structured Logging | ✅ | `config/logging.py` |
+| Error Handling | ✅ | `core/exceptions.py` |
+| Docker | ⬜ | Phase 8 |
+| Kubernetes | ⬜ | Planned |
 
 ---
 
-# Development
+## Security
 
-- Android Development
-- Web Development
-- Backend Development
-- Database Design
-- API Testing
-- Deployment Support
-- DevOps Assistance
-
----
-
-# Security
-
-- Authentication
-- Authorization
-- Permission Management
-- Encryption
-- Audit Logs
-- Secure Storage
-- Privacy Controls
+| Feature | Status | Notes |
+|---------|--------|-------|
+| CORS Configuration | ✅ | `app/main.py` |
+| Request ID Tracking | ✅ | Middleware |
+| Exception Handling | ✅ | Global handlers |
+| Security Scanning (Bandit) | ✅ | CI pipeline |
+| JWT Authentication | ⬜ | Phase 9 |
+| Rate Limiting | ⬜ | Phase 9 |
+| RBAC | ⬜ | Phase 9 |
 
 ---
 
-# Cloud
+## Planned Features (Future Phases)
 
-- AWS Integration
-- Cloud Backup
-- Cloud Sync
-- Secure Storage
-- Multi-device Sync
-
----
-
-# Platform Support
-
-- Windows Desktop
-- Android Companion
-- Web Dashboard
-
----
-
-# Future Features
-
-- Plugin Marketplace
-- AI App Store
-- Custom AI Agents
-- Custom Skills
-- Smart Home Integration
-- IoT Integration
-- Robotics Support
+| Category | Features |
+|----------|----------|
+| Documents | PDF reader, OCR, Excel analysis |
+| Voice | Speech-to-text, text-to-speech, voice commands |
+| Vision | Image analysis, screenshot analysis, camera |
+| Search | Web search, news, academic search |
+| Productivity | Task planner, calendar, reminders |
+| Automation | Workflow engine, email automation, scheduling |
+| Desktop | Windows/macOS app (Tauri + React) |
+| Android | Companion app (Kotlin + Jetpack Compose) |
+| Cloud | AWS integration, cloud sync, backup |
+| Plugins | Plugin marketplace, custom agents |
 
 ---
 
-# Version
+## Version
 
-Features Document v0.1
-
-Research Phase
+Features v0.7 — Phase 8
 
 ---
 

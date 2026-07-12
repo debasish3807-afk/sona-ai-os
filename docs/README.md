@@ -2,7 +2,9 @@
 
 Welcome to the official documentation for **Sona AI OS**.
 
-Sona AI OS is a next-generation Personal AI Operating System designed to combine multiple AI models, intelligent orchestration, long-term memory, coding assistance, research, automation, voice, vision, and secure cloud integration into one unified platform.
+Sona AI OS is a next-generation Personal AI Operating System combining multiple AI models, intelligent orchestration, long-term memory, coding assistance, research, automation, and more into one unified platform.
+
+**Current Version:** `0.7.0` — Phase 8 (Cloud AI Providers & Persistent Memory)
 
 ---
 
@@ -15,12 +17,12 @@ Sona AI OS is a next-generation Personal AI Operating System designed to combine
 | [Vision](Vision.md) | Long-term project vision |
 | [Mission](Mission.md) | Project mission and objectives |
 | [Goals](Goals.md) | Short-term, mid-term, and long-term goals |
-| [Features](Features.md) | Planned feature list |
+| [Features](Features.md) | Feature list with implementation status |
 | [Technology](Technology.md) | Technology stack |
-| [Roadmap](Roadmap.md) | Development roadmap |
+| [Roadmap](Roadmap.md) | Development roadmap (Phase 8 current) |
 | [FAQ](FAQ.md) | Frequently asked questions |
 | [Glossary](Glossary.md) | Terminology definitions |
-| [Changelog](Changelog.md) | Version history |
+| [Changelog](Changelog.md) | Version history (0.0.1 → 0.7.0) |
 
 ### Architecture
 
@@ -39,22 +41,26 @@ Sona AI OS is a next-generation Personal AI Operating System designed to combine
 | [API](../architecture/api.md) | API layer design |
 | [Deployment](../architecture/deployment.md) | Deployment strategies |
 
+### Backend
+
+| Document | Description |
+|----------|-------------|
+| [Backend README](../backend/README.md) | Implemented modules, API docs, getting started |
+
 ---
 
-## Current Version
+## Implementation Progress
 
-**v0.2-alpha** — Architecture Phase Complete
-
----
-
-## Documentation Rules
-
-- Every document has its own responsibility
-- Documentation is version controlled
-- Architecture decisions must be documented
-- Every new feature requires documentation
-- Security changes must be recorded
-- Follow Markdown best practices and consistent formatting
+| Phase | Name | Status |
+|-------|------|--------|
+| Phase 1 | System Architecture | ✅ Complete |
+| Phase 2 | Backend Foundation | ✅ Complete |
+| Phase 3 | AI Kernel | ✅ Complete |
+| Phase 4 | AI Provider Architecture | ✅ Complete |
+| Phase 5 | Multi-Agent Framework | ✅ Complete |
+| Phase 6 | Memory Engine | ✅ Complete |
+| Phase 7 | AI Brain Execution Pipeline | ✅ Complete |
+| **Phase 8** | **Cloud AI Providers & Persistent Memory** | **In Progress** |
 
 ---
 
