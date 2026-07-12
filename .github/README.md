@@ -6,23 +6,24 @@ GitHub-specific configuration including CI/CD workflows, issue templates, and co
 
 ```
 .github/
-├── workflows/     — GitHub Actions CI/CD pipelines
-├── ISSUE_TEMPLATE/ — Issue and bug report templates
-└── PULL_REQUEST_TEMPLATE.md — PR template
+├── workflows/          — GitHub Actions CI/CD pipelines
+│   └── ci.yml          — Main CI pipeline
+├── ISSUE_TEMPLATE/     — Issue and bug report templates (planned)
+└── PULL_REQUEST_TEMPLATE.md — PR template (planned)
 ```
 
 ## Workflows
 
 CI/CD pipelines for:
-- Linting and code quality checks
-- Automated testing (unit, integration)
+
+- Linting and code quality checks (Ruff, Mypy)
+- Automated testing (Pytest)
 - Security scanning
-- Docker image building
-- Deployment to staging/production
+- Docker image building (when Dockerfiles are added)
+- Deployment to staging/production (future)
 
-## Templates
+## Status
 
-Standardized templates ensure consistent:
-- Bug reports with reproduction steps
-- Feature requests with use cases
-- Pull requests with change descriptions
+- CI workflow: Template ready
+- Issue templates: Planned
+- PR template: Planned

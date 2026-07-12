@@ -1,122 +1,82 @@
-# 📚 Glossary
+# Glossary
 
-## AI
-
-Artificial Intelligence.
+Terminology and definitions used throughout the Sona AI OS project.
 
 ---
 
-## LLM
+## A
 
-Large Language Model.
+**Agent** — A specialized AI worker responsible for a specific task domain (e.g., coding, research, automation).
 
-Examples:
+**AI Kernel** — The central intelligence layer of Sona AI OS that manages reasoning and decision-making.
 
-GPT, Claude, Gemini, GLM, Llama.
-
----
-
-## SLM
-
-Small Language Model.
-
-Used for routing and lightweight tasks.
+**API** — Application Programming Interface. The communication layer between clients and backend services.
 
 ---
 
-## Agent
+## E
 
-A specialized AI worker responsible for a specific task.
-
----
-
-## Orchestrator
-
-Coordinates AI models, agents, workflows, and tools.
+**Embedding** — Numerical vector representation of text used for semantic similarity search.
 
 ---
 
-## AI Kernel
+## L
 
-The central intelligence layer of Sona AI OS.
+**LLM** — Large Language Model. Examples: GPT-4, Claude, Gemini, Llama.
 
----
-
-## LLM Pool
-
-A collection of multiple AI models available for intelligent routing.
+**LLM Pool** — A collection of multiple AI models available for intelligent routing and fallback.
 
 ---
 
-## MCP
+## M
 
-Model Context Protocol.
+**MCP** — Model Context Protocol. Provides standardized communication between AI systems and external tools.
 
-Provides standardized communication between AI and external tools.
-
----
-
-## RAG
-
-Retrieval-Augmented Generation.
-
-Combines AI models with external knowledge.
+**Memory Engine** — Stores user preferences, conversations, project knowledge, and learned patterns across sessions.
 
 ---
 
-## Memory Engine
+## O
 
-Stores user preferences, conversations, and project knowledge.
-
----
-
-## Skills
-
-Reusable instructions and knowledge for AI agents.
+**Orchestrator** — Coordinates AI models, agents, workflows, and tools to fulfill complex tasks.
 
 ---
 
-## Workflow
+## P
 
-A sequence of AI tasks executed automatically.
-
----
-
-## Plugin
-
-An extension that adds new functionality.
+**Plugin** — An extension that adds new functionality to the system without modifying core code.
 
 ---
 
-## Vector Database
+## R
 
-Stores embeddings for semantic search.
-
-Examples:
-
-ChromaDB
-
-FAISS
-
-Qdrant
+**RAG** — Retrieval-Augmented Generation. Enhances AI responses by retrieving relevant context before generation.
 
 ---
 
-## Embedding
+## S
 
-Numerical representation of text for similarity search.
+**SLM** — Small Language Model. Used for routing, classification, and lightweight tasks.
+
+**Skills** — Reusable instructions and knowledge templates for AI agents.
 
 ---
 
-## API
+## V
 
-Application Programming Interface.
+**Vector Database** — Stores embeddings for semantic search. Examples: ChromaDB, FAISS, Qdrant.
+
+---
+
+## W
+
+**Workflow** — A sequence of AI tasks executed automatically based on triggers or schedules.
 
 ---
 
 ## Version
 
-Glossary v0.1
+Glossary v0.2 — Architecture Phase
 
 ---
 
