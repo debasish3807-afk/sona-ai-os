@@ -274,9 +274,12 @@ class TestRAGEngine:
 
     def test_ingest_and_search(self):
         from rag.engine import RAGEngine
+        from storage.sqlite_backend import SQLiteBackend
 
-        engine = RAGEngine()
-        asyncio.run(engine.initialize())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test_rag.db")
+            engine = RAGEngine(storage=SQLiteBackend(db_path))
+            asyncio.run(engine.initialize())
 
         # Ingest a document
         doc = asyncio.run(
@@ -297,9 +300,12 @@ class TestRAGEngine:
 
     def test_build_context(self):
         from rag.engine import RAGEngine
+        from storage.sqlite_backend import SQLiteBackend
 
-        engine = RAGEngine()
-        asyncio.run(engine.initialize())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test_rag.db")
+            engine = RAGEngine(storage=SQLiteBackend(db_path))
+            asyncio.run(engine.initialize())
 
         asyncio.run(
             engine.ingest_document(
@@ -317,9 +323,12 @@ class TestRAGEngine:
 
     def test_delete_document(self):
         from rag.engine import RAGEngine
+        from storage.sqlite_backend import SQLiteBackend
 
-        engine = RAGEngine()
-        asyncio.run(engine.initialize())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test_rag.db")
+            engine = RAGEngine(storage=SQLiteBackend(db_path))
+            asyncio.run(engine.initialize())
 
         doc = asyncio.run(
             engine.ingest_document(content="Deletable content " * 30, title="To Delete")
@@ -331,9 +340,12 @@ class TestRAGEngine:
 
     def test_get_stats(self):
         from rag.engine import RAGEngine
+        from storage.sqlite_backend import SQLiteBackend
 
-        engine = RAGEngine()
-        asyncio.run(engine.initialize())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = os.path.join(tmpdir, "test_rag.db")
+            engine = RAGEngine(storage=SQLiteBackend(db_path))
+            asyncio.run(engine.initialize())
 
         asyncio.run(engine.ingest_document(content="Stats test content " * 30, title="Stats"))
         stats = asyncio.run(engine.get_stats())

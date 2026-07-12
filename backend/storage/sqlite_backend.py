@@ -245,20 +245,23 @@ class SQLiteBackend(StorageRepository):
         self, session_id: str | None, memory_type: str | None, limit: int
     ) -> list[MemoryRecord]:
         conn = self._get_conn()
-        conditions: list[str] = []
         params: list[Any] = []
-        if session_id:
-            conditions.append("session_id = ?")
-            params.append(session_id)
-        if memory_type:
-            conditions.append("memory_type = ?")
-            params.append(memory_type)
-        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
-        params.append(limit)
-        rows = conn.execute(
-            f"SELECT * FROM memories {where} ORDER BY created_at DESC LIMIT ?",
-            params,  # noqa: S608
-        ).fetchall()
+
+        # Build query safely without string interpolation
+        if session_id and memory_type:
+            query = "SELECT * FROM memories WHERE session_id = ? AND memory_type = ? ORDER BY created_at DESC LIMIT ?"
+            params = [session_id, memory_type, limit]
+        elif session_id:
+            query = "SELECT * FROM memories WHERE session_id = ? ORDER BY created_at DESC LIMIT ?"
+            params = [session_id, limit]
+        elif memory_type:
+            query = "SELECT * FROM memories WHERE memory_type = ? ORDER BY created_at DESC LIMIT ?"
+            params = [memory_type, limit]
+        else:
+            query = "SELECT * FROM memories ORDER BY created_at DESC LIMIT ?"
+            params = [limit]
+
+        rows = conn.execute(query, params).fetchall()
         return [self._row_to_mem(r) for r in rows]
 
     async def search_memories(self, query: str, limit: int = 10) -> list[MemoryRecord]:

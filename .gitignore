@@ -73,3 +73,4 @@ target/
 out/
 *.apk
 *.aab
+*.db
