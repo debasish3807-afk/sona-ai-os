@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from api.chat import router as chat_router
+from api.execute import router as execute_router
 from api.health import router as health_router
 from api.tools import router as tools_router
 from api.version import router as version_router
@@ -28,5 +29,8 @@ def create_api_router() -> APIRouter:
 
     # MCP Tool system routes
     api_router.include_router(tools_router)
+
+    # Execution & function calling routes
+    api_router.include_router(execute_router)
 
     return api_router
