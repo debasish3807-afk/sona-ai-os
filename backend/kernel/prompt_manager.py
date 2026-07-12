@@ -6,9 +6,9 @@ of prompts sent to language models.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -42,8 +42,8 @@ class PromptMessage:
 
     role: PromptRole
     content: str
-    name: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    name: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -66,11 +66,11 @@ class PromptTemplate:
     template: str
     template_id: str = field(default_factory=lambda: str(uuid4()))
     description: str = ""
-    variables: Dict[str, str] = field(default_factory=dict)
+    variables: dict[str, str] = field(default_factory=dict)
     default_role: PromptRole = PromptRole.SYSTEM
     format: PromptFormat = PromptFormat.CHAT
     version: str = "1.0.0"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -88,16 +88,14 @@ class RenderedPrompt:
         metadata: Additional prompt metadata.
     """
 
-    messages: List[PromptMessage]
+    messages: list[PromptMessage]
     prompt_id: str = field(default_factory=lambda: str(uuid4()))
-    template_id: Optional[str] = None
-    variables_used: Dict[str, Any] = field(default_factory=dict)
+    template_id: str | None = None
+    variables_used: dict[str, Any] = field(default_factory=dict)
     token_estimate: int = 0
     format: PromptFormat = PromptFormat.CHAT
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class PromptManager(ABC):
@@ -123,7 +121,7 @@ class PromptManager(ABC):
         ...
 
     @abstractmethod
-    async def get_template(self, template_id: str) -> Optional[PromptTemplate]:
+    async def get_template(self, template_id: str) -> PromptTemplate | None:
         """Retrieve a template by ID.
 
         Args:
@@ -137,8 +135,8 @@ class PromptManager(ABC):
     @abstractmethod
     async def list_templates(
         self,
-        format: Optional[PromptFormat] = None,
-    ) -> List[PromptTemplate]:
+        format: PromptFormat | None = None,
+    ) -> list[PromptTemplate]:
         """List available templates with optional filtering.
 
         Args:
@@ -153,7 +151,7 @@ class PromptManager(ABC):
     async def render(
         self,
         template_id: str,
-        variables: Dict[str, Any],
+        variables: dict[str, Any],
     ) -> RenderedPrompt:
         """Render a template with provided variables.
 
@@ -175,8 +173,8 @@ class PromptManager(ABC):
     @abstractmethod
     async def compose(
         self,
-        messages: List[PromptMessage],
-        system_prompt: Optional[str] = None,
+        messages: list[PromptMessage],
+        system_prompt: str | None = None,
     ) -> RenderedPrompt:
         """Compose a prompt from individual messages.
 
@@ -193,7 +191,7 @@ class PromptManager(ABC):
         ...
 
     @abstractmethod
-    async def validate(self, prompt: RenderedPrompt) -> List[str]:
+    async def validate(self, prompt: RenderedPrompt) -> list[str]:
         """Validate a rendered prompt for correctness.
 
         Checks for common issues such as empty messages,

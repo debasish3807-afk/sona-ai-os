@@ -7,7 +7,7 @@ that coordinate multiple agents in complex task sequences.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from agents.context import ExecutionResult
@@ -55,14 +55,14 @@ class WorkflowStep:
     name: str
     agent_id: str
     step_id: str = field(default_factory=lambda: str(uuid4()))
-    input_mapping: Dict[str, str] = field(default_factory=dict)
-    output_mapping: Dict[str, str] = field(default_factory=dict)
-    depends_on: List[str] = field(default_factory=list)
-    condition: Optional[str] = None
+    input_mapping: dict[str, str] = field(default_factory=dict)
+    output_mapping: dict[str, str] = field(default_factory=dict)
+    depends_on: list[str] = field(default_factory=list)
+    condition: str | None = None
     on_failure: str = "abort"
     max_retries: int = 1
     timeout_seconds: float = 120.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -80,12 +80,12 @@ class WorkflowDefinition:
     """
 
     name: str
-    steps: List[WorkflowStep]
+    steps: list[WorkflowStep]
     workflow_id: str = field(default_factory=lambda: str(uuid4()))
     description: str = ""
-    initial_state: Dict[str, Any] = field(default_factory=dict)
+    initial_state: dict[str, Any] = field(default_factory=dict)
     version: str = "1.0.0"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -107,12 +107,12 @@ class WorkflowExecution:
     workflow_id: str
     execution_id: str = field(default_factory=lambda: str(uuid4()))
     status: WorkflowStatus = WorkflowStatus.PENDING
-    current_step: Optional[str] = None
-    state: Dict[str, Any] = field(default_factory=dict)
-    step_results: Dict[str, ExecutionResult] = field(default_factory=dict)
-    started_at: Optional[str] = None
-    error: Optional[Dict[str, Any]] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    current_step: str | None = None
+    state: dict[str, Any] = field(default_factory=dict)
+    step_results: dict[str, ExecutionResult] = field(default_factory=dict)
+    started_at: str | None = None
+    error: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class WorkflowEngine(ABC):
@@ -123,9 +123,7 @@ class WorkflowEngine(ABC):
     """
 
     @abstractmethod
-    async def register_workflow(
-        self, definition: WorkflowDefinition
-    ) -> str:
+    async def register_workflow(self, definition: WorkflowDefinition) -> str:
         """Register a workflow definition.
 
         Args:
@@ -140,7 +138,7 @@ class WorkflowEngine(ABC):
     async def execute(
         self,
         workflow_id: str,
-        initial_state: Optional[Dict[str, Any]] = None,
+        initial_state: dict[str, Any] | None = None,
     ) -> WorkflowExecution:
         """Start executing a workflow.
 
@@ -190,9 +188,7 @@ class WorkflowEngine(ABC):
         ...
 
     @abstractmethod
-    async def get_execution(
-        self, execution_id: str
-    ) -> Optional[WorkflowExecution]:
+    async def get_execution(self, execution_id: str) -> WorkflowExecution | None:
         """Get workflow execution status.
 
         Args:
@@ -204,14 +200,12 @@ class WorkflowEngine(ABC):
         ...
 
     @abstractmethod
-    async def list_workflows(self) -> List[WorkflowDefinition]:
+    async def list_workflows(self) -> list[WorkflowDefinition]:
         """List all registered workflow definitions."""
         ...
 
     @abstractmethod
-    async def list_executions(
-        self, workflow_id: Optional[str] = None
-    ) -> List[WorkflowExecution]:
+    async def list_executions(self, workflow_id: str | None = None) -> list[WorkflowExecution]:
         """List workflow executions.
 
         Args:
@@ -223,9 +217,7 @@ class WorkflowEngine(ABC):
         ...
 
     @abstractmethod
-    async def validate_workflow(
-        self, definition: WorkflowDefinition
-    ) -> List[str]:
+    async def validate_workflow(self, definition: WorkflowDefinition) -> list[str]:
         """Validate a workflow definition.
 
         Args:

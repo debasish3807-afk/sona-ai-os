@@ -6,9 +6,10 @@ result collection.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from agents.base import BaseAgent
@@ -62,8 +63,8 @@ class ExecutionJob:
     max_retries: int = 2
     current_attempt: int = 0
     timeout_seconds: float = 120.0
-    result: Optional[ExecutionResult] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    result: ExecutionResult | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_terminal(self) -> bool:
@@ -94,7 +95,7 @@ class AgentExecutor(ABC):
         agent: BaseAgent,
         context: ExecutionContext,
         priority: ExecutionPriority = ExecutionPriority.NORMAL,
-        timeout_seconds: Optional[float] = None,
+        timeout_seconds: float | None = None,
     ) -> ExecutionJob:
         """Submit a task for execution.
 
@@ -114,7 +115,7 @@ class AgentExecutor(ABC):
         self,
         agent: BaseAgent,
         context: ExecutionContext,
-    ) -> AsyncIterator[Dict[str, Any]]:
+    ) -> AsyncIterator[dict[str, Any]]:
         """Submit a task for streaming execution.
 
         Args:
@@ -131,7 +132,7 @@ class AgentExecutor(ABC):
         self,
         agent: BaseAgent,
         context: ExecutionContext,
-        timeout_seconds: Optional[float] = None,
+        timeout_seconds: float | None = None,
     ) -> ExecutionResult:
         """Execute a task immediately (bypassing queue).
 
@@ -162,7 +163,7 @@ class AgentExecutor(ABC):
         ...
 
     @abstractmethod
-    async def get_job(self, job_id: str) -> Optional[ExecutionJob]:
+    async def get_job(self, job_id: str) -> ExecutionJob | None:
         """Get a job by ID.
 
         Args:
@@ -174,9 +175,7 @@ class AgentExecutor(ABC):
         ...
 
     @abstractmethod
-    async def get_queue_size(
-        self, agent_id: Optional[str] = None
-    ) -> int:
+    async def get_queue_size(self, agent_id: str | None = None) -> int:
         """Get the execution queue size.
 
         Args:
@@ -188,9 +187,7 @@ class AgentExecutor(ABC):
         ...
 
     @abstractmethod
-    async def get_running_count(
-        self, agent_id: Optional[str] = None
-    ) -> int:
+    async def get_running_count(self, agent_id: str | None = None) -> int:
         """Get number of currently executing jobs.
 
         Args:

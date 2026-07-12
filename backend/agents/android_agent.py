@@ -5,7 +5,8 @@ code generation, Jetpack Compose UI, architecture patterns, and
 Android-specific code review.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -42,9 +43,7 @@ class AndroidAgent(BaseAgent):
                 AgentCapabilityDescriptor(
                     AgentCapability.CODE_GENERATION, CapabilityLevel.ADVANCED
                 ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.CODE_REVIEW, CapabilityLevel.ADVANCED
-                ),
+                AgentCapabilityDescriptor(AgentCapability.CODE_REVIEW, CapabilityLevel.ADVANCED),
             ],
         )
 
@@ -64,7 +63,7 @@ class AndroidAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return ["coding_agent"]
 
@@ -84,9 +83,7 @@ class AndroidAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("AndroidAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("AndroidAgent streaming not yet implemented")
         yield  # type: ignore[misc]

@@ -5,7 +5,7 @@ through the Anthropic API. Known for strong reasoning, safety,
 and long-context capabilities.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -34,7 +34,7 @@ class ClaudeProvider(BaseProvider):
                   code generation, JSON mode.
     """
 
-    def __init__(self, config: Optional[ClaudeConfig] = None) -> None:
+    def __init__(self, config: ClaudeConfig | None = None) -> None:
         self._config = config or ClaudeConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -101,12 +101,12 @@ class ClaudeProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Claude embeddings not available")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         # TODO: Return known Claude model list
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

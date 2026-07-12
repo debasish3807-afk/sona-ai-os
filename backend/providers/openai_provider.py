@@ -5,7 +5,7 @@ through the OpenAI API. Supports chat, streaming, embeddings,
 function calling, vision, and tool use.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -34,7 +34,7 @@ class OpenAIProvider(BaseProvider):
                   tool use, vision, JSON mode, long context.
     """
 
-    def __init__(self, config: Optional[OpenAIConfig] = None) -> None:
+    def __init__(self, config: OpenAIConfig | None = None) -> None:
         self._config = config or OpenAIConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -103,12 +103,12 @@ class OpenAIProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("OpenAI embeddings not yet implemented")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         # TODO: Query OpenAI models API
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         # TODO: Look up specific model
         """See base class."""
         return None

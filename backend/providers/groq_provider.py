@@ -4,7 +4,7 @@ Provides access to Groq's ultra-fast inference platform. Specializes
 in low-latency responses using custom LPU hardware.
 """
 
-from typing import AsyncIterator, List, Optional
+from collections.abc import AsyncIterator
 
 from providers.base import BaseProvider
 from providers.capabilities import (
@@ -33,7 +33,7 @@ class GroqProvider(BaseProvider):
     Notable: Extremely low latency inference.
     """
 
-    def __init__(self, config: Optional[GroqConfig] = None) -> None:
+    def __init__(self, config: GroqConfig | None = None) -> None:
         self._config = config or GroqConfig()
         self._initialized = False
         self._capabilities = CapabilitySet(
@@ -97,12 +97,12 @@ class GroqProvider(BaseProvider):
         """See base class."""
         raise NotImplementedError("Groq embeddings not available")
 
-    async def list_models(self) -> List[ModelInfo]:
+    async def list_models(self) -> list[ModelInfo]:
         # TODO: Query Groq models endpoint
         """See base class."""
         return []
 
-    async def get_model(self, model_id: str) -> Optional[ModelInfo]:
+    async def get_model(self, model_id: str) -> ModelInfo | None:
         """See base class."""
         return None
 

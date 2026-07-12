@@ -1,0 +1,82 @@
+[project]
+name = "sona-ai-os"
+version = "0.2.0"
+description = "Sona AI OS — Next-Generation Personal AI Operating System"
+requires-python = ">=3.12"
+license = "MIT"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",    # flake8-comprehensions
+    "T20",   # flake8-print
+    "SIM",   # flake8-simplify
+    "ARG",   # flake8-unused-arguments
+    "RET",   # flake8-return
+]
+ignore = [
+    "E501",    # line too long (handled by formatter)
+    "COM812",  # missing trailing comma (conflicts with formatter)
+    "ARG001",  # unused function argument (common in abstract/interface methods)
+    "ARG002",  # unused method argument (common in abstract/interface methods)
+    "B008",    # function call in default argument (FastAPI Depends pattern)
+    "RET504",  # unnecessary assignment before return
+    "UP042",   # replace-str-enum (StrEnum requires Python 3.11+ migration pattern)
+    "A001",    # builtin-variable-shadowing (intentional in domain models)
+    "A002",    # builtin-argument-shadowing (intentional in domain models)
+    "A004",    # builtin-import-shadowing (intentional aliasing)
+    "N818",    # error-suffix-on-exception-name (project uses Error suffix convention)
+    "UP046",   # non-pep695-generic-class (not yet adopted)
+    "B027",    # empty-method-without-abstract-decorator (hook methods)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "app", "api", "config", "core", "kernel",
+    "providers", "agents", "memory",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true
+disallow_untyped_defs = false
+exclude = ["tests/", "__pycache__/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--strict-markers -v"
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+fail_under = 50

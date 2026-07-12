@@ -4,7 +4,8 @@ Specializes in breaking complex tasks into subtasks, creating
 execution plans, and delegating work to appropriate agents.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,9 +36,7 @@ class PlannerAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="planner_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.PLANNING, CapabilityLevel.EXPERT
-                ),
+                AgentCapabilityDescriptor(AgentCapability.PLANNING, CapabilityLevel.EXPERT),
                 AgentCapabilityDescriptor(
                     AgentCapability.MULTI_STEP_REASONING, CapabilityLevel.EXPERT
                 ),
@@ -63,7 +62,7 @@ class PlannerAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -83,9 +82,7 @@ class PlannerAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("PlannerAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("PlannerAgent streaming not yet implemented")
         yield  # type: ignore[misc]

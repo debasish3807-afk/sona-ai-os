@@ -2,7 +2,6 @@
 
 from enum import Enum
 from functools import lru_cache
-from typing import List
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -41,7 +40,7 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, description="Debug mode")
 
     # Server
-    host: str = Field(default="0.0.0.0", description="Server host")
+    host: str = Field(default="0.0.0.0", description="Server host")  # nosec B104
     port: int = Field(default=8000, description="Server port")
     workers: int = Field(default=1, description="Number of worker processes")
     reload: bool = Field(default=False, description="Auto-reload on code changes")
@@ -53,19 +52,13 @@ class Settings(BaseSettings):
     openapi_url: str = Field(default="/openapi.json", description="OpenAPI schema URL")
 
     # CORS
-    cors_origins: List[str] = Field(
+    cors_origins: list[str] = Field(
         default=["http://localhost:3000", "http://localhost:8000"],
         description="Allowed CORS origins",
     )
-    cors_allow_credentials: bool = Field(
-        default=True, description="Allow credentials in CORS"
-    )
-    cors_allow_methods: List[str] = Field(
-        default=["*"], description="Allowed CORS methods"
-    )
-    cors_allow_headers: List[str] = Field(
-        default=["*"], description="Allowed CORS headers"
-    )
+    cors_allow_credentials: bool = Field(default=True, description="Allow credentials in CORS")
+    cors_allow_methods: list[str] = Field(default=["*"], description="Allowed CORS methods")
+    cors_allow_headers: list[str] = Field(default=["*"], description="Allowed CORS headers")
 
     # Security
     secret_key: str = Field(

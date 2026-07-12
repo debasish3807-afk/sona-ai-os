@@ -6,9 +6,9 @@ state tracking, history management, and cleanup.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -38,10 +38,10 @@ class SessionConfig:
 
     max_idle_seconds: int = 3600
     max_history_length: int = 100
-    model_preference: Optional[str] = None
-    system_prompt_id: Optional[str] = None
-    features: Dict[str, bool] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    model_preference: str | None = None
+    system_prompt_id: str | None = None
+    features: dict[str, bool] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -61,10 +61,10 @@ class SessionMessage:
     role: str
     content: str
     message_id: str = field(default_factory=lambda: str(uuid4()))
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    model_used: Optional[str] = None
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    model_used: str | None = None
     token_count: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -88,12 +88,12 @@ class Session:
     session_id: str = field(default_factory=lambda: str(uuid4()))
     status: SessionStatus = SessionStatus.ACTIVE
     config: SessionConfig = field(default_factory=SessionConfig)
-    messages: List[SessionMessage] = field(default_factory=list)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    messages: list[SessionMessage] = field(default_factory=list)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_tokens_used: int = 0
     total_requests: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_active(self) -> bool:
@@ -138,7 +138,7 @@ class SessionManager(ABC):
     async def create_session(
         self,
         user_id: str,
-        config: Optional[SessionConfig] = None,
+        config: SessionConfig | None = None,
     ) -> Session:
         """Create a new session for a user.
 
@@ -152,7 +152,7 @@ class SessionManager(ABC):
         ...
 
     @abstractmethod
-    async def get_session(self, session_id: str) -> Optional[Session]:
+    async def get_session(self, session_id: str) -> Session | None:
         """Retrieve a session by ID.
 
         Args:
@@ -167,9 +167,9 @@ class SessionManager(ABC):
     async def update_session(
         self,
         session_id: str,
-        status: Optional[SessionStatus] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Optional[Session]:
+        status: SessionStatus | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> Session | None:
         """Update session status or metadata.
 
         Args:
@@ -215,9 +215,9 @@ class SessionManager(ABC):
     async def get_messages(
         self,
         session_id: str,
-        limit: Optional[int] = None,
+        limit: int | None = None,
         offset: int = 0,
-    ) -> List[SessionMessage]:
+    ) -> list[SessionMessage]:
         """Retrieve messages from a session's history.
 
         Args:
@@ -233,11 +233,11 @@ class SessionManager(ABC):
     @abstractmethod
     async def list_sessions(
         self,
-        user_id: Optional[str] = None,
-        status: Optional[SessionStatus] = None,
+        user_id: str | None = None,
+        status: SessionStatus | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> List[SessionSummary]:
+    ) -> list[SessionSummary]:
         """List sessions with optional filtering.
 
         Args:

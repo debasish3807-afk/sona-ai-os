@@ -8,10 +8,9 @@ conflict resolution, and parallel execution.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
-from agents.base import BaseAgent
 from agents.context import ExecutionContext, ExecutionResult
 
 
@@ -54,11 +53,11 @@ class DelegationRequest:
     source_agent_id: str
     context: ExecutionContext
     delegation_id: str = field(default_factory=lambda: str(uuid4()))
-    target_agent_id: Optional[str] = None
+    target_agent_id: str | None = None
     priority: int = 50
     timeout_seconds: float = 120.0
-    fallback_agents: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    fallback_agents: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -77,12 +76,11 @@ class DelegationResult:
 
     delegation_id: str
     status: DelegationStatus
-    result: Optional[ExecutionResult] = None
-    agent_id: Optional[str] = None
+    result: ExecutionResult | None = None
+    agent_id: str | None = None
     duration_ms: float = 0.0
     attempts: int = 1
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -99,11 +97,11 @@ class CoordinationPlan:
     """
 
     mode: CoordinationMode
-    agents: List[str]
+    agents: list[str]
     plan_id: str = field(default_factory=lambda: str(uuid4()))
-    steps: List[Dict[str, Any]] = field(default_factory=list)
-    shared_state: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    steps: list[dict[str, Any]] = field(default_factory=list)
+    shared_state: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class AgentCoordinator(ABC):
@@ -114,9 +112,7 @@ class AgentCoordinator(ABC):
     """
 
     @abstractmethod
-    async def delegate(
-        self, request: DelegationRequest
-    ) -> DelegationResult:
+    async def delegate(self, request: DelegationRequest) -> DelegationResult:
         """Delegate a task to another agent.
 
         Handles agent selection, execution monitoring, fallback,
@@ -133,9 +129,9 @@ class AgentCoordinator(ABC):
     @abstractmethod
     async def execute_parallel(
         self,
-        contexts: List[ExecutionContext],
-        agents: Optional[List[str]] = None,
-    ) -> List[ExecutionResult]:
+        contexts: list[ExecutionContext],
+        agents: list[str] | None = None,
+    ) -> list[ExecutionResult]:
         """Execute tasks in parallel across multiple agents.
 
         Args:
@@ -151,7 +147,7 @@ class AgentCoordinator(ABC):
     async def execute_pipeline(
         self,
         initial_context: ExecutionContext,
-        pipeline: List[str],
+        pipeline: list[str],
     ) -> ExecutionResult:
         """Execute a pipeline of agents sequentially.
 
@@ -167,9 +163,7 @@ class AgentCoordinator(ABC):
         ...
 
     @abstractmethod
-    async def execute_plan(
-        self, plan: CoordinationPlan
-    ) -> Dict[str, ExecutionResult]:
+    async def execute_plan(self, plan: CoordinationPlan) -> dict[str, ExecutionResult]:
         """Execute a coordination plan.
 
         Args:
@@ -183,7 +177,7 @@ class AgentCoordinator(ABC):
     @abstractmethod
     async def aggregate_results(
         self,
-        results: List[ExecutionResult],
+        results: list[ExecutionResult],
         strategy: str = "merge",
     ) -> ExecutionResult:
         """Aggregate results from multiple agents.
@@ -210,9 +204,7 @@ class AgentCoordinator(ABC):
         ...
 
     @abstractmethod
-    async def get_delegation_status(
-        self, delegation_id: str
-    ) -> Optional[DelegationStatus]:
+    async def get_delegation_status(self, delegation_id: str) -> DelegationStatus | None:
         """Get the status of a delegation.
 
         Args:

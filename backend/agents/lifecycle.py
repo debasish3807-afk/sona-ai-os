@@ -7,9 +7,7 @@ agent dependency graph.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 
-from agents.base import BaseAgent
 from agents.state import AgentHealth, AgentStatus
 
 
@@ -24,8 +22,8 @@ class DependencyNode:
     """
 
     agent_id: str
-    dependencies: List[str] = field(default_factory=list)
-    dependents: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
+    dependents: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -43,9 +41,8 @@ class LifecycleResult:
     agent_id: str
     success: bool
     status: AgentStatus
-    error: Optional[str] = None
+    error: str | None = None
     duration_ms: float = 0.0
-
 
 
 class AgentLifecycleManager(ABC):
@@ -110,7 +107,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def start_all(self) -> Dict[str, LifecycleResult]:
+    async def start_all(self) -> dict[str, LifecycleResult]:
         """Start all registered agents in dependency order.
 
         Returns:
@@ -119,7 +116,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def stop_all(self) -> Dict[str, LifecycleResult]:
+    async def stop_all(self) -> dict[str, LifecycleResult]:
         """Stop all agents in reverse dependency order.
 
         Returns:
@@ -128,7 +125,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    async def health_check_all(self) -> Dict[str, AgentHealth]:
+    async def health_check_all(self) -> dict[str, AgentHealth]:
         """Run health checks on all agents.
 
         Returns:
@@ -137,7 +134,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def get_dependency_graph(self) -> Dict[str, DependencyNode]:
+    def get_dependency_graph(self) -> dict[str, DependencyNode]:
         """Get the full agent dependency graph.
 
         Returns:
@@ -146,7 +143,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def get_startup_order(self) -> List[str]:
+    def get_startup_order(self) -> list[str]:
         """Get the topologically-sorted startup order.
 
         Returns:
@@ -155,7 +152,7 @@ class AgentLifecycleManager(ABC):
         ...
 
     @abstractmethod
-    def validate_dependencies(self) -> List[str]:
+    def validate_dependencies(self) -> list[str]:
         """Validate the dependency graph for cycles and missing deps.
 
         Returns:

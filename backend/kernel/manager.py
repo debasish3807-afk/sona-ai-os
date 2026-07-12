@@ -7,14 +7,12 @@ root for dependency injection.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from kernel.events import EventBus
 from kernel.kernel import AIKernel, KernelConfig
-from kernel.lifecycle import ComponentInfo, ComponentState, Lifecycle
-from kernel.registry import Provider, ProviderRegistry
+from kernel.lifecycle import ComponentInfo, Lifecycle
+from kernel.registry import Provider
 from kernel.state import KernelState, KernelStatus
-
 
 
 @dataclass
@@ -35,7 +33,7 @@ class ManagerConfig:
     health_check_interval_seconds: int = 30
     max_startup_time_seconds: int = 60
     graceful_shutdown_timeout: int = 30
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class KernelManager(ABC):
@@ -51,7 +49,7 @@ class KernelManager(ABC):
 
     @property
     @abstractmethod
-    def kernel(self) -> Optional[AIKernel]:
+    def kernel(self) -> AIKernel | None:
         """Get the managed kernel instance.
 
         Returns:
@@ -66,7 +64,7 @@ class KernelManager(ABC):
         ...
 
     @abstractmethod
-    async def initialize(self, config: Optional[ManagerConfig] = None) -> None:
+    async def initialize(self, config: ManagerConfig | None = None) -> None:
         """Initialize the kernel manager and create the kernel.
 
         Sets up all kernel subsystems and prepares the kernel
@@ -79,7 +77,6 @@ class KernelManager(ABC):
             RuntimeError: If initialization fails.
         """
         ...
-
 
     @abstractmethod
     async def start(self) -> None:
@@ -160,7 +157,7 @@ class KernelManager(ABC):
         ...
 
     @abstractmethod
-    async def get_components(self) -> List[ComponentInfo]:
+    async def get_components(self) -> list[ComponentInfo]:
         """Get information about all managed components.
 
         Returns:
@@ -169,7 +166,7 @@ class KernelManager(ABC):
         ...
 
     @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Run a comprehensive health check.
 
         Checks kernel status, all providers, and all components.

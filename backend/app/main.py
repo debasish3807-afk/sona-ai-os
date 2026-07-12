@@ -73,14 +73,14 @@ def _register_middleware(app: FastAPI, settings: Settings) -> None:
 
     # Request ID and timing middleware
     @app.middleware("http")
-    async def add_request_metadata(request: Request, call_next: object) -> Response:
+    async def add_request_metadata(request: Request, call_next):  # type: ignore[no-untyped-def]
         """Add request ID and response timing headers."""
         # Generate or extract request ID
         request_id = request.headers.get(HEADER_REQUEST_ID, str(uuid.uuid4()))
 
         # Track response time
         start_time = time.perf_counter()
-        response: Response = await call_next(request)  # type: ignore[misc]
+        response: Response = await call_next(request)
         process_time = time.perf_counter() - start_time
 
         # Add response headers

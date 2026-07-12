@@ -8,7 +8,7 @@ assignments.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -52,12 +52,12 @@ class PlanStep:
 
     step_type: StepType
     step_id: str = field(default_factory=lambda: str(uuid4()))
-    agent_id: Optional[str] = None
-    input_data: Dict[str, Any] = field(default_factory=dict)
-    depends_on: List[str] = field(default_factory=list)
+    agent_id: str | None = None
+    input_data: dict[str, Any] = field(default_factory=dict)
+    depends_on: list[str] = field(default_factory=list)
     timeout_seconds: float = 120.0
     retry_count: int = 1
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -74,11 +74,11 @@ class ExecutionPlan:
     """
 
     task_description: str
-    steps: List[PlanStep]
+    steps: list[PlanStep]
     plan_id: str = field(default_factory=lambda: str(uuid4()))
     status: PlanStatus = PlanStatus.DRAFT
     estimated_duration_ms: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def step_count(self) -> int:
@@ -106,8 +106,8 @@ class TaskPlanner(ABC):
     async def create_plan(
         self,
         task_description: str,
-        context: Dict[str, Any],
-        available_agents: Optional[List[str]] = None,
+        context: dict[str, Any],
+        available_agents: list[str] | None = None,
     ) -> ExecutionPlan:
         """Create an execution plan for a task.
 
@@ -125,7 +125,7 @@ class TaskPlanner(ABC):
         ...
 
     @abstractmethod
-    async def validate_plan(self, plan: ExecutionPlan) -> List[str]:
+    async def validate_plan(self, plan: ExecutionPlan) -> list[str]:
         """Validate a plan for correctness.
 
         Checks for dependency cycles, missing agents,
@@ -158,7 +158,7 @@ class TaskPlanner(ABC):
     async def revise_plan(
         self,
         plan: ExecutionPlan,
-        feedback: Dict[str, Any],
+        feedback: dict[str, Any],
     ) -> ExecutionPlan:
         """Revise a plan based on execution feedback.
 

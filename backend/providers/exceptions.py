@@ -5,7 +5,7 @@ connection failures, rate limiting, authentication errors, and
 model-specific issues.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class ProviderError(Exception):
@@ -23,10 +23,10 @@ class ProviderError(Exception):
     def __init__(
         self,
         message: str = "Provider error occurred",
-        provider_id: Optional[str] = None,
-        status_code: Optional[int] = None,
+        provider_id: str | None = None,
+        status_code: int | None = None,
         error_code: str = "PROVIDER_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
         retryable: bool = False,
     ) -> None:
         self.message = message
@@ -37,7 +37,7 @@ class ProviderError(Exception):
         self.retryable = retryable
         super().__init__(self.message)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dictionary."""
         return {
             "error_code": self.error_code,
@@ -55,8 +55,8 @@ class ProviderConnectionError(ProviderError):
     def __init__(
         self,
         message: str = "Failed to connect to provider",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -73,8 +73,8 @@ class ProviderAuthenticationError(ProviderError):
     def __init__(
         self,
         message: str = "Authentication failed",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -92,9 +92,9 @@ class ProviderRateLimitError(ProviderError):
     def __init__(
         self,
         message: str = "Rate limit exceeded",
-        provider_id: Optional[str] = None,
-        retry_after_seconds: Optional[float] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        retry_after_seconds: float | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if retry_after_seconds is not None:
@@ -116,9 +116,9 @@ class ProviderTimeoutError(ProviderError):
     def __init__(
         self,
         message: str = "Request timed out",
-        provider_id: Optional[str] = None,
-        timeout_seconds: Optional[float] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        timeout_seconds: float | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if timeout_seconds is not None:
@@ -139,9 +139,9 @@ class ModelNotFoundError(ProviderError):
     def __init__(
         self,
         message: str = "Model not found",
-        provider_id: Optional[str] = None,
-        model_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        model_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if model_id:
@@ -162,8 +162,8 @@ class ModelOverloadedError(ProviderError):
     def __init__(
         self,
         message: str = "Model overloaded",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -181,8 +181,8 @@ class ContentFilterError(ProviderError):
     def __init__(
         self,
         message: str = "Content filtered by safety policy",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -200,8 +200,8 @@ class InvalidRequestError(ProviderError):
     def __init__(
         self,
         message: str = "Invalid request",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -219,8 +219,8 @@ class QuotaExceededError(ProviderError):
     def __init__(
         self,
         message: str = "Quota exceeded",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -238,8 +238,8 @@ class ProviderUnavailableError(ProviderError):
     def __init__(
         self,
         message: str = "Provider unavailable",
-        provider_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        provider_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
             message=message,
@@ -257,8 +257,8 @@ class AllProvidersFailed(ProviderError):
     def __init__(
         self,
         message: str = "All providers failed",
-        attempted_providers: Optional[list[str]] = None,
-        details: Optional[Dict[str, Any]] = None,
+        attempted_providers: list[str] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         _details = details or {}
         if attempted_providers:

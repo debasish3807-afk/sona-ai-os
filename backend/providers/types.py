@@ -5,9 +5,9 @@ all provider implementations and management components.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -81,10 +81,10 @@ class ChatMessage:
 
     role: MessageRole
     content: str
-    name: Optional[str] = None
-    tool_calls: Optional[List[Dict[str, Any]]] = None
-    tool_call_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    name: str | None = None
+    tool_calls: list[dict[str, Any]] | None = None
+    tool_call_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -108,20 +108,20 @@ class ChatRequest:
         metadata: Additional request parameters.
     """
 
-    messages: List[ChatMessage]
+    messages: list[ChatMessage]
     model: str
     temperature: float = 0.7
     max_tokens: int = 4096
     top_p: float = 1.0
     frequency_penalty: float = 0.0
     presence_penalty: float = 0.0
-    stop: Optional[List[str]] = None
+    stop: list[str] | None = None
     stream: bool = False
-    tools: Optional[List[Dict[str, Any]]] = None
-    tool_choice: Optional[str] = None
-    response_format: Optional[Dict[str, str]] = None
-    seed: Optional[int] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tools: list[dict[str, Any]] | None = None
+    tool_choice: str | None = None
+    response_format: dict[str, str] | None = None
+    seed: int | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -162,12 +162,10 @@ class ChatResponse:
     response_id: str = field(default_factory=lambda: str(uuid4()))
     finish_reason: FinishReason = FinishReason.STOP
     token_usage: TokenUsage = field(default_factory=TokenUsage)
-    tool_calls: Optional[List[Dict[str, Any]]] = None
+    tool_calls: list[dict[str, Any]] | None = None
     latency_ms: float = 0.0
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -186,9 +184,9 @@ class StreamChunk:
     event: StreamEvent
     content: str = ""
     model: str = ""
-    finish_reason: Optional[FinishReason] = None
-    tool_calls: Optional[List[Dict[str, Any]]] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    finish_reason: FinishReason | None = None
+    tool_calls: list[dict[str, Any]] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -203,11 +201,11 @@ class EmbeddingRequest:
         metadata: Additional request parameters.
     """
 
-    input: List[str]
+    input: list[str]
     model: str
     encoding_format: str = "float"
-    dimensions: Optional[int] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    dimensions: int | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -223,12 +221,12 @@ class EmbeddingResponse:
         metadata: Additional response metadata.
     """
 
-    embeddings: List[List[float]]
+    embeddings: list[list[float]]
     model: str
     provider: str
     token_usage: TokenUsage = field(default_factory=TokenUsage)
     dimensions: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -263,4 +261,4 @@ class ModelInfo:
     supports_json_mode: bool = False
     cost_per_input_token: float = 0.0
     cost_per_output_token: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)

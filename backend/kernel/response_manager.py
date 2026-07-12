@@ -5,10 +5,11 @@ of AI model responses back to the caller.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -66,7 +67,7 @@ class ResponseChunk:
     chunk_id: str = field(default_factory=lambda: str(uuid4()))
     index: int = 0
     is_final: bool = False
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -96,10 +97,8 @@ class ModelResponse:
     token_usage: TokenUsage = field(default_factory=TokenUsage)
     latency_ms: float = 0.0
     finish_reason: str = "stop"
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -117,10 +116,10 @@ class ProcessedResponse:
 
     response: ModelResponse
     processed_content: str
-    filters_applied: List[str] = field(default_factory=list)
+    filters_applied: list[str] = field(default_factory=list)
     safety_passed: bool = True
-    quality_score: Optional[float] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    quality_score: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class ResponseFilter(ABC):
@@ -237,7 +236,7 @@ class ResponseManager(ABC):
         ...
 
     @abstractmethod
-    def list_filters(self) -> List[str]:
+    def list_filters(self) -> list[str]:
         """List names of all registered filters in execution order.
 
         Returns:

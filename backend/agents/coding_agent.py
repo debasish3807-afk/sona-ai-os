@@ -4,7 +4,8 @@ Specializes in writing, reviewing, and debugging code across
 multiple programming languages and frameworks.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,15 +36,9 @@ class CodingAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="coding_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.CODE_GENERATION, CapabilityLevel.EXPERT
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.CODE_REVIEW, CapabilityLevel.EXPERT
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED
-                ),
+                AgentCapabilityDescriptor(AgentCapability.CODE_GENERATION, CapabilityLevel.EXPERT),
+                AgentCapabilityDescriptor(AgentCapability.CODE_REVIEW, CapabilityLevel.EXPERT),
+                AgentCapabilityDescriptor(AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED),
             ],
         )
 
@@ -63,7 +58,7 @@ class CodingAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -83,9 +78,7 @@ class CodingAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("CodingAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("CodingAgent streaming not yet implemented")
         yield  # type: ignore[misc]

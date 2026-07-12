@@ -4,7 +4,8 @@ Specializes in security vulnerability detection, code auditing,
 threat analysis, and security best-practice recommendations.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,15 +36,9 @@ class SecurityAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="security_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.SECURITY_AUDIT, CapabilityLevel.EXPERT
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.CODE_REVIEW, CapabilityLevel.ADVANCED
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED
-                ),
+                AgentCapabilityDescriptor(AgentCapability.SECURITY_AUDIT, CapabilityLevel.EXPERT),
+                AgentCapabilityDescriptor(AgentCapability.CODE_REVIEW, CapabilityLevel.ADVANCED),
+                AgentCapabilityDescriptor(AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED),
             ],
         )
 
@@ -63,7 +58,7 @@ class SecurityAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -83,9 +78,7 @@ class SecurityAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("SecurityAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("SecurityAgent streaming not yet implemented")
         yield  # type: ignore[misc]

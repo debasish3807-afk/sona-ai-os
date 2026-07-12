@@ -4,7 +4,8 @@ Specializes in speech-to-text, text-to-speech, audio analysis,
 and voice interaction management.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -58,7 +59,7 @@ class VoiceAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -74,14 +75,11 @@ class VoiceAgent(BaseAgent):
         """See base class."""
         self._status = AgentStatus.STOPPED
 
-
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
         """See base class."""
         raise NotImplementedError("VoiceAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("VoiceAgent streaming not yet implemented")
         yield  # type: ignore[misc]

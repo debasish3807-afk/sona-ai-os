@@ -4,7 +4,8 @@ Specializes in automating repetitive tasks, executing workflows,
 performing file operations, and interacting with external APIs.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,9 +36,7 @@ class AutomationAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="automation_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.AUTOMATION, CapabilityLevel.EXPERT
-                ),
+                AgentCapabilityDescriptor(AgentCapability.AUTOMATION, CapabilityLevel.EXPERT),
                 AgentCapabilityDescriptor(
                     AgentCapability.FILE_OPERATIONS, CapabilityLevel.ADVANCED
                 ),
@@ -63,7 +62,7 @@ class AutomationAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -83,9 +82,7 @@ class AutomationAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("AutomationAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("AutomationAgent streaming not yet implemented")
         yield  # type: ignore[misc]

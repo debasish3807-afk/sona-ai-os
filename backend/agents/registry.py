@@ -6,12 +6,12 @@ by ID, capability matching, and dynamic discovery.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
-from agents.base import AgentInfo, BaseAgent
-from agents.capabilities import AgentCapability, CapabilityRequirement
-from agents.state import AgentHealth, AgentStatus
+from agents.base import BaseAgent
+from agents.capabilities import CapabilityRequirement
+from agents.state import AgentStatus
 
 
 @dataclass
@@ -27,12 +27,10 @@ class AgentEntry:
     """
 
     agent: BaseAgent
-    registered_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    registered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     enabled: bool = True
     priority: int = 50
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def agent_id(self) -> str:
@@ -48,7 +46,6 @@ class AgentEntry:
         )
 
 
-
 class AgentRegistry(ABC):
     """Abstract interface for agent registration and discovery.
 
@@ -57,9 +54,7 @@ class AgentRegistry(ABC):
     """
 
     @abstractmethod
-    async def register(
-        self, agent: BaseAgent, priority: int = 50
-    ) -> str:
+    async def register(self, agent: BaseAgent, priority: int = 50) -> str:
         """Register an agent with the system.
 
         Args:
@@ -87,7 +82,7 @@ class AgentRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get(self, agent_id: str) -> Optional[BaseAgent]:
+    async def get(self, agent_id: str) -> BaseAgent | None:
         """Get an agent by ID.
 
         Args:
@@ -99,7 +94,7 @@ class AgentRegistry(ABC):
         ...
 
     @abstractmethod
-    async def get_entry(self, agent_id: str) -> Optional[AgentEntry]:
+    async def get_entry(self, agent_id: str) -> AgentEntry | None:
         """Get the full registry entry.
 
         Args:
@@ -111,19 +106,17 @@ class AgentRegistry(ABC):
         ...
 
     @abstractmethod
-    async def list_all(self) -> List[AgentEntry]:
+    async def list_all(self) -> list[AgentEntry]:
         """List all registered agents."""
         ...
 
     @abstractmethod
-    async def list_available(self) -> List[BaseAgent]:
+    async def list_available(self) -> list[BaseAgent]:
         """List all available (enabled + running) agents."""
         ...
 
     @abstractmethod
-    async def find_by_capability(
-        self, requirement: CapabilityRequirement
-    ) -> List[BaseAgent]:
+    async def find_by_capability(self, requirement: CapabilityRequirement) -> list[BaseAgent]:
         """Find agents matching capability requirements.
 
         Args:
@@ -135,7 +128,7 @@ class AgentRegistry(ABC):
         ...
 
     @abstractmethod
-    async def find_by_tag(self, tag: str) -> List[BaseAgent]:
+    async def find_by_tag(self, tag: str) -> list[BaseAgent]:
         """Find agents with a specific tag.
 
         Args:
@@ -147,9 +140,7 @@ class AgentRegistry(ABC):
         ...
 
     @abstractmethod
-    async def set_enabled(
-        self, agent_id: str, enabled: bool
-    ) -> None:
+    async def set_enabled(self, agent_id: str, enabled: bool) -> None:
         """Enable or disable an agent."""
         ...
 

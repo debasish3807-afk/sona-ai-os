@@ -14,9 +14,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from .index import IndexHealth, IndexType
 from .types import MemoryStats
@@ -64,13 +64,13 @@ class MemorySystemState:
     """
 
     status: MemorySystemStatus = MemorySystemStatus.INITIALIZING
-    stats: Optional[MemoryStats] = None
+    stats: MemoryStats | None = None
     index_health: dict[IndexType, IndexHealth] = field(default_factory=dict)
     policy_violations: list[str] = field(default_factory=list)
-    started_at: Optional[datetime] = None
-    last_consolidation: Optional[datetime] = None
-    last_health_check: Optional[datetime] = None
-    error_message: Optional[str] = None
+    started_at: datetime | None = None
+    last_consolidation: datetime | None = None
+    last_health_check: datetime | None = None
+    error_message: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -92,7 +92,9 @@ class MemoryStateManager(ABC):
         ...
 
     @abstractmethod
-    async def set_status(self, status: MemorySystemStatus, error_message: Optional[str] = None) -> None:
+    async def set_status(
+        self, status: MemorySystemStatus, error_message: str | None = None
+    ) -> None:
         """Update the system's operational status.
 
         Args:

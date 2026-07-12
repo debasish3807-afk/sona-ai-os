@@ -19,11 +19,10 @@ from __future__ import annotations
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
-from .types import MemoryEntry
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,10 +70,10 @@ class Episode:
     description: str
     episode_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     entries: list[str] = field(default_factory=list)
-    start_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    end_time: Optional[datetime] = None
+    start_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    end_time: datetime | None = None
     participants: list[str] = field(default_factory=list)
-    outcome: Optional[str] = None
+    outcome: str | None = None
     linked_episodes: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -101,7 +100,7 @@ class EpisodicMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_episode(self, episode_id: str) -> Optional[Episode]:
+    async def get_episode(self, episode_id: str) -> Episode | None:
         """Retrieve a single episode by its ID.
 
         Args:
@@ -116,7 +115,7 @@ class EpisodicMemory(MemoryStore):
     async def search_episodes(
         self,
         query: str,
-        time_range: Optional[tuple[datetime, datetime]] = None,
+        time_range: tuple[datetime, datetime] | None = None,
         max_results: int = 20,
     ) -> list[Episode]:
         """Search for episodes matching a query within an optional time range.

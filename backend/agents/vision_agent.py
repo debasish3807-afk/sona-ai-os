@@ -4,7 +4,8 @@ Specializes in image analysis, visual content understanding,
 OCR, and multimodal vision tasks.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -38,9 +39,7 @@ class VisionAgent(BaseAgent):
                 AgentCapabilityDescriptor(
                     AgentCapability.VISION_PROCESSING, CapabilityLevel.EXPERT
                 ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED
-                ),
+                AgentCapabilityDescriptor(AgentCapability.ANALYSIS, CapabilityLevel.ADVANCED),
             ],
         )
 
@@ -60,7 +59,7 @@ class VisionAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -80,9 +79,7 @@ class VisionAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("VisionAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("VisionAgent streaming not yet implemented")
         yield  # type: ignore[misc]

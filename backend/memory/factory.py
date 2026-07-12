@@ -11,7 +11,7 @@ Classes:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Type
+from typing import Any
 
 from .base import MemoryStore
 from .types import MemoryType
@@ -32,8 +32,8 @@ class MemoryFactory(ABC):
     def register_class(
         self,
         memory_type: MemoryType,
-        store_class: Type[MemoryStore],
-        default_config: Optional[dict[str, Any]] = None,
+        store_class: type[MemoryStore],
+        default_config: dict[str, Any] | None = None,
     ) -> None:
         """Register a memory store class for a specific memory type.
 
@@ -63,7 +63,7 @@ class MemoryFactory(ABC):
     def create(
         self,
         memory_type: MemoryType,
-        config: Optional[dict[str, Any]] = None,
+        config: dict[str, Any] | None = None,
     ) -> MemoryStore:
         """Create a memory store instance for the specified type.
 
@@ -84,7 +84,7 @@ class MemoryFactory(ABC):
 
     @abstractmethod
     def create_all(
-        self, configs: Optional[dict[MemoryType, dict[str, Any]]] = None
+        self, configs: dict[MemoryType, dict[str, Any]] | None = None
     ) -> dict[MemoryType, MemoryStore]:
         """Create store instances for all registered memory types.
 

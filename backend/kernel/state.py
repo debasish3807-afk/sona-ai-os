@@ -6,9 +6,9 @@ status, resource utilization, and runtime metrics.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class KernelStatus(str, Enum):
@@ -22,7 +22,6 @@ class KernelStatus(str, Enum):
     SHUTTING_DOWN = "shutting_down"
     STOPPED = "stopped"
     ERROR = "error"
-
 
 
 @dataclass
@@ -50,7 +49,6 @@ class ResourceMetrics:
     uptime_seconds: float = 0.0
 
 
-
 @dataclass
 class ProviderStatus:
     """Status of a registered provider.
@@ -72,9 +70,8 @@ class ProviderStatus:
     models_available: int = 0
     current_rpm: int = 0
     rate_limit_rpm: int = 60
-    last_health_check: Optional[datetime] = None
+    last_health_check: datetime | None = None
     error_count: int = 0
-
 
 
 @dataclass
@@ -93,13 +90,11 @@ class KernelState:
 
     status: KernelStatus = KernelStatus.STOPPED
     metrics: ResourceMetrics = field(default_factory=ResourceMetrics)
-    providers: List[ProviderStatus] = field(default_factory=list)
-    started_at: Optional[datetime] = None
-    last_updated: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    providers: list[ProviderStatus] = field(default_factory=list)
+    started_at: datetime | None = None
+    last_updated: datetime = field(default_factory=lambda: datetime.now(UTC))
     version: str = "0.1.0"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_operational(self) -> bool:
@@ -117,7 +112,6 @@ class KernelState:
             KernelStatus.READY,
             KernelStatus.PROCESSING,
         )
-
 
 
 class StateManager(ABC):
@@ -186,7 +180,7 @@ class StateManager(ABC):
     async def get_provider_status(
         self,
         provider_id: str,
-    ) -> Optional[ProviderStatus]:
+    ) -> ProviderStatus | None:
         """Get the status of a specific provider.
 
         Args:

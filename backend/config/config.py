@@ -1,7 +1,7 @@
 """Configuration registry and validation."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any
 
 from config.settings import Environment, Settings, get_settings
 
@@ -23,7 +23,7 @@ class AppConfig:
     docs_enabled: bool
     cors_origins: tuple[str, ...]
     log_level: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_settings(cls, settings: Settings | None = None) -> "AppConfig":

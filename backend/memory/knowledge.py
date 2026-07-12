@@ -21,8 +21,8 @@ from __future__ import annotations
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
 
@@ -73,7 +73,7 @@ class KnowledgeChunk:
     content: str
     position: int
     chunk_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    embedding: Optional[list[float]] = None
+    embedding: list[float] | None = None
     token_count: int = 0
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -105,8 +105,8 @@ class KnowledgeDocument:
     doc_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     chunks: list[KnowledgeChunk] = field(default_factory=list)
     embedded: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     format: str = "text"
     size_bytes: int = 0
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -135,7 +135,7 @@ class KnowledgeMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_document(self, doc_id: str) -> Optional[KnowledgeDocument]:
+    async def get_document(self, doc_id: str) -> KnowledgeDocument | None:
         """Retrieve a document by its ID.
 
         Args:
@@ -147,9 +147,7 @@ class KnowledgeMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def search_knowledge(
-        self, query: str, max_chunks: int = 10
-    ) -> list[KnowledgeChunk]:
+    async def search_knowledge(self, query: str, max_chunks: int = 10) -> list[KnowledgeChunk]:
         """Search knowledge memory for relevant chunks.
 
         Performs semantic and/or keyword search across all document
@@ -165,9 +163,7 @@ class KnowledgeMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def list_documents(
-        self, limit: int = 50, offset: int = 0
-    ) -> list[KnowledgeDocument]:
+    async def list_documents(self, limit: int = 50, offset: int = 0) -> list[KnowledgeDocument]:
         """List all documents with pagination.
 
         Args:

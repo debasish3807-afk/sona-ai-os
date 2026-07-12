@@ -20,7 +20,7 @@ Exception Hierarchy:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass(slots=True)
@@ -81,7 +81,7 @@ class MemoryNotFoundError(MemoryError):
     error_code: str = "MEMORY_NOT_FOUND"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = False
-    entry_id: Optional[str] = None
+    entry_id: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with entry_id in details if provided."""
@@ -106,7 +106,7 @@ class MemoryStorageError(MemoryError):
     error_code: str = "MEMORY_STORAGE_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    operation: Optional[str] = None
+    operation: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with operation in details if provided."""
@@ -131,7 +131,7 @@ class MemoryRetrievalError(MemoryError):
     error_code: str = "MEMORY_RETRIEVAL_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    query: Optional[str] = None
+    query: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with query in details if provided."""
@@ -158,9 +158,9 @@ class MemoryCapacityError(MemoryError):
     error_code: str = "MEMORY_CAPACITY_EXCEEDED"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = False
-    current_usage: Optional[int] = None
-    max_capacity: Optional[int] = None
-    scope: Optional[str] = None
+    current_usage: int | None = None
+    max_capacity: int | None = None
+    scope: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with capacity details."""
@@ -188,7 +188,7 @@ class MemoryExpirationError(MemoryError):
     error_code: str = "MEMORY_EXPIRATION_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    entry_id: Optional[str] = None
+    entry_id: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with entry_id in details if provided."""
@@ -213,8 +213,8 @@ class MemoryConsolidationError(MemoryError):
     error_code: str = "MEMORY_CONSOLIDATION_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    task_id: Optional[str] = None
-    entries_affected: Optional[int] = None
+    task_id: str | None = None
+    entries_affected: int | None = None
 
     def __post_init__(self) -> None:
         """Initialize with consolidation details."""
@@ -242,8 +242,8 @@ class MemoryIndexError(MemoryError):
     error_code: str = "MEMORY_INDEX_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    index_type: Optional[str] = None
-    operation: Optional[str] = None
+    index_type: str | None = None
+    operation: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with index details."""
@@ -271,9 +271,9 @@ class MemoryImportExportError(MemoryError):
     error_code: str = "MEMORY_IMPORT_EXPORT_ERROR"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = True
-    operation: Optional[str] = None
-    entries_processed: Optional[int] = None
-    total_entries: Optional[int] = None
+    operation: str | None = None
+    entries_processed: int | None = None
+    total_entries: int | None = None
 
     def __post_init__(self) -> None:
         """Initialize with import/export details."""
@@ -304,9 +304,9 @@ class MemoryPolicyViolation(MemoryError):
     error_code: str = "MEMORY_POLICY_VIOLATION"
     details: dict[str, Any] = field(default_factory=dict)
     retryable: bool = False
-    policy_id: Optional[str] = None
-    policy_name: Optional[str] = None
-    violation_type: Optional[str] = None
+    policy_id: str | None = None
+    policy_name: str | None = None
+    violation_type: str | None = None
 
     def __post_init__(self) -> None:
         """Initialize with policy violation details."""

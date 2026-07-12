@@ -6,8 +6,9 @@ workflow engine into a unified management interface.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 
 from agents.base import BaseAgent
 from agents.capabilities import CapabilityRequirement
@@ -18,7 +19,7 @@ from agents.factory import AgentFactory
 from agents.lifecycle import AgentLifecycleManager
 from agents.registry import AgentRegistry
 from agents.router import AgentRouter
-from agents.state import AgentState, AgentStatus
+from agents.state import AgentState
 from agents.workflow import WorkflowEngine
 
 
@@ -42,8 +43,7 @@ class AgentManagerConfig:
     health_check_interval_seconds: int = 30
     default_timeout_seconds: float = 120.0
     enable_workflows: bool = True
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class AgentManager(ABC):
@@ -101,9 +101,7 @@ class AgentManager(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def initialize(
-        self, config: Optional[AgentManagerConfig] = None
-    ) -> None:
+    async def initialize(self, config: AgentManagerConfig | None = None) -> None:
         """Initialize the agent system.
 
         Discovers agents, resolves dependencies, and starts
@@ -127,8 +125,8 @@ class AgentManager(ABC):
     async def execute(
         self,
         context: ExecutionContext,
-        agent_id: Optional[str] = None,
-        requirements: Optional[CapabilityRequirement] = None,
+        agent_id: str | None = None,
+        requirements: CapabilityRequirement | None = None,
     ) -> ExecutionResult:
         """Execute a task with automatic agent selection.
 
@@ -148,8 +146,8 @@ class AgentManager(ABC):
     async def execute_stream(
         self,
         context: ExecutionContext,
-        agent_id: Optional[str] = None,
-    ) -> AsyncIterator[Dict[str, Any]]:
+        agent_id: str | None = None,
+    ) -> AsyncIterator[dict[str, Any]]:
         """Execute a task with streaming output.
 
         Args:
@@ -162,9 +160,7 @@ class AgentManager(ABC):
         ...
 
     @abstractmethod
-    async def delegate(
-        self, request: DelegationRequest
-    ) -> DelegationResult:
+    async def delegate(self, request: DelegationRequest) -> DelegationResult:
         """Delegate a task between agents.
 
         Args:
@@ -180,9 +176,7 @@ class AgentManager(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def add_agent(
-        self, agent: BaseAgent, priority: int = 50
-    ) -> str:
+    async def add_agent(self, agent: BaseAgent, priority: int = 50) -> str:
         """Add and start a new agent.
 
         Args:
@@ -207,7 +201,7 @@ class AgentManager(ABC):
         ...
 
     @abstractmethod
-    async def get_agent(self, agent_id: str) -> Optional[BaseAgent]:
+    async def get_agent(self, agent_id: str) -> BaseAgent | None:
         """Get an agent by ID.
 
         Args:
@@ -219,7 +213,7 @@ class AgentManager(ABC):
         ...
 
     @abstractmethod
-    async def list_agents(self) -> List[AgentState]:
+    async def list_agents(self) -> list[AgentState]:
         """List all agents with their current state.
 
         Returns:
@@ -228,7 +222,7 @@ class AgentManager(ABC):
         ...
 
     @abstractmethod
-    async def get_available_agents(self) -> List[str]:
+    async def get_available_agents(self) -> list[str]:
         """Get IDs of currently available agents.
 
         Returns:
@@ -241,7 +235,7 @@ class AgentManager(ABC):
     # ------------------------------------------------------------------
 
     @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Run system-wide health check.
 
         Returns:
@@ -250,7 +244,7 @@ class AgentManager(ABC):
         ...
 
     @abstractmethod
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get system-wide metrics.
 
         Returns:

@@ -5,10 +5,11 @@ This is the fundamental building block of the multi-agent system.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 
-from agents.capabilities import AgentCapability, AgentCapabilitySet
+from agents.capabilities import AgentCapabilitySet
 from agents.context import ExecutionContext, ExecutionResult
 from agents.state import AgentHealth, AgentStatus
 
@@ -34,11 +35,10 @@ class AgentInfo:
     description: str = ""
     version: str = "0.1.0"
     author: str = "Sona AI OS"
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
     max_concurrent_tasks: int = 5
     priority: int = 50
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class BaseAgent(ABC):
@@ -70,7 +70,7 @@ class BaseAgent(ABC):
 
     @property
     @abstractmethod
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """Get list of agent IDs this agent depends on.
 
         Dependencies are started before this agent and stopped after.
@@ -140,9 +140,7 @@ class BaseAgent(ABC):
         ...
 
     @abstractmethod
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """Execute a task with streaming output.
 
         For tasks that benefit from incremental results.
@@ -172,9 +170,7 @@ class BaseAgent(ABC):
     # Optional hooks
     # ------------------------------------------------------------------
 
-    async def on_error(
-        self, error: Exception, context: Optional[ExecutionContext] = None
-    ) -> None:
+    async def on_error(self, error: Exception, context: ExecutionContext | None = None) -> None:
         """Hook called when an error occurs during execution.
 
         Override for custom error handling, logging, or recovery.
@@ -185,9 +181,7 @@ class BaseAgent(ABC):
         """
         pass
 
-    async def on_task_delegated(
-        self, target_agent_id: str, context: ExecutionContext
-    ) -> None:
+    async def on_task_delegated(self, target_agent_id: str, context: ExecutionContext) -> None:
         """Hook called when this agent delegates to another.
 
         Args:

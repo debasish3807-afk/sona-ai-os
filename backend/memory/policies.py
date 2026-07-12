@@ -19,9 +19,8 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
 
 from .types import MemoryEntry, MemoryScope, MemoryType
 
@@ -90,8 +89,8 @@ class RetentionPolicy:
 
     name: str
     memory_types: list[MemoryType]
-    max_age_seconds: Optional[int] = None
-    max_entries: Optional[int] = None
+    max_age_seconds: int | None = None
+    max_entries: int | None = None
     action: ExpiryAction = ExpiryAction.DELETE
     policy_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     enabled: bool = True
@@ -116,8 +115,8 @@ class CapacityPolicy:
     """
 
     scope: MemoryScope
-    max_entries: Optional[int] = None
-    max_size_bytes: Optional[int] = None
+    max_entries: int | None = None
+    max_size_bytes: int | None = None
     eviction_strategy: EvictionStrategy = EvictionStrategy.LRU
     policy_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     warning_threshold: float = 0.8
@@ -167,8 +166,8 @@ class PinPolicy:
     """
 
     max_pinned_per_scope: int = 100
-    pin_duration_seconds: Optional[int] = None
-    allowed_memory_types: Optional[list[MemoryType]] = None
+    pin_duration_seconds: int | None = None
+    allowed_memory_types: list[MemoryType] | None = None
     require_min_importance: float = 0.0
 
 
@@ -210,7 +209,7 @@ class PolicyViolation:
     violation_type: str
     message: str
     affected_entries: list[str] = field(default_factory=list)
-    detected_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    detected_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class PolicyEngine(ABC):

@@ -6,8 +6,8 @@ shared state.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 from uuid import uuid4
 
 
@@ -26,9 +26,8 @@ class AgentTool:
     tool_id: str
     name: str
     description: str = ""
-    parameters: Dict[str, Any] = field(default_factory=dict)
-    required_capability: Optional[str] = None
-
+    parameters: dict[str, Any] = field(default_factory=dict)
+    required_capability: str | None = None
 
 
 @dataclass
@@ -57,17 +56,15 @@ class ExecutionContext:
     session_id: str
     task_id: str
     agent_id: str
-    input_data: Dict[str, Any]
+    input_data: dict[str, Any]
     context_id: str = field(default_factory=lambda: str(uuid4()))
-    tools: List[AgentTool] = field(default_factory=list)
-    shared_state: Dict[str, Any] = field(default_factory=dict)
-    parent_context_id: Optional[str] = None
+    tools: list[AgentTool] = field(default_factory=list)
+    shared_state: dict[str, Any] = field(default_factory=dict)
+    parent_context_id: str | None = None
     max_tokens: int = 4096
     timeout_seconds: float = 120.0
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_delegated(self) -> bool:
@@ -96,13 +93,11 @@ class ExecutionResult:
     context_id: str
     agent_id: str
     success: bool
-    output: Dict[str, Any] = field(default_factory=dict)
+    output: dict[str, Any] = field(default_factory=dict)
     result_id: str = field(default_factory=lambda: str(uuid4()))
-    error: Optional[Dict[str, Any]] = None
+    error: dict[str, Any] | None = None
     token_usage: int = 0
     execution_ms: float = 0.0
-    tool_calls: List[Dict[str, Any]] = field(default_factory=list)
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tool_calls: list[dict[str, Any]] = field(default_factory=list)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)

@@ -4,7 +4,8 @@ Specializes in searching the web, gathering information from
 multiple sources, and synthesizing findings into coherent summaries.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -35,18 +36,10 @@ class ResearchAgent(BaseAgent):
         self._capabilities = AgentCapabilitySet(
             agent_id="research_agent",
             capabilities=[
-                AgentCapabilityDescriptor(
-                    AgentCapability.RESEARCH, CapabilityLevel.EXPERT
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.WEB_BROWSING, CapabilityLevel.ADVANCED
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.SUMMARIZATION, CapabilityLevel.ADVANCED
-                ),
-                AgentCapabilityDescriptor(
-                    AgentCapability.ANALYSIS, CapabilityLevel.INTERMEDIATE
-                ),
+                AgentCapabilityDescriptor(AgentCapability.RESEARCH, CapabilityLevel.EXPERT),
+                AgentCapabilityDescriptor(AgentCapability.WEB_BROWSING, CapabilityLevel.ADVANCED),
+                AgentCapabilityDescriptor(AgentCapability.SUMMARIZATION, CapabilityLevel.ADVANCED),
+                AgentCapabilityDescriptor(AgentCapability.ANALYSIS, CapabilityLevel.INTERMEDIATE),
             ],
         )
 
@@ -66,7 +59,7 @@ class ResearchAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -86,9 +79,7 @@ class ResearchAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("ResearchAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("ResearchAgent streaming not yet implemented")
         yield  # type: ignore[misc]

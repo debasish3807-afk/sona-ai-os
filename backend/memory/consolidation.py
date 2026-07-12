@@ -18,9 +18,9 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from .types import MemoryEntry, MemoryType
 
@@ -85,9 +85,9 @@ class ConsolidationTask:
     target_type: MemoryType = MemoryType.LONG_TERM
     task_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     status: ConsolidationStatus = ConsolidationStatus.PENDING
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -112,11 +112,11 @@ class ConsolidationResult:
 
     task_id: str
     success: bool
-    consolidated_entry: Optional[MemoryEntry] = None
+    consolidated_entry: MemoryEntry | None = None
     entries_processed: int = 0
     entries_removed: int = 0
     summary: str = ""
-    error: Optional[str] = None
+    error: str | None = None
     duration_ms: float = 0.0
 
 
@@ -128,7 +128,9 @@ class MemoryConsolidator(ABC):
     """
 
     @abstractmethod
-    async def consolidate(self, task: ConsolidationTask, entries: list[MemoryEntry]) -> ConsolidationResult:
+    async def consolidate(
+        self, task: ConsolidationTask, entries: list[MemoryEntry]
+    ) -> ConsolidationResult:
         """Execute a single consolidation task.
 
         Takes a set of source entries and produces a consolidated result
@@ -183,7 +185,7 @@ class MemoryConsolidator(ABC):
     async def get_candidates(
         self,
         memory_type: MemoryType,
-        max_age_hours: Optional[float] = None,
+        max_age_hours: float | None = None,
         min_count: int = 5,
     ) -> list[list[str]]:
         """Identify groups of entries that are candidates for consolidation.

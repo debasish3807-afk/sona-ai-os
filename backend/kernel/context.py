@@ -7,9 +7,9 @@ system instructions, user preferences, and retrieved knowledge.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 
@@ -60,9 +60,9 @@ class ContextEntry:
     entry_id: str = field(default_factory=lambda: str(uuid4()))
     priority: ContextPriority = ContextPriority.NORMAL
     token_count: int = 0
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     source: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -81,13 +81,13 @@ class ContextWindow:
     """
 
     session_id: str
-    entries: List[ContextEntry] = field(default_factory=list)
+    entries: list[ContextEntry] = field(default_factory=list)
     window_id: str = field(default_factory=lambda: str(uuid4()))
     total_tokens: int = 0
     max_tokens: int = 8192
     truncated: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def remaining_tokens(self) -> int:
@@ -122,7 +122,7 @@ class ContextConfig:
     include_memory: bool = True
     include_knowledge: bool = True
     truncation_strategy: str = "priority"  # priority | fifo | sliding
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class ContextManager(ABC):
@@ -136,7 +136,7 @@ class ContextManager(ABC):
     async def build_context(
         self,
         session_id: str,
-        config: Optional[ContextConfig] = None,
+        config: ContextConfig | None = None,
     ) -> ContextWindow:
         """Build a complete context window for a session.
 
@@ -170,9 +170,9 @@ class ContextManager(ABC):
     async def get_entries(
         self,
         session_id: str,
-        context_type: Optional[ContextType] = None,
-        limit: Optional[int] = None,
-    ) -> List[ContextEntry]:
+        context_type: ContextType | None = None,
+        limit: int | None = None,
+    ) -> list[ContextEntry]:
         """Retrieve context entries for a session.
 
         Args:

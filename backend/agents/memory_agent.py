@@ -4,7 +4,8 @@ Specializes in managing persistent memory, storing contextual
 information, and retrieving relevant memories for other agents.
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 from agents.base import AgentInfo, BaseAgent
 from agents.capabilities import (
@@ -57,7 +58,7 @@ class MemoryAgent(BaseAgent):
         return self._status
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """See base class."""
         return []
 
@@ -77,9 +78,7 @@ class MemoryAgent(BaseAgent):
         """See base class."""
         raise NotImplementedError("MemoryAgent execution not yet implemented")
 
-    async def execute_stream(
-        self, context: ExecutionContext
-    ) -> AsyncIterator[Dict[str, Any]]:
+    async def execute_stream(self, context: ExecutionContext) -> AsyncIterator[dict[str, Any]]:
         """See base class."""
         raise NotImplementedError("MemoryAgent streaming not yet implemented")
         yield  # type: ignore[misc]

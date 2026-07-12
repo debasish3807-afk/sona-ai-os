@@ -5,7 +5,7 @@ instances on demand. Enables plugin-based agent discovery.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Type
+from typing import Any
 
 from agents.base import BaseAgent
 
@@ -21,8 +21,8 @@ class AgentFactory(ABC):
     def register_class(
         self,
         agent_id: str,
-        agent_class: Type[BaseAgent],
-        default_config: Optional[Dict[str, Any]] = None,
+        agent_class: type[BaseAgent],
+        default_config: dict[str, Any] | None = None,
     ) -> None:
         """Register an agent class for instantiation.
 
@@ -52,7 +52,7 @@ class AgentFactory(ABC):
     def create(
         self,
         agent_id: str,
-        config: Optional[Dict[str, Any]] = None,
+        config: dict[str, Any] | None = None,
     ) -> BaseAgent:
         """Create an agent instance.
 
@@ -69,7 +69,7 @@ class AgentFactory(ABC):
         ...
 
     @abstractmethod
-    def create_all(self) -> List[BaseAgent]:
+    def create_all(self) -> list[BaseAgent]:
         """Create instances of all registered agent types.
 
         Returns:
@@ -78,7 +78,7 @@ class AgentFactory(ABC):
         ...
 
     @abstractmethod
-    def get_registered_ids(self) -> List[str]:
+    def get_registered_ids(self) -> list[str]:
         """List all registered agent type IDs.
 
         Returns:
@@ -99,7 +99,7 @@ class AgentFactory(ABC):
         ...
 
     @abstractmethod
-    def discover_plugins(self, path: Optional[str] = None) -> int:
+    def discover_plugins(self, path: str | None = None) -> int:
         """Discover and register agent plugins from a directory.
 
         Args:

@@ -20,11 +20,10 @@ from __future__ import annotations
 import uuid
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from .base import MemoryStore
-from .types import MemoryEntry
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,10 +86,10 @@ class Fact:
     object: str
     fact_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     confidence: float = 1.0
-    source: Optional[str] = None
+    source: str | None = None
     verified: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -116,7 +115,7 @@ class SemanticRelation:
     relation_type: str
     weight: float = 1.0
     bidirectional: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -140,7 +139,7 @@ class SemanticMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_fact(self, fact_id: str) -> Optional[Fact]:
+    async def get_fact(self, fact_id: str) -> Fact | None:
         """Retrieve a single fact by its ID.
 
         Args:
@@ -154,9 +153,9 @@ class SemanticMemory(MemoryStore):
     @abstractmethod
     async def query_facts(
         self,
-        subject: Optional[str] = None,
-        predicate: Optional[str] = None,
-        object: Optional[str] = None,
+        subject: str | None = None,
+        predicate: str | None = None,
+        object: str | None = None,
         min_confidence: float = 0.0,
         limit: int = 50,
     ) -> list[Fact]:
@@ -188,7 +187,7 @@ class SemanticMemory(MemoryStore):
 
     @abstractmethod
     async def get_relations(
-        self, entry_id: str, relation_type: Optional[str] = None
+        self, entry_id: str, relation_type: str | None = None
     ) -> list[SemanticRelation]:
         """Get all relations involving a specific entry.
 
@@ -202,9 +201,7 @@ class SemanticMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_knowledge_subgraph(
-        self, entry_id: str, depth: int = 2
-    ) -> dict[str, Any]:
+    async def get_knowledge_subgraph(self, entry_id: str, depth: int = 2) -> dict[str, Any]:
         """Get a subgraph of the knowledge graph centered on an entry.
 
         Traverses relationships up to the specified depth and returns

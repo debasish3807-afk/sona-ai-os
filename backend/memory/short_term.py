@@ -17,8 +17,6 @@ Classes:
 from __future__ import annotations
 
 from abc import abstractmethod
-from dataclasses import dataclass, field
-from typing import Optional
 
 from .base import MemoryStore
 from .types import MemoryEntry, MemoryScope
@@ -76,7 +74,7 @@ class ShortTermMemory(MemoryStore):
     @abstractmethod
     async def get_recent(
         self,
-        scope: Optional[MemoryScope] = None,
+        scope: MemoryScope | None = None,
         hours: int = 24,
         limit: int = 50,
     ) -> list[MemoryEntry]:
@@ -93,9 +91,7 @@ class ShortTermMemory(MemoryStore):
         ...
 
     @abstractmethod
-    async def get_by_session(
-        self, session_id: str, limit: int = 50
-    ) -> list[MemoryEntry]:
+    async def get_by_session(self, session_id: str, limit: int = 50) -> list[MemoryEntry]:
         """Get all short-term memory entries from a specific session.
 
         Args:
