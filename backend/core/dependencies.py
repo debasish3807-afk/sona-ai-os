@@ -28,7 +28,7 @@ def get_request_id(request: Request) -> str:
     Returns:
         Request ID string.
     """
-    return request.headers.get("X-Request-ID", "")
+    return str(request.headers.get("X-Request-ID", ""))
 
 
 # Type aliases for dependency injection

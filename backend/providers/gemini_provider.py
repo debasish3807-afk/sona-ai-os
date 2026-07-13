@@ -319,6 +319,6 @@ class GeminiProvider(BaseProvider):
         try:
             url = f"/models?key={self._api_key}"
             resp = await self._client.get(url, timeout=10.0)
-            return resp.status_code < 400
+            return bool(resp.status_code < 400)
         except Exception:
             return False

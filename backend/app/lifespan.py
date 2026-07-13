@@ -1,7 +1,7 @@
 """Application lifespan management.
 
 Handles startup and shutdown events for the FastAPI application,
-including AI Brain initialization.
+including DI container initialization and AI Brain setup.
 """
 
 from collections.abc import AsyncGenerator
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage application lifespan events.
 
     Handles resource initialization on startup and cleanup on shutdown.
-    Initializes the AI Brain with all providers.
+    Initializes the DI container and AI Brain with all providers.
 
     Args:
         app: FastAPI application instance.
@@ -40,6 +40,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         debug=settings.debug,
     )
 
+    # Initialize DI Container (all subsystems)
+    from core.container import get_container
+    from core.service_registration import register_all_services
+
+    try:
+        container = get_container()
+        await container.initialize()
+        register_all_services(container)
+        logger.info("DI Container initialized successfully")
+    except Exception as exc:
+        logger.error("Container initialization failed", error=str(exc))
+
     # Initialize AI Brain (providers, memory, routing)
     from brain.orchestrator import initialize_brain
 
@@ -48,7 +60,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("AI Brain initialized successfully")
     except Exception as exc:
         logger.error("AI Brain initialization failed", error=str(exc))
-        # Don't fail startup — Brain can initialize lazily
 
     logger.info("Application started successfully")
 
@@ -56,6 +67,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # === SHUTDOWN ===
     logger.info("Application shutting down")
+
+    # Shutdown DI Container
+    try:
+        container = get_container()
+        await container.shutdown()
+        logger.info("DI Container shut down successfully")
+    except Exception as exc:
+        logger.warning("Container shutdown error", error=str(exc))
 
     # Shutdown AI Brain
     from brain.orchestrator import shutdown_brain
