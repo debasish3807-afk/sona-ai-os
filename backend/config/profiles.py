@@ -34,7 +34,7 @@ class EnvironmentProfile:
             "log_level": "INFO",
             "log_format": "json",
             "database_url": "sqlite:///data/sona-staging.db",
-            "host": "0.0.0.0",
+            "host": "0.0.0.0",  # nosec B104 — intentional for staging server
             "port": 8000,
             "reload": False,
             "cors_origins": ["https://staging.sona-ai.io"],
@@ -50,7 +50,7 @@ class EnvironmentProfile:
             "log_level": "WARNING",
             "log_format": "json",
             "database_url": "sqlite:///data/sona.db",
-            "host": "0.0.0.0",
+            "host": "0.0.0.0",  # nosec B104 — intentional for production server
             "port": 8000,
             "reload": False,
             "cors_origins": ["https://sona-ai.io"],
