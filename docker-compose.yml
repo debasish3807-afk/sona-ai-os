@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   app:
     build: .
@@ -8,7 +7,7 @@ services:
       - DATABASE_URL=sqlite:///data/sona.db
     volumes: ["./data:/app/data"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
       interval: 30s
       timeout: 5s
       retries: 3
