@@ -113,7 +113,8 @@ async def upload_document(request: DocumentUploadRequest) -> DocumentUploadRespo
 @router.post("/documents/index", response_model=DocumentUploadResponse)
 async def index_document(request: DocumentUploadRequest) -> DocumentUploadResponse:
     """Index raw text content (alias for upload)."""
-    return await upload_document(request)
+    result: DocumentUploadResponse = await upload_document(request)
+    return result
 
 
 @router.get("/documents/search", response_model=SearchResponse)

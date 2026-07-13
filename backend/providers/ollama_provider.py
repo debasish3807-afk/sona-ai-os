@@ -353,6 +353,6 @@ class OllamaProvider(BaseProvider):
         client = self._get_client()
         try:
             resp = await client.get("/", timeout=5.0)
-            return resp.status_code == 200
+            return bool(resp.status_code == 200)
         except (httpx.ConnectError, httpx.TimeoutException):
             return False

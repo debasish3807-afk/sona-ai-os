@@ -298,6 +298,6 @@ class ProviderClient:
         client = self._get_client()
         try:
             resp = await client.get(path, timeout=10.0)
-            return resp.status_code < 400
+            return bool(resp.status_code < 400)
         except (httpx.TimeoutException, httpx.ConnectError):
             return False

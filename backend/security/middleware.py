@@ -134,7 +134,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             # First IP in the chain is the original client
             return forwarded_for.split(",")[0].strip()
         if request.client:
-            return request.client.host
+            return str(request.client.host)
         return "unknown"
 
     @staticmethod
@@ -200,7 +200,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
         if forwarded_for:
             return forwarded_for.split(",")[0].strip()
         if request.client:
-            return request.client.host
+            return str(request.client.host)
         return "unknown"
 
 
