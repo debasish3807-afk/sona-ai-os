@@ -1,0 +1,8 @@
+apiVersion: v2
+name: sona-ai-os
+description: Sona AI OS - AI Operating System
+type: application
+version: 0.17.0
+appVersion: "17.0"
+maintainers:
+  - name: Sona AI Team
