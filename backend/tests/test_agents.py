@@ -1675,8 +1675,9 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_submit_to_runtime(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         task = AgentTask(description="run workflow", agent_id="a1")
         wf_id = await bridge.submit_to_runtime(task)
         assert wf_id is not None
@@ -1685,8 +1686,9 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_get_workflow_status(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         task = AgentTask(description="test", agent_id="a1")
         wf_id = await bridge.submit_to_runtime(task)
         status = await bridge.get_workflow_status(wf_id)
@@ -1695,16 +1697,18 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_get_workflow_status_not_found(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         status = await bridge.get_workflow_status("fake-id")
         assert status["state"] == "not_found"
 
     @pytest.mark.asyncio
     async def test_cancel_workflow(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         task = AgentTask(description="test", agent_id="a1")
         wf_id = await bridge.submit_to_runtime(task)
         result = await bridge.cancel_workflow(wf_id)
@@ -1713,16 +1717,18 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_cancel_nonexistent_workflow(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         result = await bridge.cancel_workflow("fake")
         assert result is False
 
     @pytest.mark.asyncio
     async def test_submit_creates_workflow(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         task = AgentTask(description="my task", agent_id="a1")
         wf_id = await bridge.submit_to_runtime(task)
         status = await bridge.get_workflow_status(wf_id)
@@ -1731,8 +1737,9 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_cancel_after_cancel(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         task = AgentTask(description="test", agent_id="a1")
         wf_id = await bridge.submit_to_runtime(task)
         await bridge.cancel_workflow(wf_id)
@@ -1742,8 +1749,9 @@ class TestAgentRuntimeBridge:
     @pytest.mark.asyncio
     async def test_submit_multiple(self):
         from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from runtime.runtime_engine import RuntimeEngine
 
-        bridge = AgentRuntimeBridge()
+        bridge = AgentRuntimeBridge(engine=RuntimeEngine())
         t1 = AgentTask(description="task1", agent_id="a1")
         t2 = AgentTask(description="task2", agent_id="a2")
         wf1 = await bridge.submit_to_runtime(t1)

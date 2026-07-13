@@ -22,7 +22,15 @@ from security.rate_limit import RateLimiter
 logger = get_logger(__name__)
 
 # Endpoints that bypass authentication
-_PUBLIC_PATHS: set[str] = {"/health", "/ping", "/docs", "/openapi.json"}
+_PUBLIC_PATHS: set[str] = {
+    "/health",
+    "/ping",
+    "/docs",
+    "/openapi.json",
+    "/api/v1/health",
+    "/api/v1/ping",
+    "/api/v1/status",
+}
 
 
 class AuthMiddleware(BaseHTTPMiddleware):

@@ -18,13 +18,12 @@ class PipelineStage(str, Enum):
 
     INTAKE = "intake"
     SANITIZE = "sanitize"
-    INTENT = "intent"
+    COGNITIVE = "cognitive"
     GOAL = "goal"
     EXECUTIVE = "executive"
     META_REASONING = "meta_reasoning"
-    VERIFICATION = "verification"
+    AGENT_COORDINATION = "agent_coordination"
     RUNTIME = "runtime"
-    EXECUTION = "execution"
     MEMORY = "memory"
     RESPONSE = "response"
 
@@ -79,8 +78,9 @@ class PipelineResult:
 class Pipeline:
     """Orchestrates end-to-end request processing through all layers.
 
-    Flow: Human → Sanitize → Intent → Goal → Executive → Meta Reasoning
-         → Verification → Runtime → Execution → Memory → Response
+    Flow: Security → IntentSanitizer → CognitiveKernel → ExecutiveBrain
+         → MetaReasoner → AgentManager → AgentCoordinator → RuntimeEngine
+         → MemoryManager → Response
     """
 
     def __init__(self, container: Any) -> None:
@@ -98,7 +98,7 @@ class Pipeline:
         stage_outputs: dict[str, Any] = {}
 
         try:
-            # Stage 1: Sanitize input
+            # Stage 1: Sanitize input via IntentSanitizer
             sanitize_result = await self._stage_sanitize(request)
             stage_outputs["sanitize"] = sanitize_result
             result.stages_completed.append(PipelineStage.SANITIZE.value)
@@ -108,13 +108,13 @@ class Pipeline:
                 result.output = sanitize_result
                 return result
 
-            # Stage 2: Intent classification
-            intent_result = await self._stage_intent(request)
-            stage_outputs["intent"] = intent_result
-            result.stages_completed.append(PipelineStage.INTENT.value)
+            # Stage 2: CognitiveKernel intent classification
+            cognitive_result = await self._stage_cognitive(request)
+            stage_outputs["cognitive"] = cognitive_result
+            result.stages_completed.append(PipelineStage.COGNITIVE.value)
 
-            # Stage 3: Goal creation
-            goal_result = await self._stage_goal(request, intent_result)
+            # Stage 3: Goal creation via ExecutiveBrain
+            goal_result = await self._stage_goal(request)
             stage_outputs["goal"] = goal_result
             result.stages_completed.append(PipelineStage.GOAL.value)
 
@@ -128,16 +128,21 @@ class Pipeline:
             stage_outputs["meta_reasoning"] = meta_result
             result.stages_completed.append(PipelineStage.META_REASONING.value)
 
-            # Stage 6: Runtime execution
+            # Stage 6: Agent coordination
+            agent_result = await self._stage_agent_coordination(executive_result, meta_result)
+            stage_outputs["agent_coordination"] = agent_result
+            result.stages_completed.append(PipelineStage.AGENT_COORDINATION.value)
+
+            # Stage 7: Runtime execution via AgentRuntimeBridge
             runtime_result = await self._stage_runtime(executive_result, meta_result)
             stage_outputs["runtime"] = runtime_result
             result.stages_completed.append(PipelineStage.RUNTIME.value)
 
-            # Stage 7: Memory storage
+            # Stage 8: Memory storage
             await self._stage_memory(request, stage_outputs)
             result.stages_completed.append(PipelineStage.MEMORY.value)
 
-            # Stage 8: Response assembly
+            # Stage 9: Response assembly
             response = self._assemble_response(stage_outputs)
             result.output = response
             result.stages_completed.append(PipelineStage.RESPONSE.value)
@@ -160,31 +165,44 @@ class Pipeline:
         return result
 
     async def _stage_sanitize(self, request: PipelineRequest) -> dict[str, Any]:
-        """Sanitize user input through the intent sanitizer."""
+        """Sanitize user input through the microkernel IntentSanitizer."""
         sanitizer = self._container.resolve("intent_sanitizer")
         result = sanitizer.sanitize(request.user_input)
         return dict(result.to_dict())
 
-    async def _stage_intent(self, request: PipelineRequest) -> dict[str, Any]:
-        """Classify user intent."""
-        # Uses cognitive kernel if available, otherwise basic classification
-        return {
-            "intent": "task_execution",
-            "confidence": 0.85,
-            "user_input": request.user_input,
-        }
+    async def _stage_cognitive(self, request: PipelineRequest) -> dict[str, Any]:
+        """Classify intent through the CognitiveKernel pipeline."""
+        kernel = self._container.resolve("cognitive_kernel")
+        from cognitive.request_context import RequestContext
 
-    async def _stage_goal(self, request: PipelineRequest, intent: dict[str, Any]) -> dict[str, Any]:
-        """Create a goal from the intent."""
+        ctx = RequestContext(
+            session_id=request.session_id,
+            user_id=request.user_id,
+            metadata={"user_input": request.user_input},
+        )
+        try:
+            result = await kernel.process(ctx)
+            return dict(result)
+        except Exception as exc:
+            logger.warning("cognitive_stage_fallback", error=str(exc))
+            return {
+                "success": True,
+                "intent": "task_execution",
+                "confidence": 0.7,
+                "source": "fallback",
+            }
+
+    async def _stage_goal(self, request: PipelineRequest) -> dict[str, Any]:
+        """Create a goal via the ExecutiveBrain's public API."""
         brain = self._container.resolve("executive_brain")
-        goal = brain._goal_manager.create_goal(
+        goal = brain.create_goal(
             title=request.user_input[:100],
             description=request.user_input,
         )
         return dict(goal.to_dict())
 
     async def _stage_executive(self, goal: dict[str, Any]) -> dict[str, Any]:
-        """Run executive planning."""
+        """Run executive planning via ExecutiveBrain.process_goal()."""
         brain = self._container.resolve("executive_brain")
         try:
             result = await brain.process_goal(
@@ -197,7 +215,7 @@ class Pipeline:
             return {"plan": {"tasks": []}, "approval": "auto_approved"}
 
     async def _stage_meta_reasoning(self, executive_result: dict[str, Any]) -> dict[str, Any]:
-        """Validate plan through meta-reasoning."""
+        """Validate plan through the MetaReasoner."""
         reasoner = self._container.resolve("meta_reasoner")
         plan = executive_result.get("plan", {})
         goal = executive_result.get("goal", {})
@@ -208,10 +226,45 @@ class Pipeline:
             logger.warning("meta_reasoning_stage_error", error=str(exc))
             return {"verdict": "approved", "confidence": 0.7}
 
+    async def _stage_agent_coordination(
+        self, executive_result: dict[str, Any], meta_result: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Route task to agents via AgentManager and AgentCoordinator."""
+        verdict = meta_result.get("verdict", "approved")
+        if verdict == "rejected":
+            return {"status": "skipped", "reason": "plan rejected by meta-reasoning"}
+
+        manager = self._container.resolve("agent_manager")
+        from agents.schemas import AgentType, CoordinationMode, CoordinationPlan
+
+        # Select agent type based on plan
+        tasks = executive_result.get("plan", {}).get("tasks", [])
+        if not tasks:
+            tasks = ["default_task"]
+
+        # Create an execution agent for the work
+        agent = await manager.create_agent(
+            name="pipeline_executor",
+            agent_type=AgentType.EXECUTION,
+            capabilities=["task_execution"],
+        )
+
+        # Create coordination plan
+        plan = CoordinationPlan(
+            mode=CoordinationMode.SINGLE,
+            agents=[agent.agent_id],
+            tasks=[str(t) for t in tasks[:5]],
+        )
+        result = await manager.execute_plan(plan)
+
+        # Cleanup agent
+        await manager.terminate_agent(agent.agent_id)
+        return dict(result)
+
     async def _stage_runtime(
         self, executive_result: dict[str, Any], meta_result: dict[str, Any]
     ) -> dict[str, Any]:
-        """Submit workflow to runtime engine."""
+        """Submit workflow to the shared RuntimeEngine."""
         verdict = meta_result.get("verdict", "approved")
         if verdict == "rejected":
             return {"status": "skipped", "reason": "plan rejected by meta-reasoning"}
@@ -233,7 +286,7 @@ class Pipeline:
         return {"workflow_id": workflow_id, "status": "submitted"}
 
     async def _stage_memory(self, request: PipelineRequest, outputs: dict[str, Any]) -> None:
-        """Store execution results in memory."""
+        """Store execution results in memory via the shared MemoryManager."""
         from memory.default_manager import MemoryEntry
 
         manager = self._container.resolve("memory_manager")
@@ -251,8 +304,10 @@ class Pipeline:
         """Assemble the final pipeline response."""
         return {
             "stages": list(outputs.keys()),
+            "cognitive": outputs.get("cognitive", {}),
             "executive": outputs.get("executive", {}),
             "meta_reasoning": outputs.get("meta_reasoning", {}),
+            "agent_coordination": outputs.get("agent_coordination", {}),
             "runtime": outputs.get("runtime", {}),
         }
 

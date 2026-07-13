@@ -16,7 +16,7 @@ from executive.model_selector import ModelSelector
 from executive.parallel_planner import ParallelPlanner
 from executive.provider_selector import ProviderSelector
 from executive.risk_engine import RiskEngine
-from executive.schemas import GoalPriority
+from executive.schemas import Goal, GoalPriority, GoalState
 from executive.strategic_planner import StrategicPlanner
 from executive.workflow_optimizer import WorkflowOptimizer
 
@@ -167,6 +167,35 @@ class ExecutiveBrain:
     def get_events(self) -> list[dict]:
         """Return all emitted events."""
         return [e.to_dict() for e in self._events]
+
+    # ─── Public API (eliminates private attribute access) ────────────────
+
+    def create_goal(
+        self,
+        title: str,
+        description: str,
+        priority: GoalPriority = GoalPriority.MEDIUM,
+    ) -> Goal:
+        """Create a new goal (public API)."""
+
+        return self._goal_manager.create_goal(title, description, priority)
+
+    def get_goal(self, goal_id: str) -> Goal | None:
+        """Get a goal by ID (public API)."""
+        return self._goal_manager.get_goal(goal_id)
+
+    def list_goals(
+        self,
+        state: GoalState | None = None,
+        priority: GoalPriority | None = None,
+    ) -> list:
+        """List goals with optional filters (public API)."""
+
+        return self._goal_manager.list_goals(state=state, priority=priority)
+
+    def get_goal_metrics(self) -> dict:
+        """Get goal metrics (public API)."""
+        return self._goal_manager.get_metrics()
 
     def _emit(self, event_type: ExecutiveEventType, goal_id: str, data: dict) -> None:
         """Emit an executive event."""
