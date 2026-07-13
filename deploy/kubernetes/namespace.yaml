@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sona-ai-os
+  labels:
+    app.kubernetes.io/name: sona-ai-os
+    app.kubernetes.io/part-of: sona-ai-os

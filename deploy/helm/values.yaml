@@ -1,0 +1,56 @@
+replicaCount: 3
+
+image:
+  repository: sona-ai-os
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api.sona-ai.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: sona-ai-os-tls
+      hosts:
+        - api.sona-ai.io
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+env:
+  ENVIRONMENT: production
+  LOG_LEVEL: WARNING
+  LOG_FORMAT: json
+  DATABASE_URL: "sqlite:///data/sona.db"
+
+probes:
+  liveness:
+    path: /api/v1/health
+    initialDelaySeconds: 10
+    periodSeconds: 30
+  readiness:
+    path: /api/v1/health
+    initialDelaySeconds: 5
+    periodSeconds: 10

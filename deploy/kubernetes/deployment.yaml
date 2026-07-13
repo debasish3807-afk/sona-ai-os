@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sona-ai-os
+  namespace: sona-ai-os
+  labels:
+    app: sona-ai-os
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sona-ai-os
+  template:
+    metadata:
+      labels:
+        app: sona-ai-os
+    spec:
+      containers:
+        - name: sona-ai-os
+          image: sona-ai-os:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: sona-ai-os-config
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

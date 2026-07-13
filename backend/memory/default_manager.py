@@ -8,6 +8,16 @@ from typing import Any
 
 from config.logging import get_logger
 
+from .memory_router import MemoryRouter
+from .memory_types import (
+    ConversationMemory,
+    EpisodicMemory,
+    KnowledgeMemory,
+    LongTermMemory,
+    SemanticMemory,
+    WorkingMemory,
+)
+
 logger = get_logger(__name__)
 
 
@@ -212,3 +222,18 @@ class DefaultMemoryManager:
             "by_type": by_type,
             "initialized": self._initialized,
         }
+
+    def get_memory_router(self) -> MemoryRouter:
+        """Get a MemoryRouter with all 6 memory types initialized.
+
+        Returns:
+            A configured MemoryRouter instance.
+        """
+        return MemoryRouter(
+            working=WorkingMemory(),
+            conversation=ConversationMemory(),
+            episodic=EpisodicMemory(),
+            semantic=SemanticMemory(),
+            long_term=LongTermMemory(),
+            knowledge=KnowledgeMemory(),
+        )

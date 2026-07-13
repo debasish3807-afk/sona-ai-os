@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=sqlite:///data/sona.db
+    volumes: ["./data:/app/data"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
