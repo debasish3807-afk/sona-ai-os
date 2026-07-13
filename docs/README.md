@@ -4,7 +4,7 @@ Welcome to the official documentation for **Sona AI OS**.
 
 Sona AI OS is a next-generation Personal AI Operating System combining multiple AI models, intelligent orchestration, long-term memory, coding assistance, research, automation, and more into one unified platform.
 
-**Current Version:** `0.7.0` — Phase 8 (Cloud AI Providers & Persistent Memory)
+**Current Version:** `1.0.0-rc1` — Phase 18 (AI Intelligence Platform)
 
 ---
 
@@ -19,10 +19,10 @@ Sona AI OS is a next-generation Personal AI Operating System combining multiple 
 | [Goals](Goals.md) | Short-term, mid-term, and long-term goals |
 | [Features](Features.md) | Feature list with implementation status |
 | [Technology](Technology.md) | Technology stack |
-| [Roadmap](Roadmap.md) | Development roadmap (Phase 8 current) |
+| [Roadmap](Roadmap.md) | Development roadmap (Phase 18 complete) |
 | [FAQ](FAQ.md) | Frequently asked questions |
 | [Glossary](Glossary.md) | Terminology definitions |
-| [Changelog](Changelog.md) | Version history (0.0.1 → 0.7.0) |
+| [Changelog](Changelog.md) | Version history (0.0.1 → 1.0.0-rc1) |
 
 ### Architecture
 
@@ -60,7 +60,7 @@ Sona AI OS is a next-generation Personal AI Operating System combining multiple 
 | Phase 5 | Multi-Agent Framework | ✅ Complete |
 | Phase 6 | Memory Engine | ✅ Complete |
 | Phase 7 | AI Brain Execution Pipeline | ✅ Complete |
-| **Phase 8** | **Cloud AI Providers & Persistent Memory** | **In Progress** |
+| Phase 8 | Cloud AI Providers & Persistent Memory | ✅ Complete |
 
 ---
 

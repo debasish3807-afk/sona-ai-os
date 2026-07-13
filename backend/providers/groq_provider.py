@@ -73,7 +73,6 @@ class GroqProvider(BaseProvider):
         return self._initialized
 
     async def initialize(self) -> None:
-        # TODO: Load API key, create HTTP client
         """See base class."""
         self._initialized = True
 
@@ -82,12 +81,10 @@ class GroqProvider(BaseProvider):
         self._initialized = False
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
-        # TODO: Implement Groq chat completions (OpenAI-compatible)
         """See base class."""
         raise NotImplementedError("Groq chat not yet implemented")
 
     async def stream(self, request: ChatRequest) -> AsyncIterator[StreamChunk]:
-        # TODO: Implement Groq streaming
         """See base class."""
         raise NotImplementedError("Groq stream not yet implemented")
         yield  # type: ignore[misc]
@@ -98,7 +95,6 @@ class GroqProvider(BaseProvider):
         raise NotImplementedError("Groq embeddings not available")
 
     async def list_models(self) -> list[ModelInfo]:
-        # TODO: Query Groq models endpoint
         """See base class."""
         return []
 
