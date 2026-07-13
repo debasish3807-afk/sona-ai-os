@@ -6,44 +6,40 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from cognitive.kernel import CognitiveKernel
+from core.container import get_container
 
 router = APIRouter(prefix="/kernel", tags=["kernel"])
 
-_kernel: CognitiveKernel | None = None
 
-
-def get_kernel() -> CognitiveKernel:
-    global _kernel
-    if _kernel is None:
-        _kernel = CognitiveKernel()
-    return _kernel
+def _get_kernel() -> Any:
+    """Get CognitiveKernel from DI container."""
+    return get_container().resolve("cognitive_kernel")
 
 
 @router.get("/status")
 async def kernel_status() -> dict[str, Any]:
-    return get_kernel().get_status()
+    return dict(_get_kernel().get_status())
 
 
 @router.get("/metrics")
 async def kernel_metrics() -> dict[str, Any]:
-    return {"success": True, "metrics": get_kernel().metrics.to_dict()}
+    return {"success": True, "metrics": _get_kernel().metrics.to_dict()}
 
 
 @router.get("/world")
 async def kernel_world() -> dict[str, Any]:
-    return {"success": True, "world": get_kernel().world.to_dict()}
+    return {"success": True, "world": _get_kernel().world.to_dict()}
 
 
 @router.get("/events")
 async def kernel_events(limit: int = 50) -> dict[str, Any]:
-    events = get_kernel().event_bus.get_history(limit=limit)
+    events = _get_kernel().event_bus.get_history(limit=limit)
     return {"success": True, "events": events, "total": len(events)}
 
 
 @router.get("/health")
 async def kernel_health() -> dict[str, Any]:
-    k = get_kernel()
+    k = _get_kernel()
     engine_health = await k.registry.health_check_all()
     return {
         "success": True,

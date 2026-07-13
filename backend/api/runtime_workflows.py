@@ -7,22 +7,17 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from config.logging import get_logger
-from runtime.runtime_engine import RuntimeEngine
+from core.container import get_container
 from runtime.schemas import Workflow, WorkflowTask, WorkflowType
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/runtime/workflows", tags=["workflows"])
 
-_engine: RuntimeEngine | None = None
 
-
-def _get_engine() -> RuntimeEngine:
-    """Lazy-initialize the global RuntimeEngine singleton."""
-    global _engine
-    if _engine is None:
-        _engine = RuntimeEngine()
-    return _engine
+def _get_engine() -> Any:
+    """Get RuntimeEngine from DI container."""
+    return get_container().resolve("runtime_engine")
 
 
 @router.post("/", response_model=None)
@@ -71,7 +66,7 @@ async def get_workflow(workflow_id: str) -> dict[str, Any]:
     workflow = engine.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    return workflow.to_dict()
+    return dict(workflow.to_dict())
 
 
 @router.get("/{workflow_id}/status", response_model=None)

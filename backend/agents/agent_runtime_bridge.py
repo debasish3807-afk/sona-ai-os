@@ -13,10 +13,14 @@ logger = get_logger(__name__)
 
 
 class AgentRuntimeBridge:
-    """Bridges agent tasks to the runtime workflow engine."""
+    """Bridges agent tasks to the runtime workflow engine.
 
-    def __init__(self) -> None:
-        self._engine = RuntimeEngine()
+    Accepts a shared RuntimeEngine instance via constructor injection.
+    Never creates its own RuntimeEngine.
+    """
+
+    def __init__(self, engine: RuntimeEngine) -> None:
+        self._engine = engine
 
     async def submit_to_runtime(self, agent_task: AgentTask) -> str:
         """Submit an agent task as a runtime workflow. Returns workflow_id."""

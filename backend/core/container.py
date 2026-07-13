@@ -60,16 +60,107 @@ class Container:
         self._build_runtime()
         self._build_memory()
         self._build_persistence()
+        self._build_agents()
+        self._wire_ipc()
+        await self._hydrate_state()
         self._initialized = True
         logger.info("container_initialized", services=len(self._instances))
 
     async def shutdown(self) -> None:
-        """Shutdown all managed services."""
+        """Shutdown all managed services — persist state first."""
+        await self._persist_state()
         persistence = self._instances.get("persistence")
         if persistence is not None:
             await persistence.shutdown()
         self._initialized = False
         logger.info("container_shutdown")
+
+    # ─── Persistence Lifecycle ────────────────────────────────────────────
+
+    async def _hydrate_state(self) -> None:
+        """Hydrate subsystem state from persistence on startup."""
+        persistence = self._instances.get("persistence")
+        if persistence is None:
+            return
+        try:
+            await persistence.initialize()
+            # Hydrate memory
+            memory_records = await persistence.read("state", "memory_entries")
+            if memory_records:
+                manager = self._instances.get("memory_manager")
+                if manager:
+                    entries = memory_records.get("entries", [])
+                    await manager.hydrate_from_persistence(entries)
+                    logger.info("memory_hydrated", entries=len(entries))
+        except Exception as exc:
+            logger.warning("hydration_failed", error=str(exc))
+
+    async def _persist_state(self) -> None:
+        """Persist subsystem state before shutdown."""
+        persistence = self._instances.get("persistence")
+        if persistence is None:
+            return
+        try:
+            await persistence.initialize()
+            # Persist memory
+            manager = self._instances.get("memory_manager")
+            if manager:
+                entries = [e.to_dict() for e in manager._entries.values()]
+                await persistence.write("state", "memory_entries", {"entries": entries})
+
+            # Persist runtime workflows
+            engine = self._instances.get("runtime_engine")
+            if engine:
+                workflows = [w.to_dict() for w in engine.list_workflows()]
+                await persistence.write("state", "runtime_workflows", {"workflows": workflows})
+
+            # Persist goals
+            brain = self._instances.get("executive_brain")
+            if brain:
+                goals = [g.to_dict() for g in brain.list_goals()]
+                await persistence.write("state", "executive_goals", {"goals": goals})
+
+            logger.info("state_persisted")
+        except Exception as exc:
+            logger.warning("persistence_failed", error=str(exc))
+
+    # ─── IPC Wiring ──────────────────────────────────────────────────────
+
+    def _wire_ipc(self) -> None:
+        """Subscribe services to IPC channels for inter-service messaging."""
+        ipc_bus = self._instances.get("ipc_bus")
+        if ipc_bus is None:
+            return
+
+        # Register IPC handlers for each subsystem
+        ipc_bus.subscribe("executive", self._ipc_handler_executive)
+        ipc_bus.subscribe("runtime", self._ipc_handler_runtime)
+        ipc_bus.subscribe("agents", self._ipc_handler_agents)
+        ipc_bus.subscribe("memory", self._ipc_handler_memory)
+        ipc_bus.subscribe("meta_reasoning", self._ipc_handler_meta)
+        logger.info("ipc_channels_wired", channels=5)
+
+    def _ipc_handler_executive(self, message: Any) -> None:
+        """Handle IPC messages directed to the executive layer."""
+        logger.debug("ipc_received_executive", message_id=getattr(message, "message_id", ""))
+
+    def _ipc_handler_runtime(self, message: Any) -> None:
+        """Handle IPC messages directed to the runtime engine."""
+        logger.debug("ipc_received_runtime", message_id=getattr(message, "message_id", ""))
+
+    def _ipc_handler_agents(self, message: Any) -> None:
+        """Handle IPC messages directed to the agent system."""
+        logger.debug("ipc_received_agents", message_id=getattr(message, "message_id", ""))
+
+    def _ipc_handler_memory(self, message: Any) -> None:
+        """Handle IPC messages directed to the memory manager."""
+        logger.debug("ipc_received_memory", message_id=getattr(message, "message_id", ""))
+
+    def _ipc_handler_meta(self, message: Any) -> None:
+        """Handle IPC messages directed to meta-reasoning."""
+        logger.debug("ipc_received_meta", message_id=getattr(message, "message_id", ""))
+
+    # ─── Build Methods ────────────────────────────────────────────────────
 
     def _build_security(self) -> None:
         """Build security services."""
@@ -217,7 +308,7 @@ class Container:
         )
 
     def _build_runtime(self) -> None:
-        """Build the runtime engine with microkernel integration."""
+        """Build the runtime engine."""
         from runtime.checkpoint_manager import CheckpointManager
         from runtime.dag_executor import DAGExecutor
         from runtime.recovery_manager import RecoveryManager
@@ -255,6 +346,48 @@ class Container:
         from adapters.persistence import PersistenceManager
 
         self._instances["persistence"] = PersistenceManager()
+
+    def _build_agents(self) -> None:
+        """Build the multi-agent coordination system."""
+        from agents.agent_coordinator import AgentCoordinator
+        from agents.agent_executor import AgentExecutor
+        from agents.agent_factory import AgentFactory
+        from agents.agent_lifecycle import AgentLifecycle
+        from agents.agent_manager import AgentManager
+        from agents.agent_negotiator import AgentNegotiator
+        from agents.agent_registry import AgentRegistry
+        from agents.agent_runtime_bridge import AgentRuntimeBridge
+        from agents.agent_scheduler import AgentScheduler
+        from agents.agent_supervisor import AgentSupervisor
+
+        registry = AgentRegistry()
+        factory = AgentFactory()
+        negotiator = AgentNegotiator()
+        scheduler = AgentScheduler()
+        coordinator = AgentCoordinator(
+            registry=registry, scheduler=scheduler, negotiator=negotiator
+        )
+        lifecycle = AgentLifecycle()
+        executor = AgentExecutor(lifecycle=lifecycle)
+        supervisor = AgentSupervisor()
+
+        # Bridge uses the SHARED runtime engine
+        runtime_engine = self._instances["runtime_engine"]
+        bridge = AgentRuntimeBridge(engine=runtime_engine)
+
+        manager = AgentManager(
+            registry=registry,
+            factory=factory,
+            coordinator=coordinator,
+            executor=executor,
+            supervisor=supervisor,
+        )
+
+        self._instances["agent_manager"] = manager
+        self._instances["agent_registry"] = registry
+        self._instances["agent_coordinator"] = coordinator
+        self._instances["agent_runtime_bridge"] = bridge
+        self._instances["agent_supervisor"] = supervisor
 
     def get_status(self) -> dict[str, Any]:
         """Return container status."""

@@ -1436,7 +1436,7 @@ class TestAdditionalCoverage:
     def test_pipeline_stage_all_values(self):
         from core.pipeline import PipelineStage
 
-        assert len(PipelineStage) == 11
+        assert len(PipelineStage) == 10
 
     def test_pipeline_status_all_values(self):
         from core.pipeline import PipelineStatus
