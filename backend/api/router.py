@@ -13,6 +13,7 @@ from api.executive import router as executive_router
 from api.health import router as health_router
 from api.meta_reasoning import router as meta_reasoning_router
 from api.microkernel import router as microkernel_router
+from api.research import router as research_router
 from api.runtime_workflows import router as runtime_workflows_router
 from api.tools import router as tools_router
 from api.v1.router import router as v1_router
@@ -74,5 +75,8 @@ def create_api_router() -> APIRouter:
 
     # Runtime workflow engine endpoints
     api_router.include_router(runtime_workflows_router)
+
+    # Deep Research Engine endpoints
+    api_router.include_router(research_router)
 
     return api_router
