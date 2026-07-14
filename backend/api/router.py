@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from api.adapters import router as adapters_router
 from api.auth import router as auth_router
+from api.automation import router as automation_router
 from api.capabilities import router as capabilities_router
 from api.chat import router as chat_router
 from api.cognitive import router as cognitive_router
@@ -90,5 +91,8 @@ def create_api_router() -> APIRouter:
 
     # Vision & OCR Engine
     api_router.include_router(vision_router)
+
+    # Automation Engine
+    api_router.include_router(automation_router)
 
     return api_router
