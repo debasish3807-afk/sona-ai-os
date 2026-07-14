@@ -18,6 +18,7 @@ from api.runtime_workflows import router as runtime_workflows_router
 from api.tools import router as tools_router
 from api.v1.router import router as v1_router
 from api.version import router as version_router
+from api.voice import router as voice_router
 from api.workspace import router as workspace_router
 
 
@@ -82,5 +83,8 @@ def create_api_router() -> APIRouter:
 
     # Desktop Workspace API
     api_router.include_router(workspace_router)
+
+    # Voice AI Assistant
+    api_router.include_router(voice_router)
 
     return api_router
