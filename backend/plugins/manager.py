@@ -130,10 +130,12 @@ class PluginManager:
         provider = tool.provider
         if provider == "terminal":
             import asyncio
+            import shutil
 
             cmd = args.get("command", "echo hello")
-            proc = await asyncio.create_subprocess_shell(
-                cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            shell = shutil.which("sh") or "/bin/sh"
+            proc = await asyncio.create_subprocess_exec(
+                shell, "-c", cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             out, err = await proc.communicate()
             return {"stdout": out.decode(), "stderr": err.decode(), "code": proc.returncode}

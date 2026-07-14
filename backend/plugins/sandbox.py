@@ -79,7 +79,7 @@ class PluginSandbox:
         }
 
         try:
-            exec(code, restricted_globals)  # noqa: S102
+            exec(code, restricted_globals)  # nosec B102 — required for plugin execution sandbox
             result: dict[str, Any] = restricted_globals.get("result", {})
             return result
         except Exception as exc:
