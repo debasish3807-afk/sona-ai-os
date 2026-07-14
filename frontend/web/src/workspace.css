@@ -1,0 +1,429 @@
+/* Desktop AI Workspace Styles */
+
+.workspace {
+  display: grid;
+  grid-template-columns: 48px 1fr 400px;
+  height: 100vh;
+  background: var(--bg-primary, #0f0f0f);
+  color: var(--text-primary, #e0e0e0);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────── */
+
+.workspace-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 4px;
+  background: var(--bg-sidebar, #1a1a1a);
+  border-right: 1px solid var(--border, #2a2a2a);
+}
+
+.workspace-sidebar button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.workspace-sidebar button:hover {
+  background: var(--bg-hover, #2a2a2a);
+}
+
+.workspace-sidebar button.active {
+  background: var(--bg-active, #3a3a3a);
+}
+
+.sidebar-divider {
+  width: 24px;
+  height: 1px;
+  background: var(--border, #2a2a2a);
+  margin: 8px 0;
+}
+
+/* ─── Panels ──────────────────────────────────────────────────────── */
+
+.workspace-main,
+.workspace-right {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-right {
+  border-left: 1px solid var(--border, #2a2a2a);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ─── Chat Panel ──────────────────────────────────────────────────── */
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.message.user {
+  background: var(--bg-user, #1a2a3a);
+}
+
+.message.assistant {
+  background: var(--bg-assistant, #1a1a2a);
+}
+
+.message-role {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.message-content pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border, #2a2a2a);
+}
+
+.chat-input textarea {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 8px;
+  background: var(--bg-input, #1a1a1a);
+  color: var(--text-primary, #e0e0e0);
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
+  font-size: 13px;
+}
+
+.chat-input button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent, #4a9eff);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chat-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent, #4a9eff);
+  color: white;
+}
+
+/* ─── Research Panel ──────────────────────────────────────────────── */
+
+.research-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.research-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 6px;
+  background: var(--bg-input, #1a1a1a);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.research-input button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent, #4a9eff);
+  color: white;
+  cursor: pointer;
+}
+
+.status-bar {
+  padding: 6px 16px;
+  font-size: 12px;
+  color: var(--text-secondary, #888);
+  border-bottom: 1px solid var(--border, #2a2a2a);
+}
+
+.report {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.report h4 { margin: 0 0 8px; }
+.report h5 { margin: 16px 0 8px; }
+.confidence { color: var(--accent, #4a9eff); font-weight: 600; }
+
+.sources {
+  list-style: none;
+  padding: 0;
+}
+
+.sources li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+}
+
+.sources a {
+  color: var(--accent, #4a9eff);
+  text-decoration: none;
+}
+
+.source-kind {
+  font-size: 11px;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--bg-hover, #2a2a2a);
+}
+
+/* ─── Memory Panel ────────────────────────────────────────────────── */
+
+.memory-controls {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.memory-controls input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 6px;
+  background: var(--bg-input, #1a1a1a);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.memory-controls button,
+.memory-add button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent, #4a9eff);
+  color: white;
+  cursor: pointer;
+}
+
+.memory-add {
+  padding: 0 16px 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.memory-add textarea {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 6px;
+  background: var(--bg-input, #1a1a1a);
+  color: var(--text-primary, #e0e0e0);
+  resize: none;
+  height: 60px;
+}
+
+.memory-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+.memory-item {
+  padding: 8px;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+}
+
+.memory-type {
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+}
+
+/* ─── File Explorer ───────────────────────────────────────────────── */
+
+.file-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.file-node {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.file-node:hover {
+  background: var(--bg-hover, #2a2a2a);
+}
+
+.file-content {
+  border-top: 1px solid var(--border, #2a2a2a);
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.file-path {
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border, #2a2a2a);
+}
+
+.file-content pre {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Terminal ────────────────────────────────────────────────────── */
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background: #000;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.terminal-output pre {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #0f0;
+  white-space: pre-wrap;
+}
+
+.terminal-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border, #2a2a2a);
+  background: #000;
+}
+
+.terminal-input .prompt {
+  color: #0f0;
+  font-family: monospace;
+}
+
+.terminal-input input {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #0f0;
+  font-family: monospace;
+  font-size: 13px;
+  outline: none;
+}
+
+/* ─── Settings ────────────────────────────────────────────────────── */
+
+.settings-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary, #888);
+}
+
+.settings-form select,
+.settings-form input[type="text"],
+.settings-form input:not([type="range"]) {
+  padding: 8px;
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 6px;
+  background: var(--bg-input, #1a1a1a);
+  color: var(--text-primary, #e0e0e0);
+}
+
+/* ─── Light Theme ─────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-sidebar: #f5f5f5;
+  --bg-hover: #e8e8e8;
+  --bg-active: #ddd;
+  --bg-input: #f9f9f9;
+  --bg-user: #e8f0ff;
+  --bg-assistant: #f0f0ff;
+  --border: #e0e0e0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --accent: #2563eb;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 48px 1fr;
+  }
+  .workspace-right {
+    display: none;
+  }
+}
