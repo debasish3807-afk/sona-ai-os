@@ -228,12 +228,13 @@ async def search_memory(body: MemorySearchRequest) -> SuccessResponse:
 @router.get("/health", response_model=HealthResponse)
 async def health_v1() -> HealthResponse:
     """Health check for the v1 API."""
-    status = _health_monitor.get_status()
+    summary = _health_monitor.get_summary()
     return HealthResponse(
-        status=status.status,
-        version="1.0.0-rc1",
-        uptime_seconds=status.uptime_seconds,
-        components=status.components,
+        healthy=summary["healthy"],
+        total_components=summary["total_components"],
+        healthy_components=summary["healthy_components"],
+        unhealthy_components=summary["unhealthy_components"],
+        components=summary["components"],
     )
 
 
@@ -241,10 +242,12 @@ async def health_v1() -> HealthResponse:
 async def metrics_v1() -> MetricsResponse:
     """Get metrics for the v1 API."""
     return MetricsResponse(
-        pipeline_count=_metrics.get_count("pipeline_executions", default=0),
-        workflow_count=_metrics.get_count("workflows_created", default=0),
-        goal_count=_metrics.get_count("goals_created", default=0),
-        average_pipeline_duration_ms=_metrics.get_histogram_mean(
-            "pipeline_duration_ms", default=0.0
-        ),
+        counters={
+            "pipeline_executions": _metrics.get_counter("pipeline_executions"),
+            "workflows_created": _metrics.get_counter("workflows_created"),
+            "goals_created": _metrics.get_counter("goals_created"),
+        },
+        histograms={
+            "pipeline_duration_ms": _metrics.get_histogram_stats("pipeline_duration_ms"),
+        },
     )

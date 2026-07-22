@@ -49,7 +49,13 @@ _CLOUD_METADATA_HOSTS = {
     "metadata.internal",
     "100.100.100.200",  # Alibaba Cloud
 }
-_LOCAL_HOSTNAMES = {"localhost", "127.0.0.1", "0.0.0.0", "::1", "127.0.1.1"}
+_LOCAL_HOSTNAMES = {
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",  # nosec B104 — used for SSRF protection
+    "::1",
+    "127.0.1.1",
+}
 
 _COMMAND_ALLOWLIST = [
     "ls",
