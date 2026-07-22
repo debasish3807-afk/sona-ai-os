@@ -1,516 +1,149 @@
-/**
- * Desktop AI Workspace — Main workspace page with resizable panels.
- *
- * Layout: Sidebar | Main Panel (Chat/Research/Memory) | Right Panel (Files/Terminal)
- */
-import { useState, useCallback } from 'react'
+import { useState, useCallback } from "react";
+import { WorkspaceLayout } from "./components/workspace/WorkspaceLayout";
+import { DockablePanel } from "./components/workspace/DockablePanel";
+import { AISidebar } from "./components/workspace/AISidebar";
+import { ProjectExplorer } from "./components/workspace/ProjectExplorer";
+import { FileExplorer } from "./components/workspace/FileExplorer";
+import { IntegratedTerminal } from "./components/workspace/IntegratedTerminal";
+import { CodeEditor } from "./components/workspace/CodeEditor";
+import { WorkspaceTabs, Tab } from "./components/workspace/WorkspaceTabs";
+import { CommandPalette } from "./components/workspace/CommandPalette";
+import { GlobalSearch } from "./components/workspace/GlobalSearch";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+export function WorkspacePage() {
+  const [tabs, setTabs] = useState<Tab[]>([
+    { id: "welcome", label: "Welcome", type: "chat" },
+  ]);
+  const [activeTabId, setActiveTabId] = useState<string | null>("welcome");
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [editorFile, setEditorFile] = useState<string | null>(null);
+  const [editorContent, setEditorContent] = useState("");
+  const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
+  const [leftVisible, setLeftVisible] = useState(true);
+  const [rightVisible, setRightVisible] = useState(true);
+  const [bottomVisible, setBottomVisible] = useState(false);
 
-interface Message {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  timestamp?: number
-}
-
-interface FileNode {
-  name: string
-  path: string
-  is_dir: boolean
-  size?: number
-  extension?: string
-  children?: FileNode[]
-}
-
-interface Conversation {
-  id: string
-  title: string
-  created_at: string
-  message_count: number
-  pinned: boolean
-}
-
-type PanelView = 'chat' | 'research' | 'memory' | 'rag' | 'settings'
-type RightPanel = 'files' | 'terminal' | 'github'
-
-// ─── API Client ─────────────────────────────────────────────────────────────
-
-const API_BASE = '/workspace'
-
-async function apiPost(path: string, body: object) {
-  const resp = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-  return resp.json()
-}
-
-async function apiGet(path: string) {
-  const resp = await fetch(`${API_BASE}${path}`)
-  return resp.json()
-}
-
-// ─── Chat Panel ─────────────────────────────────────────────────────────────
-
-function ChatPanel() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [streaming, setStreaming] = useState(false)
-
-  const sendMessage = useCallback(async () => {
-    if (!input.trim() || loading) return
-
-    const userMsg: Message = { role: 'user', content: input, timestamp: Date.now() }
-    const newMessages = [...messages, userMsg]
-    setMessages(newMessages)
-    setInput('')
-    setLoading(true)
-    setStreaming(true)
-
-    try {
-      const resp = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
-          stream: true,
-        }),
+  const handleFileSelect = useCallback((path: string) => {
+    setActiveFilePath(path);
+    // Check if tab already exists
+    setTabs((prev) => {
+      if (prev.find((t) => t.id === `file:${path}`)) return prev;
+      return [...prev, { id: `file:${path}`, label: path.split("/").pop() || path, type: "file", path }];
+    });
+    setActiveTabId(`file:${path}`);
+    // Load file content
+    fetch(`/api/v1/workspace/files/content?path=${encodeURIComponent(path)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.content) setEditorContent(data.content);
+        else if (data.error) setEditorContent(`// Error: ${data.error}`);
+        setEditorFile(path);
       })
+      .catch(() => setEditorContent("// Error loading file"));
+  }, []);
 
-      const reader = resp.body?.getReader()
-      const decoder = new TextDecoder()
-      let assistantContent = ''
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          const text = decoder.decode(value)
-          const lines = text.split('\n')
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6))
-                if (data.type === 'chunk') {
-                  assistantContent += data.content
-                  setMessages([...newMessages, { role: 'assistant', content: assistantContent }])
-                }
-              } catch { /* skip malformed */ }
-            }
-          }
-        }
+  const handleCloseTab = useCallback((id: string) => {
+    setTabs((prev) => {
+      const idx = prev.findIndex((t) => t.id === id);
+      const next = prev.filter((t) => t.id !== id);
+      if (activeTabId === id && next.length > 0) {
+        setActiveTabId(next[Math.min(idx, next.length - 1)].id);
       }
+      return next;
+    });
+  }, [activeTabId]);
 
-      if (!assistantContent) {
-        // Fallback to non-streaming
-        const data = await apiPost('/chat/complete', {
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
-        })
-        assistantContent = data.content || '[No response]'
-      }
+  const handleSendMessage = useCallback((message: string) => {
+    const chatId = `chat:${Date.now()}`;
+    setTabs((prev) => [...prev, { id: chatId, label: "AI Chat", type: "chat" }]);
+    setActiveTabId(chatId);
+  }, []);
 
-      setMessages([...newMessages, { role: 'assistant', content: assistantContent, timestamp: Date.now() }])
-    } catch (err) {
-      setMessages([...newMessages, { role: 'assistant', content: `Error: ${err}` }])
-    } finally {
-      setLoading(false)
-      setStreaming(false)
-    }
-  }, [input, messages, loading])
+  const commands = [
+    { id: "palette", label: "Command Palette...", shortcut: "⌘K", category: "Workspace", action: () => setShowCommandPalette(true) },
+    { id: "search", label: "Global Search...", shortcut: "⌘⇧F", category: "Workspace", action: () => setShowGlobalSearch(true) },
+    { id: "explorer", label: "Toggle Explorer", shortcut: "⌘B", category: "View", action: () => setLeftVisible((v) => !v) },
+    { id: "sidebar", label: "Toggle AI Sidebar", shortcut: "⌘⇧B", category: "View", action: () => setRightVisible((v) => !v) },
+    { id: "terminal", label: "Toggle Terminal", shortcut: "⌘`", category: "View", action: () => setBottomVisible((v) => !v) },
+    { id: "new-chat", label: "New Chat", shortcut: "⌘N", category: "AI", action: () => handleSendMessage("") },
+    { id: "ai-explain", label: "Explain Selected Code", shortcut: "⌘⇧E", category: "AI", action: () => handleSendMessage("Explain the current file structure") },
+    { id: "ai-refactor", label: "Refactor Code", shortcut: "⌘⇧R", category: "AI", action: () => handleSendMessage("Review and suggest refactoring for the current file") },
+    { id: "ai-test", label: "Generate Tests", shortcut: "⌘⇧T", category: "AI", action: () => handleSendMessage("Write tests for the current module") },
+    { id: "git-status", label: "Git Status", shortcut: "⌘⇧G", category: "Git", action: () => handleSendMessage("Show git status and recent changes") },
+  ];
 
   return (
-    <div className="panel chat-panel">
-      <div className="panel-header">
-        <h3>AI Chat</h3>
-        {streaming && <span className="badge">Streaming...</span>}
-      </div>
-      <div className="messages">
-        {messages.map((msg, i) => (
-          <div key={i} className={`message ${msg.role}`}>
-            <div className="message-role">{msg.role === 'user' ? '👤' : '🤖'}</div>
-            <div className="message-content">
-              <pre>{msg.content}</pre>
+    <>
+      <WorkspaceLayout
+        leftPanel={
+          <ProjectExplorer onFileSelect={handleFileSelect} activeFilePath={activeFilePath} />
+        }
+        rightPanel={
+          <AISidebar onSendMessage={handleSendMessage} />
+        }
+        bottomPanel={
+          <IntegratedTerminal defaultCwd="~" />
+        }
+        defaultLeftVisible={leftVisible}
+        defaultRightVisible={rightVisible}
+        defaultBottomVisible={bottomVisible}
+        onToggleLeft={() => setLeftVisible((v) => !v)}
+        onToggleRight={() => setRightVisible((v) => !v)}
+        onToggleBottom={() => setBottomVisible((v) => !v)}
+        topBar={
+          <div className="bg-gray-900 border-b border-gray-800">
+            <WorkspaceTabs tabs={tabs} activeTabId={activeTabId} onSelect={setActiveTabId} onClose={handleCloseTab} onNewTab={() => handleSendMessage("")} />
+          </div>
+        }
+      >
+        <div className="h-full flex flex-col">
+          {activeTabId?.startsWith("file:") && editorFile ? (
+            <CodeEditor filePath={editorFile} initialContent={editorContent} />
+          ) : activeTabId === "welcome" ? (
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="max-w-lg text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h1 className="text-2xl font-bold text-white mb-2">Welcome to Sona AI OS</h1>
+                <p className="text-gray-400 mb-6 text-sm">Your personal AI-powered development workspace</p>
+                <div className="grid grid-cols-2 gap-3 text-left">
+                  {[
+                    { icon: "💬", title: "AI Chat", desc: "Ask questions, get answers" },
+                    { icon: "📁", title: "Project Explorer", desc: "Browse and manage files" },
+                    { icon: "💻", title: "Terminal", desc: "Run commands and scripts" },
+                    { icon: "🔍", title: "Global Search", desc: "Find anything across files" },
+                    { icon: "⚡", title: "Command Palette", desc: "Quick actions (⌘K)" },
+                    { icon: "🔧", title: "AI Coding", desc: "Explain, review, refactor" },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-start gap-3 p-3 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer"
+                      onClick={() => handleSendMessage(`How do I use the ${item.title} feature?`)}>
+                      <span className="text-lg">{item.icon}</span>
+                      <div>
+                        <p className="text-sm font-medium text-gray-200">{item.title}</p>
+                        <p className="text-xs text-gray-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 text-xs text-gray-600">
+                  Press <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-gray-400">⌘K</kbd> to open Command Palette
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="chat-input">
-        <textarea
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-          placeholder="Ask Sona anything..."
-          disabled={loading}
-        />
-        <button onClick={sendMessage} disabled={loading || !input.trim()}>
-          {loading ? '⏳' : '▶'}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ─── Research Panel ─────────────────────────────────────────────────────────
-
-function ResearchPanel() {
-  const [query, setQuery] = useState('')
-  const [report, setReport] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState('')
-
-  const runResearch = async () => {
-    if (!query.trim()) return
-    setLoading(true)
-    setReport(null)
-    setStatus('Starting research...')
-
-    try {
-      const resp = await fetch(`${API_BASE}/research?query=${encodeURIComponent(query)}&offline=false`, {
-        method: 'POST',
-      })
-      const reader = resp.body?.getReader()
-      const decoder = new TextDecoder()
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          const text = decoder.decode(value)
-          for (const line of text.split('\n')) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6))
-                if (data.type === 'status') setStatus(data.content)
-                if (data.type === 'report') setReport(data)
-                if (data.type === 'done') setStatus('Complete')
-              } catch { /* skip */ }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      setStatus(`Error: ${err}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="panel research-panel">
-      <div className="panel-header"><h3>Deep Research</h3></div>
-      <div className="research-input">
-        <input
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') runResearch() }}
-          placeholder="Research topic..."
-          disabled={loading}
-        />
-        <button onClick={runResearch} disabled={loading}>
-          {loading ? '🔍...' : '🔍 Research'}
-        </button>
-      </div>
-      {status && <div className="status-bar">{status}</div>}
-      {report && (
-        <div className="report">
-          <h4>{report.title}</h4>
-          <p className="confidence">Confidence: {(report.confidence * 100).toFixed(0)}%</p>
-          <p>{report.summary}</p>
-          <h5>Sources ({report.source_count})</h5>
-          <ul className="sources">
-            {report.references?.map((ref: any, i: number) => (
-              <li key={i}>
-                <a href={ref.url} target="_blank" rel="noreferrer">{ref.title}</a>
-                <span className="source-kind">{ref.source_kind}</span>
-              </li>
-            ))}
-          </ul>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-gray-500">
+              <p>Select a file or start a conversation</p>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  )
-}
-
-// ─── Memory Panel ───────────────────────────────────────────────────────────
-
-function MemoryPanel() {
-  const [memories, setMemories] = useState<any[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [newMemory, setNewMemory] = useState('')
-
-  const loadMemories = async () => {
-    const params = searchQuery ? `?query=${encodeURIComponent(searchQuery)}` : ''
-    const data = await apiGet(`/memory${params}`)
-    setMemories(data.memories || [])
-  }
-
-  const storeMemory = async () => {
-    if (!newMemory.trim()) return
-    await apiPost('/memory', { content: newMemory, memory_type: 'conversation' })
-    setNewMemory('')
-    loadMemories()
-  }
-
-  return (
-    <div className="panel memory-panel">
-      <div className="panel-header"><h3>Memory</h3></div>
-      <div className="memory-controls">
-        <input
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search memory..."
-          onKeyDown={e => { if (e.key === 'Enter') loadMemories() }}
-        />
-        <button onClick={loadMemories}>Search</button>
-      </div>
-      <div className="memory-add">
-        <textarea value={newMemory} onChange={e => setNewMemory(e.target.value)} placeholder="Store new memory..." />
-        <button onClick={storeMemory}>Store</button>
-      </div>
-      <div className="memory-list">
-        {memories.map((m, i) => (
-          <div key={i} className="memory-item">
-            <span className="memory-type">{m.type}</span>
-            <p>{m.content}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ─── File Explorer ──────────────────────────────────────────────────────────
-
-function FileExplorer() {
-  const [files, setFiles] = useState<FileNode[]>([])
-  const [content, setContent] = useState('')
-  const [selectedFile, setSelectedFile] = useState('')
-
-  const loadFiles = async (path = '') => {
-    const data = await apiGet(`/files?path=${encodeURIComponent(path)}&depth=2`)
-    setFiles(data.nodes || [])
-  }
-
-  const openFile = async (path: string) => {
-    const data = await apiGet(`/files/content?path=${encodeURIComponent(path)}`)
-    if (data.content) {
-      setContent(data.content)
-      setSelectedFile(path)
-    }
-  }
-
-  useState(() => { loadFiles() })
-
-  return (
-    <div className="panel file-panel">
-      <div className="panel-header"><h3>Files</h3></div>
-      <div className="file-tree">
-        {files.map((node, i) => (
-          <div key={i} className={`file-node ${node.is_dir ? 'dir' : 'file'}`}>
-            {node.is_dir ? (
-              <span onClick={() => loadFiles(node.path)}>📁 {node.name}</span>
-            ) : (
-              <span onClick={() => openFile(node.path)}>📄 {node.name}</span>
-            )}
-          </div>
-        ))}
-      </div>
-      {content && (
-        <div className="file-content">
-          <div className="file-path">{selectedFile}</div>
-          <pre><code>{content}</code></pre>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ─── Terminal Panel ─────────────────────────────────────────────────────────
-
-function TerminalPanel() {
-  const [command, setCommand] = useState('')
-  const [output, setOutput] = useState('')
-  const [running, setRunning] = useState(false)
-
-  const executeCommand = async () => {
-    if (!command.trim() || running) return
-    setRunning(true)
-    setOutput('')
-
-    try {
-      const resp = await fetch(`${API_BASE}/terminal`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command, timeout: 30 }),
-      })
-      const reader = resp.body?.getReader()
-      const decoder = new TextDecoder()
-      let fullOutput = `$ ${command}\n`
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          const text = decoder.decode(value)
-          for (const line of text.split('\n')) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6))
-                if (data.type === 'stdout' || data.type === 'stderr') {
-                  fullOutput += data.content
-                  setOutput(fullOutput)
-                }
-                if (data.type === 'exit') {
-                  fullOutput += `\n[exit: ${data.code}]`
-                  setOutput(fullOutput)
-                }
-              } catch { /* skip */ }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      setOutput(`Error: ${err}`)
-    } finally {
-      setRunning(false)
-      setCommand('')
-    }
-  }
-
-  return (
-    <div className="panel terminal-panel">
-      <div className="panel-header"><h3>Terminal</h3></div>
-      <div className="terminal-output">
-        <pre>{output || 'Ready.'}</pre>
-      </div>
-      <div className="terminal-input">
-        <span className="prompt">$</span>
-        <input
-          value={command}
-          onChange={e => setCommand(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') executeCommand() }}
-          placeholder="Enter command..."
-          disabled={running}
-        />
-        {running && <button onClick={() => setRunning(false)}>⏹ Stop</button>}
-      </div>
-    </div>
-  )
-}
-
-// ─── Settings Panel ─────────────────────────────────────────────────────────
-
-function SettingsPanel() {
-  const [settings, setSettings] = useState<any>({})
-  const [loaded, setLoaded] = useState(false)
-
-  const loadSettings = async () => {
-    const data = await apiGet('/settings')
-    setSettings(data)
-    setLoaded(true)
-  }
-
-  const updateSetting = async (key: string, value: any) => {
-    const updated = { ...settings, [key]: value }
-    setSettings(updated)
-    await fetch(`${API_BASE}/settings`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [key]: value }),
-    })
-  }
-
-  if (!loaded) loadSettings()
-
-  return (
-    <div className="panel settings-panel">
-      <div className="panel-header"><h3>Settings</h3></div>
-      <div className="settings-form">
-        <label>
-          AI Provider
-          <select value={settings.provider || 'ollama'} onChange={e => updateSetting('provider', e.target.value)}>
-            <option value="ollama">Ollama (Local)</option>
-            <option value="gemini">Gemini (Free)</option>
-          </select>
-        </label>
-        <label>
-          Model
-          <input value={settings.model || ''} onChange={e => updateSetting('model', e.target.value)} />
-        </label>
-        <label>
-          Theme
-          <select value={settings.theme || 'dark'} onChange={e => updateSetting('theme', e.target.value)}>
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
-        </label>
-        <label>
-          Temperature: {settings.temperature || 0.7}
-          <input type="range" min="0" max="1" step="0.1"
-            value={settings.temperature || 0.7}
-            onChange={e => updateSetting('temperature', parseFloat(e.target.value))} />
-        </label>
-        <label>
-          Research Depth
-          <select value={settings.research_depth || 'standard'} onChange={e => updateSetting('research_depth', e.target.value)}>
-            <option value="quick">Quick</option>
-            <option value="standard">Standard</option>
-            <option value="deep">Deep</option>
-          </select>
-        </label>
-      </div>
-    </div>
-  )
-}
-
-// ─── Main Workspace Layout ──────────────────────────────────────────────────
-
-export default function WorkspacePage() {
-  const [activePanel, setActivePanel] = useState<PanelView>('chat')
-  const [rightPanel, setRightPanel] = useState<RightPanel>('files')
-
-  const renderMainPanel = () => {
-    switch (activePanel) {
-      case 'chat': return <ChatPanel />
-      case 'research': return <ResearchPanel />
-      case 'memory': return <MemoryPanel />
-      case 'settings': return <SettingsPanel />
-      default: return <ChatPanel />
-    }
-  }
-
-  const renderRightPanel = () => {
-    switch (rightPanel) {
-      case 'files': return <FileExplorer />
-      case 'terminal': return <TerminalPanel />
-      default: return <FileExplorer />
-    }
-  }
-
-  return (
-    <div className="workspace">
-      {/* Sidebar Navigation */}
-      <nav className="workspace-sidebar">
-        <button className={activePanel === 'chat' ? 'active' : ''} onClick={() => setActivePanel('chat')} title="AI Chat">💬</button>
-        <button className={activePanel === 'research' ? 'active' : ''} onClick={() => setActivePanel('research')} title="Deep Research">🔬</button>
-        <button className={activePanel === 'memory' ? 'active' : ''} onClick={() => setActivePanel('memory')} title="Memory">🧠</button>
-        <button className={activePanel === 'settings' ? 'active' : ''} onClick={() => setActivePanel('settings')} title="Settings">⚙️</button>
-        <div className="sidebar-divider" />
-        <button className={rightPanel === 'files' ? 'active' : ''} onClick={() => setRightPanel('files')} title="Files">📁</button>
-        <button className={rightPanel === 'terminal' ? 'active' : ''} onClick={() => setRightPanel('terminal')} title="Terminal">🖥️</button>
-      </nav>
-
-      {/* Main Panel */}
-      <main className="workspace-main">
-        {renderMainPanel()}
-      </main>
-
-      {/* Right Panel */}
-      <aside className="workspace-right">
-        {renderRightPanel()}
-      </aside>
-    </div>
-  )
+      </WorkspaceLayout>
+      <CommandPalette isOpen={showCommandPalette} onClose={() => setShowCommandPalette(false)} commands={commands} onSearch={setSearchQuery} />
+      <GlobalSearch isOpen={showGlobalSearch} onClose={() => setShowGlobalSearch(false)} initialQuery={searchQuery} />
+    </>
+  );
 }

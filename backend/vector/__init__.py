@@ -12,9 +12,9 @@ from vector.store import SearchResult, VectorRecord, VectorStore
 
 __all__ = [
     "EmbeddingEngine",
+    "InMemoryVectorStore",
     "OllamaEmbeddingEngine",
     "QdrantStore",
-    "InMemoryVectorStore",
     "SearchResult",
     "VectorRecord",
     "VectorStore",
