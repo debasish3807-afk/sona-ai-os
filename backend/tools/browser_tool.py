@@ -2,6 +2,7 @@
 
 Provides safe web content retrieval with:
     - URL fetching with timeout
+    - SSRF protection (blocks private/internal network requests)
     - HTML to plain text extraction
     - HTML to markdown conversion
     - Content length limiting
@@ -17,6 +18,67 @@ import httpx
 
 from tools.base import BaseTool, ToolCategory, ToolMetadata, ToolParam, ToolResult
 from tools.permissions import ToolPermissions
+
+_PRIVATE_IP_PREFIXES = (
+    "127.",
+    "10.",
+    "172.16.",
+    "172.17.",
+    "172.18.",
+    "172.19.",
+    "172.20.",
+    "172.21.",
+    "172.22.",
+    "172.23.",
+    "172.24.",
+    "172.25.",
+    "172.26.",
+    "172.27.",
+    "172.28.",
+    "172.29.",
+    "172.30.",
+    "172.31.",
+    "192.168.",
+)
+_CLOUD_METADATA_HOSTS = {
+    "169.254.169.254",  # AWS / GCP / Azure
+    "metadata.google.internal",
+    "metadata.internal",
+    "100.100.100.200",  # Alibaba Cloud
+}
+_LOCAL_HOSTNAMES = {"localhost", "127.0.0.1", "0.0.0.0", "::1", "127.0.1.1"}
+
+
+def _is_safe_url(url: str) -> bool:
+    """Check that a URL does not point to an internal or private network.
+
+    Prevents SSRF attacks by blocking private IP ranges, localhost,
+    and cloud metadata endpoints.
+    """
+    from urllib.parse import urlparse
+
+    if not url:
+        return False
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname or ""
+
+    if not hostname:
+        return False
+
+    # Block localhost variants
+    if hostname.lower() in _LOCAL_HOSTNAMES:
+        return False
+
+    # Block cloud metadata hosts
+    if hostname.lower() in _CLOUD_METADATA_HOSTS:
+        return False
+
+    # Block private IP ranges by prefix
+    if hostname.startswith(_PRIVATE_IP_PREFIXES):
+        return False
+
+    return True
 
 
 def _html_to_text(html: str) -> str:
@@ -80,7 +142,11 @@ def _html_to_markdown(html: str) -> str:
 
 
 class BrowserFetchTool(BaseTool):
-    """Fetch a URL and return its content."""
+    """Fetch a URL and return its content.
+
+    Includes SSRF protection — requests to private/internal networks,
+    localhost, and cloud metadata endpoints are blocked.
+    """
 
     def __init__(self, permissions: ToolPermissions) -> None:
         self._permissions = permissions
@@ -121,6 +187,13 @@ class BrowserFetchTool(BaseTool):
 
         if not self._permissions.allow_network:
             return ToolResult(success=False, error="Network access is disabled")
+
+        # SSRF protection — block private/internal hosts
+        if not _is_safe_url(url):
+            return ToolResult(
+                success=False,
+                error="URL blocked: requests to private/internal networks are not allowed",
+            )
 
         # Ensure URL has scheme
         if not url.startswith(("http://", "https://")):
@@ -190,6 +263,7 @@ class BrowserSearchTool(BaseTool):
         )
 
     async def execute(self, **params: Any) -> ToolResult:
+        """Search the web using DuckDuckGo."""
         query = str(params.get("query", ""))
         max_results = int(params.get("max_results", 5))
 
@@ -200,43 +274,41 @@ class BrowserSearchTool(BaseTool):
             return ToolResult(success=False, error="Network access is disabled")
 
         try:
+            # Use DuckDuckGo's instant answer API (no API key needed)
+            search_url = (
+                f"https://api.duckduckgo.com/?q={query}&format=json&no_html=1&skip_disambig=1"
+            )
+
+            # SSRF protection
+            if not _is_safe_url(search_url):
+                return ToolResult(success=False, error="URL blocked")
+
             async with httpx.AsyncClient(timeout=15.0) as client:
-                resp = await client.get(
-                    "https://api.duckduckgo.com/",
-                    params={"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"},
-                )
-                resp.raise_for_status()
+                resp = await client.get(search_url)
+                data = resp.json()
+
+            results: list[dict[str, str]] = []
+            # Parse DuckDuckGo response
+            abstract = data.get("AbstractText", "")
+            if abstract:
+                _ = data.get("AbstractSource", "")  # unused intentionally
+                url = data.get("AbstractURL", "")
+                results.append({"title": abstract[:100], "snippet": abstract, "url": url})
+
+            related = data.get("RelatedTopics", [])
+            for item in related[:max_results]:
+                if "Text" in item:
+                    results.append(
+                        {"title": item.get("Text", "")[:100], "url": item.get("FirstURL", "")}
+                    )
+
+            return ToolResult(
+                success=True,
+                output=f"Found {len(results)} results" if results else "No results found",
+                data={"results": results, "result_count": len(results)},
+            )
         except Exception as exc:
             return ToolResult(success=False, error=f"Search failed: {exc}")
-
-        data = resp.json()
-        results: list[str] = []
-
-        # Abstract (instant answer)
-        abstract = data.get("AbstractText", "")
-        if abstract:
-            results.append(f"**Summary:** {abstract}")
-            source = data.get("AbstractSource", "")
-            url = data.get("AbstractURL", "")
-            if source:
-                results.append(f"Source: {source} ({url})")
-            results.append("")
-
-        # Related topics
-        for topic in data.get("RelatedTopics", [])[:max_results]:
-            if "Text" in topic:
-                text = topic["Text"]
-                first_url = topic.get("FirstURL", "")
-                results.append(f"- {text}")
-                if first_url:
-                    results.append(f"  {first_url}")
-
-        output = "\n".join(results) if results else "No results found"
-        return ToolResult(
-            success=True,
-            output=output,
-            data={"query": query, "has_abstract": bool(abstract), "results_count": len(results)},
-        )
 
 
 def register_browser_tools(permissions: ToolPermissions) -> list[BaseTool]:

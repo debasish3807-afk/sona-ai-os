@@ -25,7 +25,8 @@ from core.pipeline import PipelineRequest as PipelineReq
 
 logger = get_logger(__name__)
 
-router = APIRouter(prefix="/api/v1", tags=["v1"])
+# NOTE: No prefix here — the main router in app/main.py mounts at settings.api_prefix ("/api/v1")
+router = APIRouter(tags=["v1"])
 
 # Observability singletons
 _health_monitor = UnifiedHealthMonitor()
@@ -198,14 +199,11 @@ async def store_memory(body: MemoryStoreRequest) -> SuccessResponse:
     entry = MemoryEntry(
         content=body.content,
         memory_type=body.memory_type,
-        scope=body.scope,
         session_id=body.session_id,
-        importance=body.importance,
         tags=body.tags,
     )
-    entry_id = await manager.store(entry)
-    _metrics.increment("memories_stored")
-    return SuccessResponse(data={"entry_id": entry_id})
+    memory_id = await manager.store(entry)
+    return SuccessResponse(data={"memory_id": memory_id})
 
 
 @router.post("/memory/search", response_model=SuccessResponse)
@@ -219,50 +217,34 @@ async def search_memory(body: MemorySearchRequest) -> SuccessResponse:
     results = await manager.search(
         query=body.query,
         memory_type=body.memory_type,
-        scope=body.scope,
         limit=body.limit,
     )
-    return SuccessResponse(data={"results": [e.to_dict() for e in results], "total": len(results)})
+    return SuccessResponse(data={"results": [r.to_dict() for r in results]})
 
 
-# ─── Observability Endpoints ─────────────────────────────────────────────────
+# ─── Health & Metrics (v1) ──────────────────────────────────────────────────
 
 
 @router.get("/health", response_model=HealthResponse)
-async def unified_health() -> HealthResponse:
-    """Get unified system health."""
-    container = get_container()
-    _health_monitor.update_health("container", container.initialized)
-
-    if container.initialized:
-        _health_monitor.update_health("runtime", True)
-        _health_monitor.update_health("executive", True)
-        _health_monitor.update_health("memory", True)
-        _health_monitor.update_health("security", True)
-
-    summary = _health_monitor.get_summary()
+async def health_v1() -> HealthResponse:
+    """Health check for the v1 API."""
+    status = _health_monitor.get_status()
     return HealthResponse(
-        healthy=summary["healthy"],
-        total_components=summary["total_components"],
-        healthy_components=summary["healthy_components"],
-        unhealthy_components=summary["unhealthy_components"],
-        components=summary["components"],
+        status=status.status,
+        version="1.0.0-rc1",
+        uptime_seconds=status.uptime_seconds,
+        components=status.components,
     )
 
 
 @router.get("/metrics", response_model=MetricsResponse)
-async def unified_metrics() -> MetricsResponse:
-    """Get unified system metrics."""
-    all_metrics = _metrics.get_all()
+async def metrics_v1() -> MetricsResponse:
+    """Get metrics for the v1 API."""
     return MetricsResponse(
-        counters=all_metrics["counters"],
-        gauges=all_metrics["gauges"],
-        histograms=all_metrics["histograms"],
+        pipeline_count=_metrics.get_count("pipeline_executions", default=0),
+        workflow_count=_metrics.get_count("workflows_created", default=0),
+        goal_count=_metrics.get_count("goals_created", default=0),
+        average_pipeline_duration_ms=_metrics.get_histogram_mean(
+            "pipeline_duration_ms", default=0.0
+        ),
     )
-
-
-@router.get("/status", response_model=SuccessResponse)
-async def system_status() -> SuccessResponse:
-    """Get overall system status."""
-    container = get_container()
-    return SuccessResponse(data=container.get_status())
