@@ -7,13 +7,24 @@ Tokens include user ID, role, and expiration.
 from __future__ import annotations
 
 import os
+import warnings
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from jose import JWTError, jwt
 
-# Configuration from environment (with secure defaults)
-JWT_SECRET = os.environ.get("JWT_SECRET", "sona-dev-secret-change-in-production")  # noqa: S105
+# JWT_SECRET is required in production. Default below is for DEVELOPMENT ONLY.
+JWT_SECRET = os.environ.get("JWT_SECRET")
+if not JWT_SECRET:
+    warnings.warn(
+        "JWT_SECRET environment variable is not set. "
+        "Using an insecure development fallback. "
+        'Generate a strong secret with: python -c "import secrets; print(secrets.token_hex(32))"',
+        RuntimeWarning,
+        stacklevel=2,
+    )
+    JWT_SECRET = "dev-secret-not-for-production"  # noqa: S105 — development only
+
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "7"))

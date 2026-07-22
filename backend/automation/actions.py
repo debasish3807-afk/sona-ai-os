@@ -1,7 +1,13 @@
-"""Automation actions — execute individual steps."""
+"""Automation actions — execute individual steps.
+
+Provides secure execution of automation action types with
+input validation, SSRF protection, and path traversal guards.
+"""
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -10,6 +16,153 @@ from automation.schemas import ActionStep, ActionType
 from config.logging import get_logger
 
 logger = get_logger(__name__)
+
+# ─── Constants ───────────────────────────────────────────────────────────────
+
+_WORKSPACE_ROOT = Path(os.environ.get("SONA_WORKSPACE", ".")).resolve()
+_DEFAULT_WORKSPACE = str(_WORKSPACE_ROOT)
+
+_PRIVATE_IP_PREFIXES = (
+    "127.",
+    "10.",
+    "172.16.",
+    "172.17.",
+    "172.18.",
+    "172.19.",
+    "172.20.",
+    "172.21.",
+    "172.22.",
+    "172.23.",
+    "172.24.",
+    "172.25.",
+    "172.26.",
+    "172.27.",
+    "172.28.",
+    "172.29.",
+    "172.30.",
+    "172.31.",
+    "192.168.",
+)
+_CLOUD_METADATA_HOSTS = {
+    "169.254.169.254",  # AWS / GCP / Azure metadata
+    "metadata.google.internal",
+    "metadata.internal",
+    "100.100.100.200",  # Alibaba Cloud
+}
+_LOCAL_HOSTNAMES = {"localhost", "127.0.0.1", "0.0.0.0", "::1", "127.0.1.1"}
+
+_COMMAND_ALLOWLIST = [
+    "ls",
+    "cat",
+    "head",
+    "tail",
+    "grep",
+    "find",
+    "wc",
+    "echo",
+    "pwd",
+    "python",
+    "python3",
+    "pip",
+    "node",
+    "npm",
+    "npx",
+    "curl",
+    "wget",
+    "jq",
+    "sed",
+    "awk",
+    "sort",
+    "uniq",
+    "diff",
+    "mkdir",
+    "cp",
+    "mv",
+    "rm",
+    "touch",
+    "chmod",
+    "git",
+    "make",
+    "docker",
+    "docker-compose",
+    "ruff",
+    "mypy",
+    "pytest",
+    "black",
+    "isort",
+]
+
+# ─── Validation Helpers ──────────────────────────────────────────────────────
+
+
+def _is_command_allowed(command: str) -> bool:
+    """Check if a shell command's base executable is allowed."""
+    if not command or not command.strip():
+        return False
+    base_cmd = command.strip().split()[0]
+    return base_cmd in _COMMAND_ALLOWLIST
+
+
+def _is_safe_url(url: str) -> bool:
+    """Check that a URL does not point to an internal or private network.
+
+    Prevents SSRF attacks by blocking private IP ranges, localhost,
+    and cloud metadata endpoints.
+    """
+    from urllib.parse import urlparse
+
+    if not url:
+        return False
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname or ""
+
+    # Block empty hostnames
+    if not hostname:
+        return False
+
+    # Block localhost variants
+    if hostname.lower() in _LOCAL_HOSTNAMES:
+        return False
+
+    # Block cloud metadata hosts
+    if hostname.lower() in _CLOUD_METADATA_HOSTS:
+        return False
+
+    # Block private IP ranges by prefix
+    if hostname.startswith(_PRIVATE_IP_PREFIXES):
+        return False
+
+    return True
+
+
+def _is_safe_file_path(path: str) -> Path:
+    """Validate a file path is safe and within the workspace.
+
+    Args:
+        path: The file path to validate.
+
+    Returns:
+        Resolved Path object.
+
+    Raises:
+        ValueError: If path escapes workspace or contains traversals.
+    """
+    p = Path(path)
+
+    # Block path traversal components
+    if ".." in p.parts:
+        raise ValueError(f"Path traversal denied: {path}")
+
+    resolved = p.resolve()
+    try:
+        resolved.relative_to(_WORKSPACE_ROOT)
+        return resolved
+    except ValueError:
+        raise ValueError(f"Path outside workspace: {path}") from None
+
+
+# ─── Action Executor ─────────────────────────────────────────────────────────
 
 
 async def execute_action(step: ActionStep, context: dict[str, Any]) -> dict[str, Any]:
@@ -37,6 +190,9 @@ async def execute_action(step: ActionStep, context: dict[str, Any]) -> dict[str,
     except Exception as exc:
         logger.error("action_failed", action=step.action_type.value, error=str(exc))
         return {"error": str(exc)}
+
+
+# ─── Action Implementations ──────────────────────────────────────────────────
 
 
 async def _action_ai_chat(params: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
@@ -81,27 +237,21 @@ async def _action_memory(params: dict[str, Any], ctx: dict[str, Any]) -> dict[st
 
 
 async def _action_file_create(params: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
-    from pathlib import Path
-
-    path = Path(params.get("path", ""))
+    path = _is_safe_file_path(params.get("path", ""))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(params.get("content", ""), encoding="utf-8")
     return {"created": str(path)}
 
 
 async def _action_file_read(params: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
-    from pathlib import Path
-
-    path = Path(params.get("path", ""))
+    path = _is_safe_file_path(params.get("path", ""))
     if not path.exists():
         return {"error": "File not found"}
     return {"content": path.read_text(encoding="utf-8", errors="replace")[:10000]}
 
 
 async def _action_file_write(params: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
-    from pathlib import Path
-
-    path = Path(params.get("path", ""))
+    path = _is_safe_file_path(params.get("path", ""))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(params.get("content", ""), encoding="utf-8")
     return {"written": str(path), "size": len(params.get("content", ""))}
@@ -111,6 +261,11 @@ async def _action_terminal(params: dict[str, Any], ctx: dict[str, Any]) -> dict[
     import asyncio
 
     cmd = params.get("command", "echo hello")
+
+    # Validate the command against allowlist
+    if not _is_command_allowed(cmd):
+        return {"error": f"Command '{cmd.split()[0] if cmd.strip() else ''}' is not allowed"}
+
     timeout = params.get("timeout", 30)
     proc = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
@@ -145,6 +300,12 @@ async def _action_http(params: dict[str, Any], ctx: dict[str, Any]) -> dict[str,
     url = params.get("url", "")
     if not url:
         return {"error": "No URL provided"}
+
+    # SSRF protection — block private/internal hosts
+    if not _is_safe_url(url):
+        logger.warning("ssrf_blocked_url", url=url)
+        return {"error": "URL blocked: requests to private/internal networks are not allowed"}
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         resp = await client.request(method, url, json=params.get("body"))
         return {"status": resp.status_code, "body": resp.text[:5000]}

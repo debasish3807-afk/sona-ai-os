@@ -4,6 +4,7 @@ Provides safe database operations with:
     - SQLite database creation and connection
     - Read queries (SELECT) — always allowed
     - Write queries (INSERT, UPDATE, DELETE, CREATE) — permission gated
+    - Single-statement enforcement (defense-in-depth against injection)
     - Query result formatting
     - Database path workspace restriction
 """
@@ -16,8 +17,11 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from config.logging import get_logger
 from tools.base import BaseTool, ToolCategory, ToolMetadata, ToolParam, ToolResult
 from tools.permissions import ToolPermissions
+
+logger = get_logger(__name__)
 
 # SQL statements considered write operations
 WRITE_KEYWORDS = {"insert", "update", "delete", "drop", "alter", "create", "replace", "truncate"}
@@ -29,6 +33,37 @@ def _is_write_query(sql: str) -> bool:
     return first_word in WRITE_KEYWORDS
 
 
+def _validate_query(sql: str) -> None:
+    """Validate a SQL query for safety (single-statement enforcement).
+
+    Raises ValueError if the query contains multiple statements.
+
+    This provides defense-in-depth against SQL injection via multi-statement
+    execution. Parameterized queries are the primary defense.
+    """
+    stripped = sql.strip()
+    if not stripped:
+        raise ValueError("Empty query")
+
+    # Check for multiple statements (semicolons not inside string literals)
+    in_single_quote = False
+    in_double_quote = False
+    for i, ch in enumerate(stripped):
+        if ch == "'" and not in_double_quote:
+            in_single_quote = not in_single_quote
+        elif ch == '"' and not in_single_quote:
+            in_double_quote = not in_double_quote
+        elif ch == ";" and not (in_single_quote or in_double_quote):
+            # Semicolons inside string literals are fine
+            remaining = stripped[i:].lstrip(";").strip()
+            if remaining:
+                raise ValueError(
+                    "Multiple SQL statements are not allowed. "
+                    "Use parameterized queries for dynamic values."
+                )
+            break
+
+
 def _format_results(columns: list[str], rows: list[tuple[Any, ...]]) -> str:
     """Format query results as a readable table."""
     if not rows:
@@ -36,7 +71,7 @@ def _format_results(columns: list[str], rows: list[tuple[Any, ...]]) -> str:
 
     # Calculate column widths
     col_widths = [len(c) for c in columns]
-    for row in rows[:100]:  # Limit formatting to 100 rows
+    for row in rows[:100]:
         for i, val in enumerate(row):
             col_widths[i] = max(col_widths[i], len(str(val)[:50]))
 
@@ -96,6 +131,12 @@ class DatabaseQueryTool(BaseTool):
             return ToolResult(
                 success=False, error="Write queries require STANDARD permission level or higher"
             )
+
+        # Validate query safety
+        try:
+            _validate_query(query)
+        except ValueError as exc:
+            return ToolResult(success=False, error=f"Query validation failed: {exc}")
 
         # Execute in thread pool to avoid blocking
         try:
@@ -211,7 +252,12 @@ class DatabaseSchemaTool(BaseTool):
             table_info: dict[str, list[str]] = {}
 
             for table in tables:
-                cursor.execute(f"PRAGMA table_info({table})")  # noqa: S608
+                # Validate table name to prevent SQL injection via malicious table names
+                if not table or not isinstance(table, str) or not table.isidentifier():
+                    logger.warning("Skipping table with invalid name", table=table)
+                    continue
+
+                cursor.execute(f"PRAGMA table_info({table})")  # noqa: S608 — table validated
                 columns = cursor.fetchall()
                 col_defs: list[str] = []
                 for col in columns:

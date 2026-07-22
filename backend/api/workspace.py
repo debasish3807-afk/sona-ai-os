@@ -23,6 +23,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from config.logging import get_logger
+from tools.permissions import ToolPermissions
 
 logger = get_logger(__name__)
 
@@ -166,6 +167,36 @@ async def workspace_chat_complete(request: ChatRequest) -> dict[str, Any]:
 # ─── File Explorer ────────────────────────────────────────────────────────────
 
 WORKSPACE_ROOT = Path(os.environ.get("SONA_WORKSPACE", ".")).resolve()
+
+# Workspace permissions for shell command validation
+_permissions = ToolPermissions(workspace_root=str(WORKSPACE_ROOT))
+
+
+def _ensure_in_workspace(target: Path) -> Path:
+    """Resolve a path and assert it is contained within WORKSPACE_ROOT.
+
+    Raises ValueError if the path escapes the workspace boundaries.
+    """
+    resolved = target.resolve()
+    try:
+        resolved.relative_to(WORKSPACE_ROOT)
+        return resolved
+    except ValueError:
+        raise ValueError(f"Path traversal denied: {target} is outside workspace") from None
+
+
+def _validate_command(command: str) -> None:
+    """Validate a shell command against the command allowlist.
+
+    Raises ValueError if the command base is not allowed.
+    """
+    if not command or not command.strip():
+        raise ValueError("Empty command")
+    base_cmd = command.strip().split()[0]
+    if not _permissions.is_command_allowed(base_cmd):
+        raise ValueError(f"Command '{base_cmd}' is not allowed")
+
+
 ALLOWED_EXTENSIONS = {
     ".py",
     ".ts",
@@ -211,7 +242,9 @@ async def list_files(
 ) -> dict[str, Any]:
     """List files and directories in the workspace."""
     target = (WORKSPACE_ROOT / path).resolve()
-    if not str(target).startswith(str(WORKSPACE_ROOT)):
+    try:
+        _ensure_in_workspace(target)
+    except ValueError:
         return {"error": "Path traversal denied", "nodes": []}
 
     if not target.exists():
@@ -227,7 +260,9 @@ async def read_file_content(
 ) -> dict[str, Any]:
     """Read file content with safety checks."""
     target = (WORKSPACE_ROOT / path).resolve()
-    if not str(target).startswith(str(WORKSPACE_ROOT)):
+    try:
+        _ensure_in_workspace(target)
+    except ValueError:
         return {"error": "Path traversal denied"}
 
     if not target.is_file():
@@ -297,10 +332,23 @@ async def execute_terminal(request: TerminalRequest) -> StreamingResponse:
     target_cwd = Path(cwd).resolve()
 
     # Security: ensure cwd is within workspace
-    if not str(target_cwd).startswith(str(WORKSPACE_ROOT)):
+    try:
+        _ensure_in_workspace(target_cwd)
+    except ValueError:
 
         async def denied():
             yield f"data: {json.dumps({'type': 'error', 'content': 'Access denied'})}\n\n"
+
+        return StreamingResponse(denied(), media_type="text/event-stream")
+
+    # Validate the command against the allowlist
+    try:
+        _validate_command(request.command)
+    except ValueError as exc:
+        error_msg = str(exc)
+
+        async def denied():
+            yield f"data: {json.dumps({'type': 'error', 'content': error_msg})}\n\n"
 
         return StreamingResponse(denied(), media_type="text/event-stream")
 

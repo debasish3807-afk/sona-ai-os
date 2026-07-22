@@ -151,6 +151,9 @@ class GeminiProvider(BaseProvider):
         self._client = httpx.AsyncClient(
             base_url=base,
             timeout=httpx.Timeout(self._config.timeout_seconds, connect=10.0),
+            # Use header-based auth instead of URL query params to prevent
+            # API key leakage in server logs, proxy headers, and browser history
+            headers={"X-Goog-Api-Key": self._api_key},
         )
         self._initialized = True
         logger.info("Gemini provider initialized")
@@ -185,7 +188,7 @@ class GeminiProvider(BaseProvider):
         if request.stop:
             payload["generationConfig"]["stopSequences"] = request.stop
 
-        url = f"/models/{model}:generateContent?key={self._api_key}"
+        url = f"/models/{model}:generateContent"
         start = time.perf_counter()
         resp = await client.post(url, json=payload)
         latency_ms = (time.perf_counter() - start) * 1000
@@ -233,7 +236,7 @@ class GeminiProvider(BaseProvider):
         if system_instruction:
             payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
 
-        url = f"/models/{model}:streamGenerateContent?alt=sse&key={self._api_key}"
+        url = f"/models/{model}:streamGenerateContent?alt=sse"
         yield StreamChunk(event=StreamEvent.START, model=model)
 
         try:
@@ -274,7 +277,7 @@ class GeminiProvider(BaseProvider):
         total_tokens = 0
 
         for text in request.input:
-            url = f"/models/{model}:embedContent?key={self._api_key}"
+            url = f"/models/{model}:embedContent"
             payload = {"model": f"models/{model}", "content": {"parts": [{"text": text}]}}
             resp = await client.post(url, json=payload)
             if resp.status_code >= 400:
@@ -317,7 +320,7 @@ class GeminiProvider(BaseProvider):
         if not self._client or not self._api_key:
             return False
         try:
-            url = f"/models?key={self._api_key}"
+            url = "/models"
             resp = await self._client.get(url, timeout=10.0)
             return bool(resp.status_code < 400)
         except Exception:

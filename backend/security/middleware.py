@@ -23,13 +23,29 @@ logger = get_logger(__name__)
 
 # Endpoints that bypass authentication
 _PUBLIC_PATHS: set[str] = {
-    "/health",
-    "/ping",
+    # Documentation
     "/docs",
     "/openapi.json",
+    "/redoc",
+    # Health / status
+    "/health",
+    "/ping",
     "/api/v1/health",
     "/api/v1/ping",
     "/api/v1/status",
+    # Authentication (login, register, refresh tokens)
+    "/auth/login",
+    "/auth/register",
+    "/auth/refresh",
+    "/auth/token",
+    "/api/v1/auth/login",
+    "/api/v1/auth/register",
+    "/api/v1/auth/refresh",
+    "/api/v1/auth/token",
+    # Workspace login
+    "/workspace/auth/login",
+    # Version info
+    "/version",
 }
 
 
