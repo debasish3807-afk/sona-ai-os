@@ -14,6 +14,7 @@ from api.executive import router as executive_router
 from api.health import router as health_router
 from api.meta_reasoning import router as meta_reasoning_router
 from api.microkernel import router as microkernel_router
+from api.plugins import router as plugins_router
 from api.research import router as research_router
 from api.runtime_workflows import router as runtime_workflows_router
 from api.tools import router as tools_router
@@ -94,5 +95,8 @@ def create_api_router() -> APIRouter:
 
     # Automation Engine
     api_router.include_router(automation_router)
+
+    # Plugin & MCP Ecosystem
+    api_router.include_router(plugins_router)
 
     return api_router
