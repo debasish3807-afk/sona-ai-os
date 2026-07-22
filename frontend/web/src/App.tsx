@@ -32,6 +32,7 @@ export default function App() {
               <Route path="/memory" element={<MemoryPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/tools" element={<ToolsPage />} />
+          <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>
