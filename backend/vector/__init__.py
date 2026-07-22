@@ -6,10 +6,14 @@ FAISS-like implementation for development and testing.
 
 from vector.embeddings import EmbeddingEngine, chunk_text
 from vector.memory_store import InMemoryVectorStore
+from vector.ollama_embeddings import OllamaEmbeddingEngine
+from vector.qdrant_store import QdrantStore
 from vector.store import SearchResult, VectorRecord, VectorStore
 
 __all__ = [
     "EmbeddingEngine",
+    "OllamaEmbeddingEngine",
+    "QdrantStore",
     "InMemoryVectorStore",
     "SearchResult",
     "VectorRecord",

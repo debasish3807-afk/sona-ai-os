@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     # Application
     app_name: str = Field(default="Sona AI OS", description="Application name")
-    app_version: str = Field(default="0.1.0", description="Application version")
+    app_version: str = Field(default="1.0.0-rc1", description="Application version")
     app_description: str = Field(
         default="AI-native operating system",
         description="Application description",
