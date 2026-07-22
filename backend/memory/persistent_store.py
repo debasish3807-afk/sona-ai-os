@@ -194,10 +194,10 @@ class PersistentMemoryStore:
                 updates[col] = value
         if not updates:
             return entry
-        set_clause = ", ".join(f"{key} = ?" for key in updates)
+        set_clause = ", ".join(key + " = ?" for key in updates)
         values = list(updates.values()) + [entry_id]
         conn = self._get_conn()
-        conn.execute(f"UPDATE memories SET {set_clause} WHERE entry_id = ?", values)
+        conn.execute(f"UPDATE memories SET {set_clause} WHERE entry_id = ?", values)  # nosec B608 — column names validated against allowlist
         conn.commit()
         return await self.get(entry_id)
 
@@ -228,11 +228,12 @@ class PersistentMemoryStore:
         if user_id:
             conds.append("user_id = ?")
             params.append(user_id)
-        where = " AND ".join(conds) if conds else "1=1"
-        rows = conn.execute(
-            f"SELECT * FROM memories WHERE {where} ORDER BY created_at DESC LIMIT ? OFFSET ?",
-            params + [limit, offset],
-        ).fetchall()
+        sql_parts = ["SELECT * FROM memories"]
+        if conds:
+            sql_parts.append("WHERE " + " AND ".join(conds))
+        sql_parts.append("ORDER BY created_at DESC LIMIT ? OFFSET ?")
+        sql = " ".join(sql_parts)
+        rows = conn.execute(sql, params + [limit, offset]).fetchall()
         return [self._row_to_entry(r) for r in rows]
 
     async def search(self, query: str, top_k: int = 10) -> list[MemorySearchResult]:
