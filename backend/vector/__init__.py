@@ -14,6 +14,8 @@ __all__ = [
     "EmbeddingEngine",
     "OllamaEmbeddingEngine",
     "QdrantStore",
+    "OllamaEmbeddingEngine",
+    "QdrantStore",
     "InMemoryVectorStore",
     "SearchResult",
     "VectorRecord",
