@@ -251,3 +251,28 @@ async def metrics_v1() -> MetricsResponse:
             "pipeline_duration_ms": _metrics.get_histogram_stats("pipeline_duration_ms"),
         },
     )
+
+
+@router.get("/version")
+async def version_v1() -> dict:
+    """Get application version information (v1)."""
+    import platform
+    import sys
+
+    from config.settings import get_settings
+    from core.constants import API_VERSION
+
+    settings = get_settings()
+    return {
+        "app": {
+            "name": settings.app_name,
+            "version": settings.app_version,
+            "description": settings.app_description,
+            "api_version": API_VERSION,
+        },
+        "runtime": {
+            "python_version": sys.version.split()[0],
+            "platform": platform.system(),
+            "architecture": platform.machine(),
+        },
+    }
