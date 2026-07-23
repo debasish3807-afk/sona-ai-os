@@ -21,14 +21,18 @@ class ConversationRecall:
     async def recall_recent(self, session_id: str, limit: int = 20) -> list[Any]:
         if not self._store:
             return []
-        return await self._store.list_memories(memory_type="conversation", user_id=session_id, limit=limit)
+        return await self._store.list_memories(
+            memory_type="conversation", user_id=session_id, limit=limit
+        )
 
     async def recall_context(
         self, session_id: str, query: str, limit: int = 10
     ) -> list[dict[str, Any]]:
         if not self._store:
             return []
-        entries = await self._store.list_memories(memory_type="conversation", user_id=session_id, limit=100)
+        entries = await self._store.list_memories(
+            memory_type="conversation", user_id=session_id, limit=100
+        )
         ranked = self._ranker.rank(entries, query=query, top_k=limit)
         return [
             {
