@@ -30,6 +30,17 @@ class ActionType(str, Enum):
     GITHUB = "github"
     HTTP_REQUEST = "http_request"
     NOTIFICATION = "notification"
+    BROWSER_CLICK = "browser_click"
+    BROWSER_NAVIGATE = "browser_navigate"
+    BROWSER_TYPE = "browser_type"
+    BROWSER_EXTRACT = "browser_extract"
+    DESKTOP_MOUSE_MOVE = "desktop_mouse_move"
+    DESKTOP_MOUSE_CLICK = "desktop_mouse_click"
+    DESKTOP_KEYBOARD_TYPE = "desktop_keyboard_type"
+    DESKTOP_SCREENSHOT = "desktop_screenshot"
+    MACRO_PLAY = "macro_play"
+    SCHEDULE_CREATE = "schedule_create"
+    API_CALL = "api_call"
 
 
 class WorkflowStatus(str, Enum):
@@ -102,3 +113,42 @@ class WorkflowRun:
     steps_total: int = 0
     output: dict[str, Any] = field(default_factory=dict)
     error: str = ""
+
+
+@dataclass
+class ScheduleConfig:
+    schedule_id: str = ""
+    name: str = ""
+    cron_expr: str = ""
+    workflow_id: str = ""
+    enabled: bool = True
+    created_at: float = 0.0
+    last_run: float | None = None
+    next_run: float | None = None
+    owner: str = ""
+
+
+@dataclass
+class AutomationTemplate:
+    template_id: str = ""
+    name: str = ""
+    description: str = ""
+    category: str = ""
+    steps: list[ActionStep] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    variables: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class HistoryEntry:
+    entry_id: str = ""
+    workflow_id: str = ""
+    workflow_name: str = ""
+    status: WorkflowStatus = WorkflowStatus.COMPLETED
+    started_at: float = 0.0
+    completed_at: float | None = None
+    duration_ms: float = 0.0
+    steps_total: int = 0
+    steps_completed: int = 0
+    error: str = ""
+    owner: str = ""

@@ -6,6 +6,7 @@ from api.adapters import router as adapters_router
 from api.agents import router as agents_router
 from api.auth import router as auth_router
 from api.automation import router as automation_router
+from api.automation_v2 import router as automation_v2_router
 from api.capabilities import router as capabilities_router
 from api.chat import router as chat_router
 from api.coding import router as coding_router
@@ -103,6 +104,7 @@ def create_api_router() -> APIRouter:
 
     # Automation Engine
     api_router.include_router(automation_router)
+    api_router.include_router(automation_v2_router)
 
     # Plugin & MCP Ecosystem
     api_router.include_router(plugins_router)
