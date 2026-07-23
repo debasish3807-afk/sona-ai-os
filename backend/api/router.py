@@ -28,6 +28,7 @@ from api.version import router as version_router
 from api.vision import router as vision_router
 from api.voice import router as voice_router
 from api.workspace import router as workspace_router
+from knowledge.router import router as knowledge_router
 
 
 def create_api_router() -> APIRouter:
@@ -101,6 +102,7 @@ def create_api_router() -> APIRouter:
 
     # Vision & OCR Engine
     api_router.include_router(agents_router)
+    api_router.include_router(knowledge_router)
     api_router.include_router(memory_router)
     api_router.include_router(vision_router)
 

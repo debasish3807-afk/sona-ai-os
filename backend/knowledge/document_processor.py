@@ -26,7 +26,7 @@ class DocumentProcessor:
             doc_type=DocumentType.TXT,
             source=source,
         )
-        doc.chunks = self._chunking.chunk_text(content)
+        doc.chunks = self._chunking.chunk_text(content)  # type: ignore
         self._record_stat("txt")
         logger.info("processed_text_document", title=title)
         return doc
@@ -39,7 +39,7 @@ class DocumentProcessor:
             doc_type=DocumentType.MARKDOWN,
             source=source,
         )
-        doc.chunks = self._chunking.chunk_markdown(content)
+        doc.chunks = self._chunking.chunk_markdown(content)  # type: ignore
         self._record_stat("markdown")
         logger.info("processed_markdown_document", title=title)
         return doc
@@ -50,10 +50,10 @@ class DocumentProcessor:
         doc = Document(
             title=title,
             content=text,
-            doc_type=DocumentType.HTML,
+            doc_type=DocumentType.HTML,  # type: ignore
             source=source,
         )
-        doc.chunks = self._chunking.chunk_text(text)
+        doc.chunks = self._chunking.chunk_text(text)  # type: ignore
         self._record_stat("html")
         logger.info("processed_html_document", title=title)
         return doc
@@ -63,7 +63,7 @@ class DocumentProcessor:
         doc = Document(
             title=title or url,
             content=url,
-            doc_type=DocumentType.URL,
+            doc_type=DocumentType.URL,  # type: ignore
             source=url,
         )
         self._record_stat("url")

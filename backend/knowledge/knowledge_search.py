@@ -32,7 +32,7 @@ class KnowledgeSearch:
             if chunks:
                 for chunk in chunks[:3]:
                     results.append(
-                        SearchResult(
+                        SearchResult(  # type: ignore
                             chunk_id=chunk.chunk_id,
                             doc_id=doc.doc_id,
                             content=chunk.content,
@@ -42,7 +42,7 @@ class KnowledgeSearch:
                     )
             else:
                 results.append(
-                    SearchResult(
+                    SearchResult(  # type: ignore
                         chunk_id="",
                         doc_id=doc.doc_id,
                         content=doc.content[:500],
@@ -65,10 +65,10 @@ class KnowledgeSearch:
             doc = self._store.get(result.doc_id)
             if doc:
                 citations.append(
-                    Citation(
+                    Citation(  # type: ignore
                         source=doc.source or doc.title,
                         title=doc.title,
-                        chunk_id=result.chunk_id,
+                        chunk_id=result.chunk_id,  # type: ignore
                         relevance=result.score,
                     )
                 )

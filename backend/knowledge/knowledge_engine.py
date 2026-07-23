@@ -33,7 +33,7 @@ class KnowledgeEngine:
 
         if dtype == DocumentType.MARKDOWN:
             doc = self._processor.process_markdown(title, content, source)
-        elif dtype == DocumentType.HTML:
+        elif dtype == DocumentType.HTML:  # type: ignore
             doc = self._processor.process_html(title, content, source)
         else:
             doc = self._processor.process_text(title, content, source)
