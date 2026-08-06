@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     Document,
     DocumentChunk,
@@ -85,7 +86,7 @@ class TestDocument:
             content="content",
             doc_type=DocumentType.TEXT,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             doc.title = "changed"  # type: ignore[misc]
 
 
@@ -140,7 +141,7 @@ class TestDocumentChunk:
             embedding=[0.1],
             chunk_index=0,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             chunk.content = "changed"  # type: ignore[misc]
 
 
@@ -177,7 +178,7 @@ class TestRAGQuery:
     def test_is_frozen(self) -> None:
         """Verify RAGQuery is immutable."""
         query = RAGQuery(query="test")
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             query.query = "changed"  # type: ignore[misc]
 
 
@@ -236,5 +237,5 @@ class TestRAGResult:
             sources=[],
             confidence=0.5,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result.confidence = 0.9  # type: ignore[misc]

@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     IntentCategory,
     RequestPriority,
@@ -108,7 +109,7 @@ class TestRoutingDecision:
             requires_agents=[],
             estimated_latency_ms=100,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             decision.target_service = "other"  # type: ignore[misc]
 
     def test_critical_priority_routing(self) -> None:

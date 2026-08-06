@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability where expected.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     PluginInstance,
     PluginManifest,
@@ -83,7 +84,7 @@ class TestPluginManifest:
             entry_point="plugins.test.TestPlugin",
             permissions=[],
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             manifest.name = "Changed"  # type: ignore[misc]
 
     def test_multiple_permissions(self) -> None:

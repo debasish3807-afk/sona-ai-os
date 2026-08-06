@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import AISafetyPort, AuthenticationPort, AuthorizationPort
 from domain.models import AuthToken, Permission, Role
 

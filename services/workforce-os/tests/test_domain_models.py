@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     AgentResult,
     AgentStatus,
@@ -20,9 +21,17 @@ class TestAgentType:
     def test_all_values_defined(self) -> None:
         """Verify all required agent types exist."""
         expected = {
-            "CODING", "RESEARCH", "PLANNER", "AUTOMATION",
-            "COMMUNICATION", "SYSTEM", "VOICE", "VISION",
-            "WEB", "ANDROID", "CUSTOM",
+            "CODING",
+            "RESEARCH",
+            "PLANNER",
+            "AUTOMATION",
+            "COMMUNICATION",
+            "SYSTEM",
+            "VOICE",
+            "VISION",
+            "WEB",
+            "ANDROID",
+            "CUSTOM",
         }
         actual = {member.name for member in AgentType}
         assert actual == expected
@@ -124,7 +133,7 @@ class TestAgentTask:
             agent_type=AgentType.SYSTEM,
             instruction="Check health",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             task.task_id = "changed"  # type: ignore[misc]
 
     def test_agent_type_is_enum_value(self) -> None:
@@ -190,7 +199,7 @@ class TestAgentResult:
             output="Page scraped",
             status="success",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result.output = "changed"  # type: ignore[misc]
 
     def test_error_status(self) -> None:

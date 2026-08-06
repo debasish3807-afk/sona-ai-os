@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import MCPManagerPort
 from domain.models import (
     MCPServer,
@@ -46,9 +45,7 @@ class TestMCPManagerPort:
             async def call_tool(
                 self, tool_name: str, arguments: dict, user_id: str
             ) -> ToolCallResult:
-                return ToolCallResult(
-                    tool_name=tool_name, output=None, success=True
-                )
+                return ToolCallResult(tool_name=tool_name, output=None, success=True)
 
             async def list_servers(self) -> list[MCPServer]:
                 return []
@@ -73,9 +70,7 @@ class TestMCPManagerPort:
             async def call_tool(
                 self, tool_name: str, arguments: dict, user_id: str
             ) -> ToolCallResult:
-                return ToolCallResult(
-                    tool_name=tool_name, output=None, success=True
-                )
+                return ToolCallResult(tool_name=tool_name, output=None, success=True)
 
             async def list_servers(self) -> list[MCPServer]:
                 return []
@@ -115,9 +110,7 @@ class TestMCPManagerPort:
             async def call_tool(
                 self, tool_name: str, arguments: dict, user_id: str
             ) -> ToolCallResult:
-                return ToolCallResult(
-                    tool_name=tool_name, output=None, success=True
-                )
+                return ToolCallResult(tool_name=tool_name, output=None, success=True)
 
             async def list_servers(self) -> list[MCPServer]:
                 return []
@@ -184,9 +177,7 @@ class TestMCPManagerPort:
             async def call_tool(
                 self, tool_name: str, arguments: dict, user_id: str
             ) -> ToolCallResult:
-                return ToolCallResult(
-                    tool_name=tool_name, output=None, success=True
-                )
+                return ToolCallResult(tool_name=tool_name, output=None, success=True)
 
             async def list_servers(self) -> list[MCPServer]:
                 return [
@@ -225,9 +216,7 @@ class TestMCPManagerPort:
             async def call_tool(
                 self, tool_name: str, arguments: dict, user_id: str
             ) -> ToolCallResult:
-                return ToolCallResult(
-                    tool_name=tool_name, output=None, success=True
-                )
+                return ToolCallResult(tool_name=tool_name, output=None, success=True)
 
             async def list_servers(self) -> list[MCPServer]:
                 return []

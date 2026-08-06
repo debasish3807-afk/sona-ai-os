@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.models.chat import ChatRequest, ChatResponse, ChatMessage, TokenUsage
+from app.models.chat import ChatMessage, ChatRequest, ChatResponse, TokenUsage
 
 router = APIRouter()
 

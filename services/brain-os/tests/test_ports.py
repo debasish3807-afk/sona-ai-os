@@ -4,10 +4,9 @@ Tests verify that port interfaces are correctly defined, enforce
 abstractness, and that concrete implementations must satisfy all methods.
 """
 
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 import pytest
-
 from application.ports import BrainOrchestratorPort, PipelineStagePort
 from domain.models import BrainRequest, BrainResponse
 
@@ -43,6 +42,7 @@ class TestBrainOrchestratorPort:
             async def execute_stream(self, request: BrainRequest) -> AsyncIterator[str]:
                 async def _gen():
                     yield "token"
+
                 return _gen()
 
             async def get_session_context(self, session_id: str) -> dict:
@@ -85,6 +85,7 @@ class TestBrainOrchestratorPort:
             async def execute_stream(self, request: BrainRequest) -> AsyncIterator[str]:
                 async def _gen():
                     yield "chunk"
+
                 return _gen()
 
             async def get_session_context(self, session_id: str) -> dict:
@@ -118,6 +119,7 @@ class TestBrainOrchestratorPort:
             async def execute_stream(self, request: BrainRequest) -> AsyncIterator[str]:
                 async def _gen():
                     yield "x"
+
                 return _gen()
 
             async def get_session_context(self, session_id: str) -> dict:

@@ -4,10 +4,10 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-from datetime import datetime, timedelta
+from dataclasses import FrozenInstanceError
+from datetime import UTC, datetime, timedelta
 
 import pytest
-
 from domain.models import MemoryEntry, MemoryQuery, MemoryType
 
 
@@ -62,7 +62,7 @@ class TestMemoryEntry:
 
     def test_custom_values(self) -> None:
         """Create with all optional fields."""
-        now = datetime(2024, 1, 15, 10, 30, 0)
+        now = datetime(2024, 1, 15, 10, 30, 0, tzinfo=UTC)
         expires = now + timedelta(hours=24)
         entry = MemoryEntry(
             id="mem-003",
@@ -89,7 +89,7 @@ class TestMemoryEntry:
             memory_type=MemoryType.EPISODIC,
             content="Something happened",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             entry.content = "changed"  # type: ignore[misc]
 
     def test_episodic_memory_type(self) -> None:
@@ -139,8 +139,8 @@ class TestMemoryQuery:
 
     def test_with_all_fields(self) -> None:
         """Create with all optional fields."""
-        start = datetime(2024, 1, 1)
-        end = datetime(2024, 1, 31)
+        start = datetime(2024, 1, 1, tzinfo=UTC)
+        end = datetime(2024, 1, 31, tzinfo=UTC)
         query = MemoryQuery(
             user_id="user-456",
             query="important conversations",
@@ -157,7 +157,7 @@ class TestMemoryQuery:
     def test_is_frozen(self) -> None:
         """Verify MemoryQuery is immutable."""
         query = MemoryQuery(user_id="u1", query="test")
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             query.query = "changed"  # type: ignore[misc]
 
     def test_single_memory_type_filter(self) -> None:

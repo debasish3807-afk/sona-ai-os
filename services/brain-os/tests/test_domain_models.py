@@ -4,8 +4,9 @@ Tests verify that all domain models and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     BrainRequest,
     BrainResponse,
@@ -61,7 +62,7 @@ class TestBrainRequest:
             user_id="u1",
             messages=[{"role": "user", "content": "test"}],
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             req.session_id = "changed"  # type: ignore[misc]
 
     def test_multiple_messages(self) -> None:
@@ -135,7 +136,7 @@ class TestBrainResponse:
             tokens={"input": 1, "output": 1},
             latency_ms=10.0,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             resp.content = "changed"  # type: ignore[misc]
 
     def test_tokens_dict_structure(self) -> None:

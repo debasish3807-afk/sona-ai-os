@@ -4,6 +4,8 @@ Tests verify that the data models are correctly defined,
 instantiate properly, and enforce immutability.
 """
 
+from dataclasses import FrozenInstanceError
+
 import pytest
 
 from sona_llm.models import CompletionResult, LLMProviderConfig, Message, ProviderType
@@ -78,7 +80,7 @@ class TestLLMProviderConfig:
             provider=ProviderType.OPENAI,
             model_id="gpt-4o",
         )
-        with pytest.raises(Exception):  # FrozenInstanceError
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):  # FrozenInstanceError
             config.model_id = "gpt-3.5-turbo"  # type: ignore[misc]
 
 
@@ -104,7 +106,7 @@ class TestMessage:
     def test_message_is_frozen(self) -> None:
         """Verify message is immutable (frozen dataclass)."""
         msg = Message(role="user", content="test")
-        with pytest.raises(Exception):  # FrozenInstanceError
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):  # FrozenInstanceError
             msg.content = "changed"  # type: ignore[misc]
 
 
@@ -135,7 +137,7 @@ class TestCompletionResult:
             tokens_output=3,
             latency_ms=100.0,
         )
-        with pytest.raises(Exception):  # FrozenInstanceError
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):  # FrozenInstanceError
             result.content = "changed"  # type: ignore[misc]
 
     def test_zero_latency_is_valid(self) -> None:

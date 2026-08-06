@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     ResearchQuery,
     ResearchReport,
@@ -75,7 +76,7 @@ class TestResearchQuery:
             query="test",
             research_type=ResearchType.WEB_SEARCH,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             query.query = "changed"  # type: ignore[misc]
 
 
@@ -106,7 +107,7 @@ class TestSearchResult:
             relevance_score=0.8,
             source_domain="test.com",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result.title = "Modified"  # type: ignore[misc]
 
     def test_relevance_score_boundaries(self) -> None:
@@ -185,5 +186,5 @@ class TestResearchReport:
             confidence=0.5,
             key_findings=[],
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             report.summary = "changed"  # type: ignore[misc]

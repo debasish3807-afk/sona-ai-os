@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import CodeGenerationPort, CodeReviewPort, DebuggingPort
 from domain.models import (
     CodeLanguage,
@@ -181,9 +180,7 @@ class TestDebuggingPort:
         """Test that analyze_error() returns an explanation string."""
 
         class MockDebugger(DebuggingPort):
-            async def analyze_error(
-                self, error: str, code: str, language: CodeLanguage
-            ) -> str:
+            async def analyze_error(self, error: str, code: str, language: CodeLanguage) -> str:
                 return f"The error '{error}' is caused by a type mismatch."
 
             async def suggest_fix(
@@ -211,9 +208,7 @@ class TestDebuggingPort:
         """Test that suggest_fix() returns a CodeResult."""
 
         class MockDebugger(DebuggingPort):
-            async def analyze_error(
-                self, error: str, code: str, language: CodeLanguage
-            ) -> str:
+            async def analyze_error(self, error: str, code: str, language: CodeLanguage) -> str:
                 return "Analysis"
 
             async def suggest_fix(

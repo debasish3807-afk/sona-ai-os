@@ -5,7 +5,7 @@ to provide AI reasoning, model routing, and kernel processing capabilities.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from domain.models import KernelRequest, KernelResponse, ModelConfig, ReasoningStrategy
 

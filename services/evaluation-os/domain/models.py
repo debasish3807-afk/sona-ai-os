@@ -4,7 +4,7 @@ Defines the data structures used by the Evaluation OS for quality evaluation,
 metric collection, and regression testing operations.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 
 

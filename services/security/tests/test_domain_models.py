@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import AuthToken, Permission, Role
 
 
@@ -86,7 +87,7 @@ class TestAuthToken:
             expires_at="2025-01-01T12:00:00Z",
             issued_at="2025-01-01T00:00:00Z",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             token.token = "modified"  # type: ignore[misc]
 
     def test_equality(self) -> None:
@@ -147,7 +148,7 @@ class TestPermission:
             resource="agents",
             action="read",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             perm.resource = "modified"  # type: ignore[misc]
 
     def test_equality(self) -> None:

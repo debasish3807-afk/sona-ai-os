@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import EmbeddingPort, MemoryStorePort
 from domain.models import MemoryEntry, MemoryQuery, MemoryType
 

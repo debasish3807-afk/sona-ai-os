@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     MCPServer,
     MCPTool,
@@ -95,7 +96,7 @@ class TestMCPTool:
             permissions=[ToolPermission.READ],
             server_id="s1",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             tool.name = "changed"  # type: ignore[misc]
 
 
@@ -172,7 +173,7 @@ class TestMCPServer:
             name="Test",
             transport=MCPTransport.STDIO,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             server.name = "changed"  # type: ignore[misc]
 
 
@@ -223,5 +224,5 @@ class TestToolCallResult:
             output="data",
             success=True,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result.success = False  # type: ignore[misc]

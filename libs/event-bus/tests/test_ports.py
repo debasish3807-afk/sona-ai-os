@@ -5,39 +5,40 @@ cannot be instantiated directly, and that concrete implementations
 work as expected.
 """
 
-from dataclasses import dataclass, field
-from typing import Type
-from uuid import uuid4
+from dataclasses import dataclass
 
 import pytest
 
-from sona_shared.domain.primitives import DomainEvent, EntityId, Timestamp
 from sona_events.ports import EventBusPort, EventPublisherPort, EventSubscriberPort
 from sona_events.protocols import AsyncEventHandler
-
+from sona_shared.domain.primitives import DomainEvent
 
 # --- Test Event Fixtures ---
+
 
 @dataclass(frozen=True)
 class UserCreatedEvent(DomainEvent):
     """Test domain event representing a user creation."""
+
     user_id: str = ""
 
 
 @dataclass(frozen=True)
 class OrderPlacedEvent(DomainEvent):
     """Test domain event representing an order placement."""
+
     order_id: str = ""
     amount: float = 0.0
 
 
 # --- Minimal Concrete Implementation for Testing ---
 
+
 class InMemoryEventBus(EventBusPort):
     """A minimal in-memory event bus implementation for testing."""
 
     def __init__(self) -> None:
-        self._handlers: dict[Type[DomainEvent], list[AsyncEventHandler]] = {}
+        self._handlers: dict[type[DomainEvent], list[AsyncEventHandler]] = {}
 
     async def start(self) -> None:
         pass
@@ -46,7 +47,6 @@ class InMemoryEventBus(EventBusPort):
         pass
 
     async def publish(self, event: DomainEvent) -> None:
-        event_type = type(event)
         for handler_type, handlers in self._handlers.items():
             if isinstance(event, handler_type):
                 for handler in handlers:
@@ -56,22 +56,21 @@ class InMemoryEventBus(EventBusPort):
         for event in events:
             await self.publish(event)
 
-    def subscribe(self, event_type: Type[DomainEvent], handler: AsyncEventHandler) -> None:
+    def subscribe(self, event_type: type[DomainEvent], handler: AsyncEventHandler) -> None:
         if event_type not in self._handlers:
             self._handlers[event_type] = []
         self._handlers[event_type].append(handler)
 
-    def unsubscribe(self, event_type: Type[DomainEvent], handler: AsyncEventHandler) -> None:
+    def unsubscribe(self, event_type: type[DomainEvent], handler: AsyncEventHandler) -> None:
         if event_type in self._handlers:
-            self._handlers[event_type] = [
-                h for h in self._handlers[event_type] if h is not handler
-            ]
+            self._handlers[event_type] = [h for h in self._handlers[event_type] if h is not handler]
 
-    def get_subscribers(self, event_type: Type[DomainEvent]) -> list[AsyncEventHandler]:
+    def get_subscribers(self, event_type: type[DomainEvent]) -> list[AsyncEventHandler]:
         return list(self._handlers.get(event_type, []))
 
 
 # --- Tests ---
+
 
 class TestEventPublisherPort:
     """Tests for EventPublisherPort abstract base class."""
@@ -208,10 +207,7 @@ class TestInMemoryEventBus:
             received.append(event)
 
         bus.subscribe(UserCreatedEvent, handler)
-        events = [
-            UserCreatedEvent(user_id=f"user-{i}")
-            for i in range(5)
-        ]
+        events = [UserCreatedEvent(user_id=f"user-{i}") for i in range(5)]
         await bus.publish_batch(events)
 
         assert len(received) == 5

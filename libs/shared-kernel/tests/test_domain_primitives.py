@@ -1,6 +1,7 @@
 """Unit tests for shared kernel domain primitives."""
 
-from datetime import datetime
+from dataclasses import FrozenInstanceError
+from datetime import UTC, datetime
 from uuid import UUID
 
 import pytest
@@ -33,7 +34,7 @@ class TestEntityId:
 
     def test_is_frozen(self) -> None:
         entity_id = EntityId()
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             entity_id.value = UUID("12345678-1234-5678-1234-567812345678")  # type: ignore[misc]
 
     def test_two_instances_have_different_uuids(self) -> None:
@@ -50,14 +51,14 @@ class TestTimestamp:
         assert isinstance(ts.value, datetime)
 
     def test_creates_with_specific_datetime(self) -> None:
-        specific_time = datetime(2024, 1, 15, 10, 30, 0)
+        specific_time = datetime(2024, 1, 15, 10, 30, 0, tzinfo=UTC)
         ts = Timestamp(value=specific_time)
         assert ts.value == specific_time
 
     def test_is_frozen(self) -> None:
         ts = Timestamp()
-        with pytest.raises(Exception):
-            ts.value = datetime.now()  # type: ignore[misc]
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
+            ts.value = datetime.now(UTC)  # type: ignore[misc]
 
 
 class TestEntity:
@@ -100,7 +101,7 @@ class TestDomainEvent:
 
     def test_is_frozen(self) -> None:
         event = DomainEvent()
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             event.event_id = EntityId()  # type: ignore[misc]
 
 
@@ -146,5 +147,5 @@ class TestResult:
 
     def test_is_frozen(self) -> None:
         result = Result.ok(42)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result._value = 99  # type: ignore[misc]

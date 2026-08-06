@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     KernelRequest,
     KernelResponse,
@@ -66,7 +67,7 @@ class TestModelConfig:
     def test_is_frozen(self) -> None:
         """Verify ModelConfig is immutable."""
         config = ModelConfig(provider="openai", model_id="gpt-4o")
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             config.model_id = "gpt-3.5"  # type: ignore[misc]
 
 
@@ -113,7 +114,7 @@ class TestKernelRequest:
     def test_is_frozen(self) -> None:
         """Verify KernelRequest is immutable."""
         req = KernelRequest(session_id="s1", user_id="u1", content="test")
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             req.content = "changed"  # type: ignore[misc]
 
 
@@ -159,5 +160,5 @@ class TestKernelResponse:
             tokens_output=1,
             latency_ms=10.0,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             resp.content = "changed"  # type: ignore[misc]

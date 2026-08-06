@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import LoggingPort, MetricsPort, TracingPort
 from domain.models import LogLevel, SpanContext
 
@@ -273,9 +272,7 @@ class TestTracingPort:
                 }
 
         tracing = MockTracing()
-        span = SpanContext(
-            trace_id="abc123", span_id="def456", service_name="gateway"
-        )
+        span = SpanContext(trace_id="abc123", span_id="def456", service_name="gateway")
         headers = tracing.inject_context(span)
         assert "traceparent" in headers
         assert "abc123" in headers["traceparent"]

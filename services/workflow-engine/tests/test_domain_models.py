@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability where specified.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     StepStatus,
     WorkflowDefinition,
@@ -96,7 +97,7 @@ class TestWorkflowStep:
             action="noop",
             params={},
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             step.step_id = "changed"  # type: ignore[misc]
 
     def test_depends_on_multiple_steps(self) -> None:
@@ -184,7 +185,7 @@ class TestWorkflowDefinition:
             name="Test",
             description="Test workflow",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             defn.name = "changed"  # type: ignore[misc]
 
 

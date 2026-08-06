@@ -5,7 +5,6 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-
 from application.ports import AgentCoordinatorPort, AgentPort
 from domain.models import AgentResult, AgentStatus, AgentTask, AgentType
 
@@ -186,9 +185,7 @@ class TestAgentCoordinatorPort:
                     status="success",
                 )
 
-            async def dispatch_parallel(
-                self, tasks: list[AgentTask]
-            ) -> list[AgentResult]:
+            async def dispatch_parallel(self, tasks: list[AgentTask]) -> list[AgentResult]:
                 return [
                     AgentResult(
                         task_id=t.task_id,
@@ -199,9 +196,7 @@ class TestAgentCoordinatorPort:
                     for t in tasks
                 ]
 
-            async def register_agent(
-                self, agent_type: AgentType, agent: AgentPort
-            ) -> None:
+            async def register_agent(self, agent_type: AgentType, agent: AgentPort) -> None:
                 pass
 
             async def list_agents(self) -> dict[AgentType, AgentStatus]:
@@ -240,14 +235,10 @@ class TestAgentCoordinatorPort:
                     duration_ms=150.0,
                 )
 
-            async def dispatch_parallel(
-                self, tasks: list[AgentTask]
-            ) -> list[AgentResult]:
+            async def dispatch_parallel(self, tasks: list[AgentTask]) -> list[AgentResult]:
                 return []
 
-            async def register_agent(
-                self, agent_type: AgentType, agent: AgentPort
-            ) -> None:
+            async def register_agent(self, agent_type: AgentType, agent: AgentPort) -> None:
                 pass
 
             async def list_agents(self) -> dict[AgentType, AgentStatus]:
@@ -277,9 +268,7 @@ class TestAgentCoordinatorPort:
                     status="success",
                 )
 
-            async def dispatch_parallel(
-                self, tasks: list[AgentTask]
-            ) -> list[AgentResult]:
+            async def dispatch_parallel(self, tasks: list[AgentTask]) -> list[AgentResult]:
                 return [
                     AgentResult(
                         task_id=t.task_id,
@@ -290,9 +279,7 @@ class TestAgentCoordinatorPort:
                     for t in tasks
                 ]
 
-            async def register_agent(
-                self, agent_type: AgentType, agent: AgentPort
-            ) -> None:
+            async def register_agent(self, agent_type: AgentType, agent: AgentPort) -> None:
                 pass
 
             async def list_agents(self) -> dict[AgentType, AgentStatus]:
@@ -322,14 +309,10 @@ class TestAgentCoordinatorPort:
                     status="success",
                 )
 
-            async def dispatch_parallel(
-                self, tasks: list[AgentTask]
-            ) -> list[AgentResult]:
+            async def dispatch_parallel(self, tasks: list[AgentTask]) -> list[AgentResult]:
                 return []
 
-            async def register_agent(
-                self, agent_type: AgentType, agent: AgentPort
-            ) -> None:
+            async def register_agent(self, agent_type: AgentType, agent: AgentPort) -> None:
                 pass
 
             async def list_agents(self) -> dict[AgentType, AgentStatus]:

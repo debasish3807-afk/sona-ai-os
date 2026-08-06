@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import (
     EvaluationRequest,
     EvaluationType,
@@ -97,7 +98,7 @@ class TestEvaluationRequest:
             eval_type=EvaluationType.QUALITY,
             input_data="test",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             req.input_data = "changed"  # type: ignore[misc]
 
 
@@ -144,7 +145,7 @@ class TestMetricResult:
             value=1.0,
             status=MetricStatus.PASS,
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             result.value = 0.5  # type: ignore[misc]
 
 
@@ -195,7 +196,7 @@ class TestQualityReport:
             passed=True,
             summary="Empty evaluation.",
         )
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             report.passed = False  # type: ignore[misc]
 
     def test_empty_metrics_list(self) -> None:

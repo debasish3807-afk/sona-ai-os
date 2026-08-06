@@ -4,8 +4,9 @@ Tests verify that all domain models, enums, and dataclasses are correctly
 defined, instantiate properly, and enforce immutability.
 """
 
-import pytest
+from dataclasses import FrozenInstanceError
 
+import pytest
 from domain.models import LogLevel, MetricType, SpanContext
 
 
@@ -91,7 +92,7 @@ class TestSpanContext:
     def test_is_frozen(self) -> None:
         """Verify SpanContext is immutable."""
         span = SpanContext(trace_id="t1", span_id="s1")
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, AttributeError, FrozenInstanceError)):
             span.trace_id = "changed"  # type: ignore[misc]
 
     def test_equality(self) -> None:

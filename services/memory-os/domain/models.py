@@ -4,7 +4,7 @@ Defines the data structures used by the Memory OS for memory storage,
 retrieval, consolidation, and querying across multiple memory types.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
 

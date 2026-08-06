@@ -5,7 +5,7 @@ to provide orchestration and pipeline stage capabilities.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from domain.models import BrainRequest, BrainResponse
 

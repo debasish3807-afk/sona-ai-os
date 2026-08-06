@@ -74,9 +74,7 @@ class MemoryStorePort(ABC):
         ...
 
     @abstractmethod
-    async def get_conversation_history(
-        self, session_id: str, limit: int = 50
-    ) -> list[MemoryEntry]:
+    async def get_conversation_history(self, session_id: str, limit: int = 50) -> list[MemoryEntry]:
         """Get recent conversation history for a session.
 
         Retrieves the most recent conversation turns stored as

@@ -4,7 +4,7 @@ Defines the data structures used by the AI Kernel for request processing,
 model selection, and response generation.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
