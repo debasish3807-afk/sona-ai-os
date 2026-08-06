@@ -4,7 +4,7 @@ Defines the data structures used for Model Context Protocol server management,
 tool discovery, and permission-gated tool execution.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
@@ -47,7 +47,7 @@ class MCPTool:
 
     name: str
     description: str
-    input_schema: dict
+    input_schema: dict[str, Any]
     permissions: list[ToolPermission]
     server_id: str
 
@@ -70,7 +70,7 @@ class MCPServer:
     transport: MCPTransport
     command: str | None = None
     url: str | None = None
-    tools: list[MCPTool] = ()
+    tools: list[MCPTool] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

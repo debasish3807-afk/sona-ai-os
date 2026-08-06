@@ -6,6 +6,7 @@ RAG (Retrieval-Augmented Generation) queries, and knowledge base management.
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 
 class DocumentType(StrEnum):
@@ -40,7 +41,7 @@ class Document:
     title: str
     content: str
     doc_type: DocumentType
-    metadata: dict | None = None
+    metadata: dict[str, Any] | None = None
     source_url: str | None = None
 
 
@@ -65,7 +66,7 @@ class DocumentChunk:
     content: str
     embedding: list[float]
     chunk_index: int
-    metadata: dict | None = None
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

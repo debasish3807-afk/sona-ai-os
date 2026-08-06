@@ -5,6 +5,7 @@ to provide quality evaluation, metric collection, and regression testing capabil
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import EvaluationRequest, MetricResult, QualityReport
 
@@ -51,7 +52,9 @@ class MetricCollectorPort(ABC):
     """
 
     @abstractmethod
-    async def collect(self, metric_name: str, value: float, tags: dict | None = None) -> None:
+    async def collect(
+        self, metric_name: str, value: float, tags: dict[str, Any] | None = None
+    ) -> None:
         """Record a metric measurement.
 
         Args:
@@ -63,13 +66,13 @@ class MetricCollectorPort(ABC):
 
     @abstractmethod
     async def get_metrics(
-        self, metric_name: str, time_range: tuple | None = None
+        self, metric_name: str, time_range: tuple[Any, ...] | None = None
     ) -> list[MetricResult]:
         """Retrieve historical metric measurements.
 
         Args:
             metric_name: The name of the metric to retrieve.
-            time_range: Optional time range tuple (start, end) to filter results.
+            time_range: Optional time range tuple[Any, ...] (start, end) to filter results.
 
         Returns:
             A list of MetricResult instances within the specified range.

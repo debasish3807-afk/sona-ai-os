@@ -7,6 +7,7 @@ retrieval, consolidation, and querying across multiple memory types.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 
 class MemoryType(StrEnum):
@@ -43,7 +44,7 @@ class MemoryEntry:
     memory_type: MemoryType
     content: str
     embedding: list[float] | None = None
-    metadata: dict | None = None
+    metadata: dict[str, Any] | None = None
     importance: float = 0.5
     created_at: datetime | None = None
     expires_at: datetime | None = None

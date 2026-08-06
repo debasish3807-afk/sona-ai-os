@@ -6,6 +6,7 @@ extraction, summarization, and multi-source research synthesis.
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 
 class ResearchType(StrEnum):
@@ -37,7 +38,7 @@ class ResearchQuery:
     research_type: ResearchType
     max_sources: int = 10
     language: str = "en"
-    context: dict | None = None
+    context: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

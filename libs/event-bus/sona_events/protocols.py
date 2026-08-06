@@ -10,7 +10,7 @@ from typing import Protocol, TypeVar, runtime_checkable
 from sona_shared.domain.primitives import DomainEvent
 
 # TypeVar for specific DomainEvent subtypes
-E = TypeVar("E", bound=DomainEvent)
+E = TypeVar("E", bound=DomainEvent, contravariant=True)
 
 
 @runtime_checkable

@@ -6,6 +6,7 @@ to provide orchestration and pipeline stage capabilities.
 
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
+from typing import Any
 
 from domain.models import BrainRequest, BrainResponse
 
@@ -49,7 +50,7 @@ class BrainOrchestratorPort(ABC):
         ...
 
     @abstractmethod
-    async def get_session_context(self, session_id: str) -> dict:
+    async def get_session_context(self, session_id: str) -> dict[str, Any]:
         """Retrieve full context for a session.
 
         Returns the accumulated context for a given session including
@@ -72,11 +73,11 @@ class PipelineStagePort(ABC):
     """
 
     @abstractmethod
-    async def execute(self, context: dict) -> dict:
+    async def execute(self, context: dict[str, Any]) -> dict[str, Any]:
         """Execute this pipeline stage, enriching the context.
 
         Takes the current pipeline context, performs its processing,
-        and returns an updated context dict for the next stage.
+        and returns an updated context dict[str, Any] for the next stage.
 
         Args:
             context: The current pipeline context dictionary.
@@ -87,7 +88,7 @@ class PipelineStagePort(ABC):
         ...
 
     @abstractmethod
-    def should_skip(self, context: dict) -> bool:
+    def should_skip(self, context: dict[str, Any]) -> bool:
         """Determine if this stage should be skipped.
 
         Evaluates the current context to decide whether this stage

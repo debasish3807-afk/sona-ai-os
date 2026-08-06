@@ -5,6 +5,7 @@ to provide authentication, authorization, and AI safety capabilities.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import AuthToken, Permission, Role
 
@@ -17,7 +18,7 @@ class AuthenticationPort(ABC):
     """
 
     @abstractmethod
-    async def authenticate(self, credentials: dict) -> AuthToken:
+    async def authenticate(self, credentials: dict[str, Any]) -> AuthToken:
         """Authenticate a user or service with the provided credentials.
 
         Args:
@@ -152,7 +153,7 @@ class AISafetyPort(ABC):
         ...
 
     @abstractmethod
-    async def audit_log(self, event: dict) -> None:
+    async def audit_log(self, event: dict[str, Any]) -> None:
         """Record an audit log entry for AI safety events.
 
         Args:

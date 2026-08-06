@@ -6,6 +6,7 @@ authorization, and AI safety operations.
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 
 class Role(StrEnum):
@@ -52,4 +53,4 @@ class Permission:
 
     resource: str
     action: str
-    conditions: dict | None = None
+    conditions: dict[str, Any] | None = None

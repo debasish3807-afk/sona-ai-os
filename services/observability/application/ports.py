@@ -5,6 +5,7 @@ to provide metrics collection, distributed tracing, and structured logging.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import LogLevel, SpanContext
 
@@ -17,7 +18,7 @@ class MetricsPort(ABC):
     """
 
     @abstractmethod
-    def increment(self, name: str, value: float = 1.0, tags: dict | None = None) -> None:
+    def increment(self, name: str, value: float = 1.0, tags: dict[str, Any] | None = None) -> None:
         """Increment a counter metric.
 
         Args:
@@ -28,7 +29,7 @@ class MetricsPort(ABC):
         ...
 
     @abstractmethod
-    def gauge(self, name: str, value: float, tags: dict | None = None) -> None:
+    def gauge(self, name: str, value: float, tags: dict[str, Any] | None = None) -> None:
         """Set a gauge metric to a specific value.
 
         Args:
@@ -39,7 +40,7 @@ class MetricsPort(ABC):
         ...
 
     @abstractmethod
-    def histogram(self, name: str, value: float, tags: dict | None = None) -> None:
+    def histogram(self, name: str, value: float, tags: dict[str, Any] | None = None) -> None:
         """Record a value in a histogram metric.
 
         Args:
@@ -101,7 +102,7 @@ class LoggingPort(ABC):
     """
 
     @abstractmethod
-    def log(self, level: LogLevel, message: str, context: dict | None = None) -> None:
+    def log(self, level: LogLevel, message: str, context: dict[str, Any] | None = None) -> None:
         """Emit a structured log entry.
 
         Args:
@@ -112,7 +113,7 @@ class LoggingPort(ABC):
         ...
 
     @abstractmethod
-    def with_context(self, **kwargs) -> "LoggingPort":
+    def with_context(self, **kwargs: Any) -> "LoggingPort":
         """Create a new logger instance with additional bound context.
 
         Args:

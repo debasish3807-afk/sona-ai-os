@@ -5,6 +5,7 @@ to provide MCP server management, tool discovery, and tool execution capabilitie
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import MCPServer, MCPTool, ToolCallResult
 
@@ -42,7 +43,9 @@ class MCPManagerPort(ABC):
         ...
 
     @abstractmethod
-    async def call_tool(self, tool_name: str, arguments: dict, user_id: str) -> ToolCallResult:
+    async def call_tool(
+        self, tool_name: str, arguments: dict[str, Any], user_id: str
+    ) -> ToolCallResult:
         """Execute a tool call on the appropriate MCP server.
 
         Permission checks are performed before execution based on the

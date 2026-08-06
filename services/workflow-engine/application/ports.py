@@ -5,6 +5,7 @@ to provide workflow execution, management, and lifecycle capabilities.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import WorkflowDefinition, WorkflowExecution
 
@@ -33,7 +34,7 @@ class WorkflowEnginePort(ABC):
         ...
 
     @abstractmethod
-    async def execute(self, workflow_id: str, inputs: dict) -> str:
+    async def execute(self, workflow_id: str, inputs: dict[str, Any]) -> str:
         """Start workflow execution.
 
         Begins executing the specified workflow with the given inputs.
@@ -81,7 +82,7 @@ class WorkflowEnginePort(ABC):
         ...
 
     @abstractmethod
-    async def resume(self, execution_id: str, input_data: dict) -> bool:
+    async def resume(self, execution_id: str, input_data: dict[str, Any]) -> bool:
         """Resume a workflow waiting for human input.
 
         Provides the requested input data to a workflow that is in

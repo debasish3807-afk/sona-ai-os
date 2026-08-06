@@ -123,7 +123,7 @@ class TestMCPServer:
         )
         assert server.command is None
         assert server.url is None
-        assert server.tools == ()
+        assert server.tools == []
 
     def test_stdio_server_with_command(self) -> None:
         """Create a STDIO server with a command."""

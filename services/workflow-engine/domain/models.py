@@ -4,7 +4,7 @@ Defines the data structures used by the Workflow Engine for workflow
 definition, step execution, and workflow lifecycle management.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
@@ -43,7 +43,7 @@ class WorkflowStep:
     name: str
     action: str
     params: dict[str, Any]
-    depends_on: list[str] = ()
+    depends_on: list[str] = field(default_factory=list)
     retry_count: int = 3
     timeout_seconds: int = 300
     condition: str | None = None
@@ -65,7 +65,7 @@ class WorkflowDefinition:
     workflow_id: str
     name: str
     description: str
-    steps: list[WorkflowStep] = ()
+    steps: list[WorkflowStep] = field(default_factory=list)
     trigger: str | None = None
     schedule: str | None = None
 

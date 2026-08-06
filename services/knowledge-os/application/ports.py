@@ -5,6 +5,7 @@ to provide knowledge base management and document processing capabilities.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import Document, DocumentChunk, DocumentType, RAGQuery, RAGResult
 
@@ -48,7 +49,7 @@ class KnowledgeBasePort(ABC):
         ...
 
     @abstractmethod
-    async def list_knowledge_bases(self, user_id: str) -> list[dict]:
+    async def list_knowledge_bases(self, user_id: str) -> list[dict[str, Any]]:
         """List available knowledge bases for a user.
 
         Args:

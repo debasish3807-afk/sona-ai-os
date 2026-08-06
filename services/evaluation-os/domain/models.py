@@ -6,6 +6,7 @@ metric collection, and regression testing operations.
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 
 class EvaluationType(StrEnum):
@@ -51,7 +52,7 @@ class EvaluationRequest:
     input_data: str
     expected_output: str | None = None
     model_id: str | None = None
-    metadata: dict | None = None
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

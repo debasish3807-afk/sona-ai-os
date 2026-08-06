@@ -5,6 +5,7 @@ and load-aware instance selection.
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from domain.models import IntentCategory, RoutingDecision
 
@@ -17,7 +18,7 @@ class ThalamusRouterPort(ABC):
     """
 
     @abstractmethod
-    async def classify_intent(self, content: str, context: dict) -> IntentCategory:
+    async def classify_intent(self, content: str, context: dict[str, Any]) -> IntentCategory:
         """Classify the intent of incoming content.
 
         Analyzes the request content and context to determine which
@@ -33,7 +34,7 @@ class ThalamusRouterPort(ABC):
         ...
 
     @abstractmethod
-    async def route(self, request: dict) -> RoutingDecision:
+    async def route(self, request: dict[str, Any]) -> RoutingDecision:
         """Determine routing for a request.
 
         Produces a complete routing decision including target service,

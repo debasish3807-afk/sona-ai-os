@@ -67,7 +67,7 @@ class TestWorkflowStep:
             action="transform",
             params={},
         )
-        assert step.depends_on == ()
+        assert step.depends_on == []
         assert step.retry_count == 3
         assert step.timeout_seconds == 300
         assert step.condition is None
@@ -135,7 +135,7 @@ class TestWorkflowDefinition:
             name="Test",
             description="A test workflow",
         )
-        assert defn.steps == ()
+        assert defn.steps == []
         assert defn.trigger is None
         assert defn.schedule is None
 
