@@ -1,0 +1,56 @@
+# Sona AI OS - Generic Service Dockerfile
+# Multi-stage build with configurable SERVICE_NAME
+# Usage: docker build --build-arg SERVICE_NAME=ai-kernel -f infra/docker/Dockerfile.service .
+
+ARG PYTHON_VERSION=3.12
+
+# ---- Build Stage ----
+FROM python:${PYTHON_VERSION}-slim AS builder
+
+ARG SERVICE_NAME
+ENV SERVICE_NAME=${SERVICE_NAME}
+
+WORKDIR /build
+
+# Install build dependencies
+RUN pip install --no-cache-dir hatchling
+
+# Copy shared kernel (common dependency)
+COPY libs/shared-kernel /build/libs/shared-kernel
+RUN pip install --no-cache-dir /build/libs/shared-kernel
+
+# Copy service source
+COPY services/${SERVICE_NAME}/pyproject.toml /build/service/
+COPY services/${SERVICE_NAME}/src /build/service/src
+RUN pip install --no-cache-dir /build/service
+
+# ---- Runtime Stage ----
+FROM python:${PYTHON_VERSION}-slim AS runtime
+
+ARG SERVICE_NAME
+ENV SERVICE_NAME=${SERVICE_NAME}
+
+# Create non-root user
+RUN groupadd -g 1000 sona && \
+    useradd -u 1000 -g sona -m -s /bin/bash sona
+
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+
+# Copy application code
+COPY services/${SERVICE_NAME}/src /app/src
+
+# Set ownership
+RUN chown -R sona:sona /app
+
+USER sona
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

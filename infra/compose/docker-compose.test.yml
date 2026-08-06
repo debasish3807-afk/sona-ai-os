@@ -1,0 +1,36 @@
+# Sona AI OS - Test Configuration
+# Usage: docker compose -f infra/compose/docker-compose.yml -f infra/compose/docker-compose.test.yml up
+
+services:
+  gateway:
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+      - DATABASE_NAME=sona_test_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    environment:
+      POSTGRES_DB: sona_test_db
+    tmpfs:
+      - /var/lib/postgresql/data
+    ports: []
+
+  redis:
+    command: >
+      redis-server
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+    tmpfs:
+      - /data
+    ports: []
+
+  qdrant:
+    tmpfs:
+      - /qdrant/storage
+    ports: []

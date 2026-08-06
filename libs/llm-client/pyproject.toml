@@ -1,0 +1,38 @@
+[project]
+name = "sona-llm-client"
+version = "1.0.0"
+description = "Sona AI OS LLM Client - Unified abstraction for multiple LLM providers"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+    "sona-shared-kernel",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.100",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sona_llm"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
