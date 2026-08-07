@@ -10,12 +10,12 @@ import com.sona.ai.features.camera.CameraScreen
 import com.sona.ai.features.chat.ChatScreen
 import com.sona.ai.features.communication.CommunicationScreen
 import com.sona.ai.features.connectors.ConnectorsScreen
+import com.sona.ai.features.dashboard.DashboardScreen
 import com.sona.ai.features.files.FilePickerScreen
 import com.sona.ai.features.memory.MemoryScreen
 import com.sona.ai.features.settings.SettingsScreen
 import com.sona.ai.features.vision.VisionScreen
 import com.sona.ai.features.voice.VoiceScreen
-import com.sona.ai.ui.screens.HomeScreen
 import com.sona.ai.ui.screens.LoginScreen
 import com.sona.ai.ui.screens.SplashScreen
 
@@ -60,15 +60,36 @@ fun SonaNavGraph(
         }
 
         composable(Screen.Home.route) {
-            HomeScreen(
+            DashboardScreen(
                 onNavigateToChat = {
                     navController.navigate(Screen.Chat.route)
+                },
+                onNavigateToVoice = {
+                    navController.navigate(Screen.Voice.route)
+                },
+                onNavigateToCamera = {
+                    navController.navigate(Screen.Camera.route)
+                },
+                onNavigateToVision = {
+                    navController.navigate(Screen.Vision.route)
+                },
+                onNavigateToFiles = {
+                    navController.navigate(Screen.Files.route)
+                },
+                onNavigateToMemory = {
+                    navController.navigate(Screen.Memory.route)
+                },
+                onNavigateToAgents = {
+                    navController.navigate(Screen.Agents.route)
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
                 },
-                onNavigateToMemory = {
-                    navController.navigate(Screen.Memory.route)
+                onNavigateToConnectors = {
+                    navController.navigate(Screen.Connectors.route)
+                },
+                onNavigateToCommunication = {
+                    navController.navigate(Screen.Communication.route)
                 }
             )
         }
