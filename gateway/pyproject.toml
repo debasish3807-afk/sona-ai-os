@@ -10,6 +10,11 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "structlog>=24.0",
     "sona-shared-kernel",
+    "sona-ai-kernel",
+    "sona-thalamus-router",
+    "sona-brain-os",
+    "sona-memory-os",
+    "sse-starlette>=2.0",
 ]
 
 [project.optional-dependencies]

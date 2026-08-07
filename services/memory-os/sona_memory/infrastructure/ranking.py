@@ -110,7 +110,8 @@ class MemoryRanker:
 
         # Exponential decay with 24-hour half-life
         half_life = 24.0
-        return 2.0 ** (-age_hours / half_life)
+        result: float = 2.0 ** (-age_hours / half_life)
+        return result
 
     def _compute_frequency(
         self, memory_id: str, access_counts: dict[str, int], max_count: int
