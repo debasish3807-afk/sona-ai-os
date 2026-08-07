@@ -53,7 +53,8 @@ class StreamingEngine:
         token_count = 0
 
         try:
-            async for token in provider.stream(request):
+            stream = provider.stream(request)
+            async for token in stream:
                 token_count += 1
                 yield token
         except Exception as exc:

@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class InferenceStartedEvent(DomainEvent):
+class InferenceStartedEvent(DomainEvent):  # type: ignore[misc]
     """Emitted when an inference request begins processing."""
 
     request_id: str = ""
@@ -19,7 +19,7 @@ class InferenceStartedEvent(DomainEvent):
 
 
 @dataclass(frozen=True)
-class InferenceCompletedEvent(DomainEvent):
+class InferenceCompletedEvent(DomainEvent):  # type: ignore[misc]
     """Emitted when an inference request completes successfully."""
 
     request_id: str = ""
@@ -31,7 +31,7 @@ class InferenceCompletedEvent(DomainEvent):
 
 
 @dataclass(frozen=True)
-class InferenceFailedEvent(DomainEvent):
+class InferenceFailedEvent(DomainEvent):  # type: ignore[misc]
     """Emitted when an inference request fails."""
 
     request_id: str = ""
@@ -41,7 +41,7 @@ class InferenceFailedEvent(DomainEvent):
 
 
 @dataclass(frozen=True)
-class ProviderHealthChangedEvent(DomainEvent):
+class ProviderHealthChangedEvent(DomainEvent):  # type: ignore[misc]
     """Emitted when a provider's health status changes."""
 
     provider: str = ""
