@@ -30,4 +30,6 @@ sealed class Screen(val route: String) {
     data object Agents : Screen("agents")
 
     data object Vision : Screen("vision")
+
+    data object Communication : Screen("communication")
 }
