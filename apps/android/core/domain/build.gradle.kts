@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.sona.ai.core.domain"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    // Hilt
+    // Hilt (for @Inject annotations in use cases)
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-compiler:2.51.1")
 

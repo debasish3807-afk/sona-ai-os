@@ -8,20 +8,6 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.21-1.0.25" apply false
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 tasks.register("clean", Delete::class) {
     delete(rootProject.layout.buildDirectory)
 }
