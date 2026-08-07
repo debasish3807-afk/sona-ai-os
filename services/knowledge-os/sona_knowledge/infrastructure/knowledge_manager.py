@@ -269,7 +269,7 @@ class KnowledgeManager(KnowledgeBasePort):
                 document_id=doc_id,
                 content=result.content,
                 embedding=embedding,
-                chunk_index=int(result.metadata.get("chunk_index", 0)),
+                chunk_index=int(result.metadata.get("chunk_index") or 0),  # type: ignore[call-overload]
                 metadata=result.metadata,
             )
             result_chunks.append(chunk)
