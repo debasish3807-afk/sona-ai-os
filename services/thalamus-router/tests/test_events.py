@@ -3,13 +3,13 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
+
+from sona_shared.domain.primitives import DomainEvent
 from sona_thalamus.domain.events import (
     ExecutionPlanCreatedEvent,
     IntentClassifiedEvent,
     RoutingFailedEvent,
 )
-
-from sona_shared.domain.primitives import DomainEvent
 
 
 class TestIntentClassifiedEvent:

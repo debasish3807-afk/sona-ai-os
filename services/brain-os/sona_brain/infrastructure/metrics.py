@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 logger = structlog.get_logger()
 

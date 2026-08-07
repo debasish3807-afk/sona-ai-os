@@ -8,6 +8,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 
 import pytest
+
 from sona_ai_kernel.infrastructure.providers.base import (
     CompletionRequest,
     CompletionResponse,

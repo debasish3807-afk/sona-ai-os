@@ -7,10 +7,10 @@ model failures, retry exhaustion, and unrecoverable errors.
 from enum import StrEnum
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.domain.models import BrainResponse
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 logger = structlog.get_logger()
 

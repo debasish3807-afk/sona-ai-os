@@ -7,10 +7,10 @@ quality meets confidence thresholds and recommending retry strategies.
 from enum import StrEnum
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.domain.models import BrainResponse
+from sona_thalamus.domain.execution_plan import ExecutionPlan
 
 logger = structlog.get_logger()
 

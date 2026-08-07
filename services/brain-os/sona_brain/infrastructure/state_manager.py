@@ -9,9 +9,9 @@ import asyncio
 from datetime import UTC, datetime
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 from sona_brain.domain.execution import ExecutionContext, ExecutionState, StepResult, StepState
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 logger = structlog.get_logger()
 

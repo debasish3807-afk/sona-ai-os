@@ -3,6 +3,7 @@
 from dataclasses import FrozenInstanceError
 
 import pytest
+
 from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 

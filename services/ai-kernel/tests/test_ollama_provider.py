@@ -8,6 +8,7 @@ import json
 
 import httpx
 import pytest
+
 from sona_ai_kernel.infrastructure.providers.base import CompletionRequest, ProviderConfig
 from sona_ai_kernel.infrastructure.providers.ollama import OllamaProvider
 

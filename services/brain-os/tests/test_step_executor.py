@@ -4,6 +4,7 @@ Tests verify step execution, timeout handling, and type dispatch.
 """
 
 import pytest
+
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.step_executor import StepExecutor
 from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType

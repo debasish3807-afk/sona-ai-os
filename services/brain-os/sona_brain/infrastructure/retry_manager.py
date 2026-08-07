@@ -9,9 +9,9 @@ import random
 from dataclasses import dataclass, field
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
+from sona_thalamus.domain.execution_plan import ExecutionStep
 
 logger = structlog.get_logger()
 

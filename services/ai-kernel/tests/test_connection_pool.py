@@ -5,6 +5,7 @@ Tests verify client creation, reuse, cleanup, and stats.
 
 import httpx
 import pytest
+
 from sona_ai_kernel.infrastructure.connection_pool import (
     ConnectionPoolManager,
     PoolConfig,

@@ -7,6 +7,7 @@ and proper TimeoutError raising.
 import asyncio
 
 import pytest
+
 from sona_ai_kernel.infrastructure.timeout import with_timeout
 
 

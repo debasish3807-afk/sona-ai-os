@@ -5,6 +5,7 @@ and carry the expected data.
 """
 
 import pytest
+
 from sona_brain.domain.events import (
     ExecutionCompletedEvent,
     ExecutionFailedEvent,
@@ -12,7 +13,6 @@ from sona_brain.domain.events import (
     StepCompletedEvent,
     StepFailedEvent,
 )
-
 from sona_shared.domain.primitives import DomainEvent
 
 

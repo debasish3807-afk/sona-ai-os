@@ -5,6 +5,7 @@ proper default values.
 """
 
 import pytest
+
 from sona_ai_kernel.domain.errors import ErrorCode, KernelError
 
 

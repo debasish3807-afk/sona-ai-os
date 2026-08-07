@@ -4,6 +4,7 @@ Tests verify ordered execution, dependency respect, and failure stopping.
 """
 
 import pytest
+
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.retry_manager import RetryConfig, RetryManager
 from sona_brain.infrastructure.sequential_executor import SequentialExecutor

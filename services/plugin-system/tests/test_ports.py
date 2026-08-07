@@ -5,6 +5,7 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
+
 from sona_plugins.application.ports import PluginPort, PluginRegistryPort
 from sona_plugins.domain.models import PluginInstance, PluginManifest, PluginStatus
 

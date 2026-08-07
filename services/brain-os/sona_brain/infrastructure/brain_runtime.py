@@ -10,7 +10,6 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 from sona_brain.application.ports import BrainOrchestratorPort
 from sona_brain.domain.events import (
@@ -28,6 +27,7 @@ from sona_brain.infrastructure.reflection_engine import ReflectionDecision, Refl
 from sona_brain.infrastructure.result_aggregator import ResultAggregator
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_brain.infrastructure.timeout_recovery import TimeoutRecovery
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 

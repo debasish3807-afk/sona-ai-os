@@ -6,6 +6,7 @@ Tests verify failover execution, provider cycling, and circuit integration.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from sona_ai_kernel.infrastructure.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerConfig,

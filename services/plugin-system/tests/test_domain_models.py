@@ -7,6 +7,7 @@ defined, instantiate properly, and enforce immutability where expected.
 from dataclasses import FrozenInstanceError
 
 import pytest
+
 from sona_plugins.domain.models import (
     PluginInstance,
     PluginManifest,

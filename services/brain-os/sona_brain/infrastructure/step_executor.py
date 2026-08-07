@@ -9,9 +9,9 @@ import time
 from typing import Any
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
+from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 

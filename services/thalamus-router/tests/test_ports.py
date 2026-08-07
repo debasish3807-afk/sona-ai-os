@@ -5,6 +5,7 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
+
 from sona_thalamus.application.ports import LoadBalancerPort, ThalamusRouterPort
 from sona_thalamus.domain.models import IntentCategory, RequestPriority, RoutingDecision
 

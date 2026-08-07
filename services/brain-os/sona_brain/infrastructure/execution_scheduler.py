@@ -8,12 +8,12 @@ sequentially with steps within a wave running in parallel.
 from typing import Any
 
 import structlog
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.parallel_executor import ParallelExecutor
 from sona_brain.infrastructure.sequential_executor import SequentialExecutor
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 logger = structlog.get_logger()
 

@@ -4,6 +4,7 @@ Tests verify wave-based execution, dependency grouping, and failure handling.
 """
 
 import pytest
+
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.execution_scheduler import ExecutionScheduler
 from sona_brain.infrastructure.parallel_executor import ParallelExecutor

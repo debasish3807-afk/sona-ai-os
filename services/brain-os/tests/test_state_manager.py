@@ -4,6 +4,7 @@ Tests verify state transitions, ready-step queries, and thread safety.
 """
 
 import pytest
+
 from sona_brain.domain.execution import ExecutionState, StepState
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType

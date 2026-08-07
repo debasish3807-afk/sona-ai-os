@@ -71,6 +71,20 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = [
+    "sona_ai_kernel",
+    "sona_ai_engineering",
+    "sona_brain",
+    "sona_evaluation",
+    "sona_knowledge",
+    "sona_mcp",
+    "sona_memory",
+    "sona_observability",
+    "sona_plugins",
+    "sona_research",
+    "sona_security",
+    "sona_thalamus",
+    "sona_workflow",
+    "sona_workforce",
     "sona_shared",
     "sona_llm",
     "sona_events",
