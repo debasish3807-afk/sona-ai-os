@@ -132,9 +132,10 @@ class RedisAdapter:
                 return []
             lst = self._store[key]
             if stop == -1:
-                return lst[start:]
-            return lst[start : stop + 1]
-
+                result_list: list[Any] = list(lst[start:])
+                return result_list
+            result_slice: list[Any] = list(lst[start : stop + 1])
+            return result_slice
     async def ltrim(self, key: str, start: int, stop: int) -> None:
         """Trim a list to the specified range."""
         async with self._lock:
