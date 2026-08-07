@@ -1,103 +1,47 @@
 # =============================================================================
 # Sona AI OS — Development Deployment Pipeline
 # =============================================================================
-# Triggers: Push to main or develop branch (after CI passes)
-# Policy:   Deploy ONLY if all CI checks pass. Never deploy broken code.
-# Target:   Development/staging environment
+# Triggers: Push to develop branch (monorepo changes)
+# Gate:     Requires CI Monorepo Pipeline to pass first
+# Target:   Development environment
 # =============================================================================
 
 name: Deploy Development
 
 on:
   push:
-    branches: [main, develop]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/deploy-dev.yml'
+    branches: [develop]
+  workflow_dispatch:
 
 env:
   PYTHON_VERSION: "3.12"
-  WORKING_DIR: backend
   DEPLOY_ENV: development
   APP_NAME: sona-ai-os
   IMAGE_TAG: dev-${{ github.sha }}
 
-# Ensure only one deployment runs at a time per branch
 concurrency:
   group: deploy-dev-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   # ===========================================================================
-  # Gate: Run CI Checks First — Never deploy if tests fail
+  # Gate: Verify CI Monorepo Pipeline passed on this commit
   # ===========================================================================
   ci-gate:
     name: "CI Gate"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+      - name: Wait for CI Monorepo Pipeline
+        uses: lewagon/wait-on-check-action@v1.3.4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: ${{ env.WORKING_DIR }}/requirements-dev.txt
+          ref: ${{ github.sha }}
+          check-name: 'backend-test'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Lint check
-        run: ruff check . --output-format=github
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Format check
-        run: ruff format --check .
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Type check
-        run: mypy . --ignore-missing-imports
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Security scan
-        run: bandit -r . -x ./tests -ll -ii
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Run tests
-        run: |
-          pytest tests/ \
-            --cov=. \
-            --cov-report=term-missing \
-            --cov-fail-under=50 \
-            -v
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Validate syntax
-        run: |
-          python -c "
-          import py_compile, os, sys
-          errors = []
-          for root, dirs, files in os.walk('.'):
-              if '.git' in root or '__pycache__' in root:
-                  continue
-              for f in files:
-                  if f.endswith('.py'):
-                      path = os.path.join(root, f)
-                      try:
-                          py_compile.compile(path, doraise=True)
-                      except py_compile.PyCompileError as e:
-                          errors.append(str(e))
-          if errors:
-              for e in errors:
-                  print(f'ERROR: {e}')
-              sys.exit(1)
-          print('✅ All Python files pass syntax validation')
-          "
-        working-directory: ${{ env.WORKING_DIR }}
+      - name: Gate passed
+        run: echo "✅ CI Monorepo Pipeline passed — safe to deploy"
 
   # ===========================================================================
   # Build: Create deployment artifact
@@ -127,9 +71,24 @@ jobs:
       - name: Create deployment package
         run: |
           mkdir -p dist
-          cp -r ${{ env.WORKING_DIR }}/ dist/backend/
-          rm -rf dist/backend/__pycache__ dist/backend/tests
-          find dist/ -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+          # Package monorepo services
+          for service in services/*/; do
+            if [ -f "$service/pyproject.toml" ]; then
+              svc_name=$(basename "$service")
+              cp -r "$service" "dist/$svc_name/"
+              find "dist/$svc_name/" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+              rm -rf "dist/$svc_name/tests"
+            fi
+          done
+          # Package gateway
+          cp -r gateway/ dist/gateway/
+          find dist/gateway/ -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+          rm -rf dist/gateway/tests
+          # Package shared libs
+          cp -r libs/ dist/libs/
+          find dist/libs/ -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+          find dist/libs/ -path "*/tests" -type d -exec rm -rf {} + 2>/dev/null || true
+          # Build info
           echo "{
             \"app\": \"${{ env.APP_NAME }}\",
             \"version\": \"dev\",
@@ -146,12 +105,6 @@ jobs:
           name: deploy-package-dev
           path: dist/
           retention-days: 7
-
-      # NOTE: When Docker registry is configured, add:
-      # - name: Build Docker image
-      #   run: docker build -t ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} .
-      # - name: Push to registry
-      #   run: docker push $REGISTRY/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }}
 
   # ===========================================================================
   # Deploy: Push to development environment
@@ -179,30 +132,15 @@ jobs:
           echo "  Environment: ${{ env.DEPLOY_ENV }}"
           echo "  Branch:      ${{ github.ref_name }}"
           echo "  Commit:      ${{ github.sha }}"
-          echo "  Image Tag:   ${{ env.IMAGE_TAG }}"
           echo "  Triggered:   ${{ github.event_name }}"
           echo "  Actor:       ${{ github.actor }}"
           echo "============================================"
           cat dist/build-info.json
 
-      # NOTE: Replace with actual deployment commands:
-      # - name: Deploy to Kubernetes
-      #   run: |
-      #     kubectl set image deployment/${{ env.APP_NAME }} \
-      #       app=$REGISTRY/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} \
-      #       --namespace=development
-      #
-      # - name: Deploy to AWS ECS
-      #   run: |
-      #     aws ecs update-service \
-      #       --cluster sona-dev \
-      #       --service ${{ env.APP_NAME }} \
-      #       --force-new-deployment
-
       - name: Deployment placeholder
         run: |
           echo "✅ Development deployment successful (placeholder)"
-          echo "   Configure actual deployment target in this step"
+          echo "   Configure actual deployment target (K8s, ECS, etc.) in this step"
 
   # ===========================================================================
   # Verify: Post-deployment health check
@@ -215,8 +153,8 @@ jobs:
       - name: Health check
         run: |
           echo "Running post-deployment health checks..."
-          # NOTE: Replace with actual health endpoint:
-          # curl -f https://dev.sona-ai.example.com/api/v1/health || exit 1
+          # Replace with actual health endpoint:
+          # curl -f https://dev.sona-ai.example.com/health || exit 1
           echo "✅ Health check passed (placeholder)"
 
       - name: Deployment summary
