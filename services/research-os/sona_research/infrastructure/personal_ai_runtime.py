@@ -10,6 +10,8 @@ Combines all subsystems into a unified runtime:
 - Metrics
 """
 
+from typing import Any
+
 import structlog
 
 from sona_research.domain.github_models import GitHubRepository
@@ -160,7 +162,7 @@ class PersonalAIRuntime:
     # --- Knowledge Graph Operations ---
 
     async def add_knowledge(
-        self, label: str, node_type: str, properties: dict | None = None
+        self, label: str, node_type: str, properties: dict[str, Any] | None = None
     ) -> KnowledgeNode:
         """Add a knowledge node and track metrics.
 
