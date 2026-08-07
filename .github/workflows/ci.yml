@@ -16,13 +16,10 @@ on:
     branches: [main, develop]
     paths:
       - 'backend/**'
-      - '.github/workflows/ci.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'backend/**'
-      - '.github/workflows/ci.yml'
-
 env:
   PYTHON_VERSION: "3.12"
   WORKING_DIR: backend
