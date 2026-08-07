@@ -34,4 +34,6 @@ sealed class Screen(val route: String) {
     data object Communication : Screen("communication")
 
     data object Connectors : Screen("connectors")
+
+    data object Dashboard : Screen("dashboard")
 }
