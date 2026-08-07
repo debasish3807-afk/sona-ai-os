@@ -37,7 +37,7 @@ class AIKernelPort(ABC):
         ...
 
     @abstractmethod
-    async def stream(self, request: KernelRequest) -> AsyncIterator[str]:
+    def stream(self, request: KernelRequest) -> AsyncIterator[str]:
         """Stream response tokens for a request.
 
         Args:

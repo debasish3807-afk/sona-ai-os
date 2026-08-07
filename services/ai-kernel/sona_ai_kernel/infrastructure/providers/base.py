@@ -128,7 +128,7 @@ class LLMProviderBase(ABC):
         ...
 
     @abstractmethod
-    async def stream(self, request: CompletionRequest) -> AsyncIterator[str]:
+    def stream(self, request: CompletionRequest) -> AsyncIterator[str]:
         """Stream completion tokens.
 
         Args:
