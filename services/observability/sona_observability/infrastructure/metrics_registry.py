@@ -120,10 +120,10 @@ class MetricsRegistry(MetricsPort):
             result[name] = {"type": MetricType.COUNTER, "values": dict(series)}
         for name, series in self._gauges.items():
             result[name] = {"type": MetricType.GAUGE, "values": dict(series)}
-        for name, series in self._histograms.items():
+        for name, hist_series in self._histograms.items():
             result[name] = {
                 "type": MetricType.HISTOGRAM,
-                "values": {k: len(v) for k, v in series.items()},
+                "values": {k: len(v) for k, v in hist_series.items()},
             }
         return result
 
@@ -157,11 +157,11 @@ class MetricsRegistry(MetricsPort):
                 else:
                     lines.append(f"{name} {value:g}")
         # Export histograms
-        for name, series in sorted(self._histograms.items()):
+        for name, hist_data in sorted(self._histograms.items()):
             help_text = self._metric_help.get(name, f"Distribution of {name}")
             lines.append(f"# HELP {name} {help_text}")
             lines.append(f"# TYPE {name} histogram")
-            for tags_str, values in sorted(series.items()):
+            for tags_str, values in sorted(hist_data.items()):
                 count = len(values)
                 total = sum(values)
                 if tags_str:
