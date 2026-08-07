@@ -3,8 +3,6 @@
 Tests verify combining step results into a BrainResponse.
 """
 
-import pytest
-
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.result_aggregator import ResultAggregator
 from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
@@ -68,7 +66,12 @@ class TestResultAggregator:
             StepResult(
                 step_id="llm-1",
                 state=StepState.COMPLETED,
-                output={"content": "Hello world", "model": "gpt-4o", "tokens_in": 50, "tokens_out": 20},
+                output={
+                    "content": "Hello world",
+                    "model": "gpt-4o",
+                    "tokens_in": 50,
+                    "tokens_out": 20,
+                },
                 latency_ms=200.0,
             ),
         ]
@@ -94,7 +97,12 @@ class TestResultAggregator:
             StepResult(
                 step_id="llm-2",
                 state=StepState.COMPLETED,
-                output={"content": "Final answer", "model": "gpt-4o", "tokens_in": 40, "tokens_out": 20},
+                output={
+                    "content": "Final answer",
+                    "model": "gpt-4o",
+                    "tokens_in": 40,
+                    "tokens_out": 20,
+                },
                 latency_ms=150.0,
             ),
         ]
@@ -140,7 +148,12 @@ class TestResultAggregator:
             StepResult(
                 step_id="llm-1",
                 state=StepState.COMPLETED,
-                output={"content": "With memory", "model": "gpt-4o", "tokens_in": 10, "tokens_out": 5},
+                output={
+                    "content": "With memory",
+                    "model": "gpt-4o",
+                    "tokens_in": 10,
+                    "tokens_out": 5,
+                },
                 latency_ms=80.0,
             ),
         ]

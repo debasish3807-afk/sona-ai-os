@@ -4,7 +4,6 @@ Tests verify step execution, timeout handling, and type dispatch.
 """
 
 import pytest
-
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.step_executor import StepExecutor
 from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
@@ -133,7 +132,7 @@ class TestStepExecutor:
     async def test_timeout_handling(self) -> None:
         """Verify step times out with very short timeout."""
         import asyncio
-        from unittest.mock import AsyncMock, patch
+        from unittest.mock import patch
 
         executor = StepExecutor()
         step = _make_step(
@@ -160,9 +159,7 @@ class TestStepExecutor:
         executor = StepExecutor()
         step = _make_step(ExecutionStepType.LLM_CALL)
 
-        with patch.object(
-            executor._llm_handler, "execute", side_effect=RuntimeError("boom")
-        ):
+        with patch.object(executor._llm_handler, "execute", side_effect=RuntimeError("boom")):
             result = await executor.execute_step(step)
 
         assert result.state == StepState.FAILED

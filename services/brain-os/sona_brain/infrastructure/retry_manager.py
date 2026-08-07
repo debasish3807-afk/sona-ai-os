@@ -7,12 +7,11 @@ respecting the retryable flag and configurable retry limits.
 import asyncio
 import random
 from dataclasses import dataclass, field
-from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionStep
 
 logger = structlog.get_logger()
 
@@ -209,7 +208,7 @@ class RetryManager:
             Delay in seconds with optional jitter.
         """
         delay = min(
-            self._config.base_delay_seconds * (self._config.backoff_factor ** attempt),
+            self._config.base_delay_seconds * (self._config.backoff_factor**attempt),
             self._config.max_delay_seconds,
         )
         if self._config.jitter:

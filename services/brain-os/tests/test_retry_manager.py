@@ -4,9 +4,8 @@ Tests verify retry logic, backoff calculation, and state tracking.
 """
 
 import pytest
-
 from sona_brain.domain.execution import StepResult, StepState
-from sona_brain.infrastructure.retry_manager import RetryConfig, RetryManager, RetryState
+from sona_brain.infrastructure.retry_manager import RetryConfig, RetryManager
 from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 
 

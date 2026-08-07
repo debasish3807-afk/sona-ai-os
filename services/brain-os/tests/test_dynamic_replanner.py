@@ -3,8 +3,6 @@
 Tests verify plan modification on failure, model substitution, and simplification.
 """
 
-import pytest
-
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.dynamic_replanner import DynamicReplanner
 from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
@@ -161,9 +159,7 @@ class TestDynamicReplanner:
 
     def test_custom_fallback_models(self) -> None:
         """Custom fallback models are used for substitution."""
-        replanner = DynamicReplanner(
-            fallback_models=[("claude-3-opus", "anthropic")]
-        )
+        replanner = DynamicReplanner(fallback_models=[("claude-3-opus", "anthropic")])
         plan = _make_plan([_llm_step()])
         results = [
             StepResult(step_id="llm-1", state=StepState.FAILED, error="Error"),
@@ -177,11 +173,13 @@ class TestDynamicReplanner:
     def test_multiple_tool_failures_removed(self) -> None:
         """Multiple failed tool steps are all removed."""
         replanner = DynamicReplanner()
-        plan = _make_plan([
-            _tool_step("t1"),
-            _tool_step("t2"),
-            _llm_step("llm-1", depends_on=["t1", "t2"]),
-        ])
+        plan = _make_plan(
+            [
+                _tool_step("t1"),
+                _tool_step("t2"),
+                _llm_step("llm-1", depends_on=["t1", "t2"]),
+            ]
+        )
         results = [
             StepResult(step_id="t1", state=StepState.FAILED, error="Err"),
             StepResult(step_id="t2", state=StepState.FAILED, error="Err"),

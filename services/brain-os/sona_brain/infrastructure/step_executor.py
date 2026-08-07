@@ -9,9 +9,9 @@ import time
 from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -218,7 +218,7 @@ class StepExecutor:
                 output=output,
                 latency_ms=elapsed_ms,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             elapsed_ms = (time.perf_counter() - start_time) * 1000.0
             error_msg = f"Step timed out after {step.timeout_seconds}s"
             logger.warning(

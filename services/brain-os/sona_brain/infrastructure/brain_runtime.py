@@ -10,6 +10,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 from sona_brain.application.ports import BrainOrchestratorPort
 from sona_brain.domain.events import (
@@ -27,7 +28,6 @@ from sona_brain.infrastructure.reflection_engine import ReflectionDecision, Refl
 from sona_brain.infrastructure.result_aggregator import ResultAggregator
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_brain.infrastructure.timeout_recovery import TimeoutRecovery
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -123,7 +123,7 @@ class BrainRuntime(BrainOrchestratorPort):
             chunk_size = 50
             content = response.content
             for i in range(0, len(content), chunk_size):
-                yield content[i:i + chunk_size]
+                yield content[i : i + chunk_size]
                 await asyncio.sleep(0)  # Allow event loop to process
 
         return _generate()
@@ -137,11 +137,14 @@ class BrainRuntime(BrainOrchestratorPort):
         Returns:
             Session context dictionary.
         """
-        return self._sessions.get(session_id, {
-            "session_id": session_id,
-            "history": [],
-            "active": True,
-        })
+        return self._sessions.get(
+            session_id,
+            {
+                "session_id": session_id,
+                "history": [],
+                "active": True,
+            },
+        )
 
     async def execute_plan(
         self,
@@ -167,11 +170,13 @@ class BrainRuntime(BrainOrchestratorPort):
         self._reflection_engine.reset()
 
         # Emit execution started event
-        self._emit_event(ExecutionStartedEvent(
-            plan_id=plan.plan_id,
-            intent=plan.intent,
-            steps_count=len(plan.steps),
-        ))
+        self._emit_event(
+            ExecutionStartedEvent(
+                plan_id=plan.plan_id,
+                intent=plan.intent,
+                steps_count=len(plan.steps),
+            )
+        )
 
         state_manager = ExecutionStateManager(plan)
         await state_manager.start_execution()
@@ -200,18 +205,22 @@ class BrainRuntime(BrainOrchestratorPort):
 
         # Emit completion event
         if success:
-            self._emit_event(ExecutionCompletedEvent(
-                plan_id=plan.plan_id,
-                total_latency_ms=response.latency_ms,
-                tokens_in=response.tokens.get("input", 0),
-                tokens_out=response.tokens.get("output", 0),
-            ))
+            self._emit_event(
+                ExecutionCompletedEvent(
+                    plan_id=plan.plan_id,
+                    total_latency_ms=response.latency_ms,
+                    tokens_in=response.tokens.get("input", 0),
+                    tokens_out=response.tokens.get("output", 0),
+                )
+            )
         else:
-            self._emit_event(ExecutionFailedEvent(
-                plan_id=plan.plan_id,
-                error="; ".join(state_manager.context.errors[-3:]),
-                steps_completed=state_manager.get_completed_count(),
-            ))
+            self._emit_event(
+                ExecutionFailedEvent(
+                    plan_id=plan.plan_id,
+                    error="; ".join(state_manager.context.errors[-3:]),
+                    steps_completed=state_manager.get_completed_count(),
+                )
+            )
 
         return response
 
@@ -400,11 +409,13 @@ class BrainRuntime(BrainOrchestratorPort):
                 "active": True,
             }
 
-        self._sessions[session_id]["history"].append({
-            "messages": request.messages,
-            "response": response.content,
-            "model": response.model_used,
-        })
+        self._sessions[session_id]["history"].append(
+            {
+                "messages": request.messages,
+                "response": response.content,
+                "model": response.model_used,
+            }
+        )
 
     def _emit_event(self, event: Any) -> None:
         """Emit a domain event.

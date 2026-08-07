@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -101,12 +101,8 @@ class ExecutionMetrics:
         self._plan_metrics.append(metrics)
 
         # Track provider and model usage
-        self._provider_usage[plan.provider] = (
-            self._provider_usage.get(plan.provider, 0) + 1
-        )
-        self._model_usage[plan.model_id] = (
-            self._model_usage.get(plan.model_id, 0) + 1
-        )
+        self._provider_usage[plan.provider] = self._provider_usage.get(plan.provider, 0) + 1
+        self._model_usage[plan.model_id] = self._model_usage.get(plan.model_id, 0) + 1
 
         logger.info(
             "metrics_recorded",

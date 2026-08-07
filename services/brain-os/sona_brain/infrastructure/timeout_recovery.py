@@ -6,9 +6,9 @@ execution strategies.
 """
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -177,9 +177,7 @@ class TimeoutRecovery:
             return None
 
         # Ensure at least one LLM step remains
-        has_llm = any(
-            s.step_type == ExecutionStepType.LLM_CALL for s in remaining_steps
-        )
+        has_llm = any(s.step_type == ExecutionStepType.LLM_CALL for s in remaining_steps)
         if not has_llm:
             return None
 

@@ -6,8 +6,6 @@ are correctly defined and behave as expected.
 
 from datetime import UTC, datetime
 
-import pytest
-
 from sona_brain.domain.execution import (
     ExecutionContext,
     ExecutionState,

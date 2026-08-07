@@ -8,12 +8,12 @@ sequentially with steps within a wave running in parallel.
 from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.parallel_executor import ParallelExecutor
 from sona_brain.infrastructure.sequential_executor import SequentialExecutor
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 logger = structlog.get_logger()
 
@@ -102,9 +102,7 @@ class ExecutionScheduler:
                     failed_steps=[f.step_id for f in failed],
                 )
                 # Cancel remaining waves
-                remaining_steps = [
-                    s for w in waves[wave_index + 1:] for s in w
-                ]
+                remaining_steps = [s for w in waves[wave_index + 1 :] for s in w]
                 for step in remaining_steps:
                     await state_manager.mark_step_cancelled(step.step_id)
                 break
@@ -144,9 +142,7 @@ class ExecutionScheduler:
 
         # BFS by levels
         waves: list[list[ExecutionStep]] = []
-        current_wave = [
-            step_map[sid] for sid, deg in in_degree.items() if deg == 0
-        ]
+        current_wave = [step_map[sid] for sid, deg in in_degree.items() if deg == 0]
 
         while current_wave:
             # Sort by priority for deterministic ordering

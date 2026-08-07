@@ -7,9 +7,9 @@ failed steps, substituting models/providers, or simplifying the plan.
 import uuid
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -108,9 +108,7 @@ class DynamicReplanner:
 
         # Only remove non-LLM failed steps
         removable = {
-            sid
-            for sid in failed_step_ids
-            if step_types.get(sid) != ExecutionStepType.LLM_CALL
+            sid for sid in failed_step_ids if step_types.get(sid) != ExecutionStepType.LLM_CALL
         }
 
         if not removable:

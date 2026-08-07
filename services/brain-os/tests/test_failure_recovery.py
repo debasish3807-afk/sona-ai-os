@@ -3,8 +3,6 @@
 Tests verify failure classification, recovery recommendations, and error responses.
 """
 
-import pytest
-
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.failure_recovery import (
     FailureRecovery,
@@ -74,7 +72,9 @@ class TestFailureRecovery:
         """Classify model-specific errors."""
         recovery = FailureRecovery()
         results = [
-            StepResult(step_id="s1", state=StepState.FAILED, error="Model rate limit exceeded: 429"),
+            StepResult(
+                step_id="s1", state=StepState.FAILED, error="Model rate limit exceeded: 429"
+            ),
         ]
         plan = _make_plan()
 
@@ -150,7 +150,9 @@ class TestFailureRecovery:
             StepResult(step_id="s1", state=StepState.FAILED, error="Timeout exceeded"),
         ]
 
-        response = recovery.create_error_response(plan, results, "session-1", FailureType.TIMEOUT_FAILURE)
+        response = recovery.create_error_response(
+            plan, results, "session-1", FailureType.TIMEOUT_FAILURE
+        )
         assert response.session_id == "session-1"
         assert "error" in response.content.lower() or "timeout" in response.content.lower()
         assert response.model_used == "gpt-4o"

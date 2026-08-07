@@ -5,10 +5,10 @@ aggregating token counts, latency, and selecting the primary output.
 """
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.domain.models import BrainResponse
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -181,7 +181,7 @@ class ResultAggregator:
                 return str(result.output["model"])
 
         # Fall back to plan's model_id
-        return plan.model_id
+        return str(plan.model_id)
 
     def _extract_agent_used(
         self,

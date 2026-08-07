@@ -7,10 +7,10 @@ model failures, retry exhaustion, and unrecoverable errors.
 from enum import StrEnum
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.domain.models import BrainResponse
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStepType
 
 logger = structlog.get_logger()
 
@@ -63,17 +63,16 @@ class FailureRecovery:
             return FailureType.PARTIAL_FAILURE
 
         # Check for timeout failures
-        timeout_failures = [
-            r for r in failed_results
-            if r.error and "timed out" in r.error.lower()
-        ]
+        timeout_failures = [r for r in failed_results if r.error and "timed out" in r.error.lower()]
         if timeout_failures:
             return FailureType.TIMEOUT_FAILURE
 
         # Check for provider-related failures
         provider_errors = [
-            r for r in failed_results
-            if r.error and any(
+            r
+            for r in failed_results
+            if r.error
+            and any(
                 kw in r.error.lower()
                 for kw in ["provider", "connection", "unavailable", "503", "502"]
             )
@@ -83,8 +82,10 @@ class FailureRecovery:
 
         # Check for model-specific failures
         model_errors = [
-            r for r in failed_results
-            if r.error and any(
+            r
+            for r in failed_results
+            if r.error
+            and any(
                 kw in r.error.lower()
                 for kw in ["model", "capacity", "overloaded", "rate limit", "429"]
             )
@@ -161,8 +162,10 @@ class FailureRecovery:
         error_msgs = [r.error or "Unknown error" for r in failed_results[:3]]
         error_summary = "; ".join(error_msgs)
 
-        content = partial_content if partial_content else (
-            f"I encountered an error processing your request: {error_summary}"
+        content = (
+            partial_content
+            if partial_content
+            else (f"I encountered an error processing your request: {error_summary}")
         )
 
         total_latency = sum(r.latency_ms for r in results)

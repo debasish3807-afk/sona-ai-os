@@ -4,7 +4,6 @@ Tests verify quality evaluation, retry decisions, and reflection limits.
 """
 
 import pytest
-
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.domain.models import BrainResponse
 from sona_brain.infrastructure.reflection_engine import (
@@ -117,9 +116,7 @@ class TestReflectionEngine:
 
     def test_max_reflections_forces_accept(self) -> None:
         """After max reflections, always accept."""
-        engine = ReflectionEngine(
-            ReflectionConfig(min_content_length=100, max_reflection_rounds=2)
-        )
+        engine = ReflectionEngine(ReflectionConfig(min_content_length=100, max_reflection_rounds=2))
         response = _make_response("Short")
         plan = _make_plan()
         results = _make_results()

@@ -7,12 +7,12 @@ passing outputs from completed steps to dependents.
 from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.retry_manager import RetryManager
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_brain.infrastructure.step_executor import StepExecutor
-from sona_thalamus.domain.execution_plan import ExecutionStep
 
 logger = structlog.get_logger()
 
@@ -84,7 +84,7 @@ class SequentialExecutor:
                     error=result.error,
                 )
                 # Cancel remaining steps
-                for remaining in sorted_steps[sorted_steps.index(step) + 1:]:
+                for remaining in sorted_steps[sorted_steps.index(step) + 1 :]:
                     await state_manager.mark_step_cancelled(remaining.step_id)
                 break
 

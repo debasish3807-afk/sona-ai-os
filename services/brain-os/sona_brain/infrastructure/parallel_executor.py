@@ -8,12 +8,12 @@ import asyncio
 from typing import Any
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionStep
 
 from sona_brain.domain.execution import StepResult, StepState
 from sona_brain.infrastructure.retry_manager import RetryManager
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_brain.infrastructure.step_executor import StepExecutor
-from sona_thalamus.domain.execution_plan import ExecutionStep
 
 logger = structlog.get_logger()
 
@@ -71,10 +71,7 @@ class ParallelExecutor:
 
         shared_context = shared_context or {}
 
-        tasks = [
-            self._execute_one(step, state_manager, shared_context)
-            for step in steps
-        ]
+        tasks = [self._execute_one(step, state_manager, shared_context) for step in steps]
 
         results = await asyncio.gather(*tasks, return_exceptions=False)
         return list(results)

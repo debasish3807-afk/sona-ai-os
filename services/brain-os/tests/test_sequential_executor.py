@@ -4,7 +4,6 @@ Tests verify ordered execution, dependency respect, and failure stopping.
 """
 
 import pytest
-
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.retry_manager import RetryConfig, RetryManager
 from sona_brain.infrastructure.sequential_executor import SequentialExecutor
@@ -98,7 +97,7 @@ class TestSequentialExecutor:
     @pytest.mark.asyncio
     async def test_stops_on_failure(self) -> None:
         """Execution stops when a step fails."""
-        from unittest.mock import AsyncMock, patch
+        from unittest.mock import patch
 
         step_exec = StepExecutor()
         retry_mgr = RetryManager(RetryConfig(max_retries=0))
@@ -114,6 +113,7 @@ class TestSequentialExecutor:
         async def failing_execute(step, context=None):
             if step.step_id == "s2":
                 from sona_brain.domain.execution import StepResult
+
                 return StepResult(step_id="s2", state=StepState.FAILED, error="Boom")
             return await original_execute(step, context)
 

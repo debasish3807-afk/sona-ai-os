@@ -4,7 +4,6 @@ Tests verify state transitions, ready-step queries, and thread safety.
 """
 
 import pytest
-
 from sona_brain.domain.execution import ExecutionState, StepState
 from sona_brain.infrastructure.state_manager import ExecutionStateManager
 from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep, ExecutionStepType
@@ -127,10 +126,12 @@ class TestExecutionStateManager:
 
     def test_get_ready_steps_with_deps(self) -> None:
         """Steps with unmet dependencies are not ready."""
-        plan = _make_plan([
-            _make_step("s1"),
-            _make_step("s2", depends_on=["s1"]),
-        ])
+        plan = _make_plan(
+            [
+                _make_step("s1"),
+                _make_step("s2", depends_on=["s1"]),
+            ]
+        )
         mgr = ExecutionStateManager(plan)
         ready = mgr.get_ready_steps()
         assert len(ready) == 1
@@ -139,10 +140,12 @@ class TestExecutionStateManager:
     @pytest.mark.asyncio
     async def test_get_ready_steps_after_completion(self) -> None:
         """Dependent steps become ready after deps complete."""
-        plan = _make_plan([
-            _make_step("s1"),
-            _make_step("s2", depends_on=["s1"]),
-        ])
+        plan = _make_plan(
+            [
+                _make_step("s1"),
+                _make_step("s2", depends_on=["s1"]),
+            ]
+        )
         mgr = ExecutionStateManager(plan)
         await mgr.mark_step_completed("s1", output="done")
         ready = mgr.get_ready_steps()

@@ -9,9 +9,9 @@ import asyncio
 from datetime import UTC, datetime
 
 import structlog
+from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 from sona_brain.domain.execution import ExecutionContext, ExecutionState, StepResult, StepState
-from sona_thalamus.domain.execution_plan import ExecutionPlan, ExecutionStep
 
 logger = structlog.get_logger()
 
@@ -235,9 +235,7 @@ class ExecutionStateManager:
             StepState.SKIPPED,
             StepState.CANCELLED,
         }
-        return all(
-            r.state in terminal_states for r in self._context.step_results.values()
-        )
+        return all(r.state in terminal_states for r in self._context.step_results.values())
 
     def get_completed_count(self) -> int:
         """Return the number of successfully completed steps.
@@ -245,11 +243,7 @@ class ExecutionStateManager:
         Returns:
             Count of steps in COMPLETED state.
         """
-        return sum(
-            1
-            for r in self._context.step_results.values()
-            if r.state == StepState.COMPLETED
-        )
+        return sum(1 for r in self._context.step_results.values() if r.state == StepState.COMPLETED)
 
     def get_failed_count(self) -> int:
         """Return the number of failed steps.
@@ -257,11 +251,7 @@ class ExecutionStateManager:
         Returns:
             Count of steps in FAILED state.
         """
-        return sum(
-            1
-            for r in self._context.step_results.values()
-            if r.state == StepState.FAILED
-        )
+        return sum(1 for r in self._context.step_results.values() if r.state == StepState.FAILED)
 
     def all_deps_completed(self, step_id: str) -> bool:
         """Check if all dependencies for a step are completed.
@@ -276,7 +266,9 @@ class ExecutionStateManager:
         if step is None:
             return False
         return all(
-            self._context.step_results.get(dep_id, StepResult(step_id=dep_id, state=StepState.PENDING)).state
+            self._context.step_results.get(
+                dep_id, StepResult(step_id=dep_id, state=StepState.PENDING)
+            ).state
             == StepState.COMPLETED
             for dep_id in step.depends_on
         )

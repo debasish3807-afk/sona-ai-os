@@ -4,7 +4,6 @@ Tests verify wave-based execution, dependency grouping, and failure handling.
 """
 
 import pytest
-
 from sona_brain.domain.execution import StepState
 from sona_brain.infrastructure.execution_scheduler import ExecutionScheduler
 from sona_brain.infrastructure.parallel_executor import ParallelExecutor
@@ -87,7 +86,7 @@ class TestExecutionScheduler:
             _make_step("s2", depends_on=["s1"]),
             _make_step("s3", depends_on=["s2"]),
         ]
-        plan = _make_plan(steps)
+        _make_plan(steps)  # validate plan creation
 
         wave_count = scheduler.get_wave_count(steps)
         assert wave_count == 3
@@ -138,7 +137,7 @@ class TestExecutionScheduler:
             return await original_execute(step, context)
 
         with patch.object(step_exec, "execute_step", side_effect=fail_s1):
-            results = await scheduler.execute_plan(plan, state_mgr)
+            await scheduler.execute_plan(plan, state_mgr)
 
         # s1 failed, s2 should be cancelled
         assert state_mgr.context.step_results["s2"].state == StepState.CANCELLED
