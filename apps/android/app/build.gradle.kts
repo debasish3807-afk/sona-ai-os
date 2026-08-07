@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":features:memory"))
     implementation(project(":features:agents"))
     implementation(project(":features:vision"))
+    implementation(project(":features:communication"))
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
