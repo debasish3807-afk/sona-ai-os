@@ -9,6 +9,7 @@ import com.sona.ai.features.agents.AgentsScreen
 import com.sona.ai.features.camera.CameraScreen
 import com.sona.ai.features.chat.ChatScreen
 import com.sona.ai.features.communication.CommunicationScreen
+import com.sona.ai.features.connectors.ConnectorsScreen
 import com.sona.ai.features.files.FilePickerScreen
 import com.sona.ai.features.memory.MemoryScreen
 import com.sona.ai.features.settings.SettingsScreen
@@ -125,6 +126,12 @@ fun SonaNavGraph(
 
         composable(Screen.Communication.route) {
             CommunicationScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Connectors.route) {
+            ConnectorsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
