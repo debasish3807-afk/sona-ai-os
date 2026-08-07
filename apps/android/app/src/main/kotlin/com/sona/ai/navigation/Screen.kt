@@ -20,4 +20,12 @@ sealed class Screen(val route: String) {
     data object Settings : Screen("settings")
 
     data object Memory : Screen("memory")
+
+    data object Voice : Screen("voice")
+
+    data object Camera : Screen("camera")
+
+    data object Files : Screen("files")
+
+    data object Agents : Screen("agents")
 }
