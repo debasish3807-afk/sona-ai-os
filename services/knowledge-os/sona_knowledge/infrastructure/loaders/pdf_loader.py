@@ -34,7 +34,7 @@ class PDFLoader(DocumentLoader):
         title = str(kwargs.get("title", "")) or self._extract_title(source)
         doc_id = str(kwargs.get("doc_id", "")) or str(uuid.uuid4())
         source_url = str(kwargs.get("source_url", "")) or None
-        page_count = int(kwargs.get("page_count", 0)) or self._estimate_pages(source)
+        page_count = int(kwargs.get("page_count") or 0) or self._estimate_pages(source)  # type: ignore[call-overload]
 
         logger.info(
             "loading_pdf_document",

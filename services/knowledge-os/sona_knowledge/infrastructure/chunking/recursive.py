@@ -36,8 +36,8 @@ class RecursiveChunker(TextChunker):
         Returns:
             A list of text chunks.
         """
-        chunk_size = int(kwargs.get("chunk_size", 0)) or self._chunk_size
-        chunk_overlap = int(kwargs.get("chunk_overlap", 0)) or self._chunk_overlap
+        chunk_size = int(kwargs.get("chunk_size") or 0) or self._chunk_size  # type: ignore[call-overload]
+        chunk_overlap = int(kwargs.get("chunk_overlap") or 0) or self._chunk_overlap  # type: ignore[call-overload]
 
         if not text.strip():
             return []

@@ -34,8 +34,8 @@ class SlidingWindowChunker(TextChunker):
         Returns:
             A list of text chunks.
         """
-        window_size = int(kwargs.get("window_size", 0)) or self._window_size
-        stride = int(kwargs.get("stride", 0)) or self._stride
+        window_size = int(kwargs.get("window_size") or 0) or self._window_size  # type: ignore[call-overload]
+        stride = int(kwargs.get("stride") or 0) or self._stride  # type: ignore[call-overload]
 
         if not text.strip():
             return []
