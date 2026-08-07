@@ -1,6 +1,6 @@
 """Tests for the startup validator."""
 
-from tests.test_health_checks import (
+from conftest import (
     FakeDegradedCheck,
     FakeHealthyCheck,
     FakeUnhealthyCheck,
