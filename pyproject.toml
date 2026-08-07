@@ -101,6 +101,7 @@ testpaths = [
     "gateway/tests",
 ]
 asyncio_mode = "auto"
+importmode = "importlib"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

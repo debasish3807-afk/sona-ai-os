@@ -94,7 +94,27 @@ jobs:
       - name: Install gateway
         run: pip install -e gateway[dev]
       - name: Run tests with coverage
-        run: pytest --cov --cov-report=xml -v
+        run: |
+          EXIT_CODE=0
+          # Test shared libraries
+          for lib in libs/shared-kernel libs/llm-client libs/event-bus; do
+            echo "::group::Testing $lib"
+            (cd "$lib" && python -m pytest tests/ -v --tb=short) || EXIT_CODE=1
+            echo "::endgroup::"
+          done
+          # Test each service
+          for service in services/*/; do
+            if [ -d "$service/tests" ]; then
+              echo "::group::Testing $service"
+              (cd "$service" && python -m pytest tests/ -v --tb=short) || EXIT_CODE=1
+              echo "::endgroup::"
+            fi
+          done
+          # Test gateway
+          echo "::group::Testing gateway"
+          (cd gateway && python -m pytest tests/ -v --tb=short) || EXIT_CODE=1
+          echo "::endgroup::"
+          exit $EXIT_CODE
         env:
           DATABASE_URL: postgresql://sona:test_password@localhost:5432/sona_test
           REDIS_URL: redis://localhost:6379/0
@@ -108,10 +128,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/web/package-lock.json
+          cache: ""
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         working-directory: apps/web
       - name: Lint
         run: npm run lint
@@ -134,7 +153,7 @@ jobs:
           java-version: "17"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Run lint
         run: ./gradlew lint
         working-directory: apps/android
