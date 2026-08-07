@@ -7,7 +7,7 @@ defined, instantiate properly, and enforce immutability.
 from dataclasses import FrozenInstanceError
 
 import pytest
-from domain.models import AuthToken, Permission, Role
+from sona_security.domain.models import AuthToken, Permission, Role
 
 
 class TestRole:

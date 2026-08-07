@@ -7,8 +7,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 from collections.abc import AsyncIterator
 
 import pytest
-from application.ports import BrainOrchestratorPort, PipelineStagePort
-from domain.models import BrainRequest, BrainResponse
+from sona_brain.application.ports import BrainOrchestratorPort, PipelineStagePort
+from sona_brain.domain.models import BrainRequest, BrainResponse
 
 
 class TestBrainOrchestratorPort:

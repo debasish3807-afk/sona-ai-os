@@ -5,8 +5,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import WorkflowEnginePort
-from domain.models import (
+from sona_workflow.application.ports import WorkflowEnginePort
+from sona_workflow.domain.models import (
     StepStatus,
     WorkflowDefinition,
     WorkflowExecution,

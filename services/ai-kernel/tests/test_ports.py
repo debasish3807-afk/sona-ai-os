@@ -7,8 +7,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 from collections.abc import AsyncIterator
 
 import pytest
-from application.ports import AIKernelPort, ModelRouterPort, ReasoningEnginePort
-from domain.models import (
+from sona_ai_kernel.application.ports import AIKernelPort, ModelRouterPort, ReasoningEnginePort
+from sona_ai_kernel.domain.models import (
     KernelRequest,
     KernelResponse,
     ModelConfig,

@@ -5,8 +5,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import AgentCoordinatorPort, AgentPort
-from domain.models import AgentResult, AgentStatus, AgentTask, AgentType
+from sona_workforce.application.ports import AgentCoordinatorPort, AgentPort
+from sona_workforce.domain.models import AgentResult, AgentStatus, AgentTask, AgentType
 
 
 class TestAgentPort:

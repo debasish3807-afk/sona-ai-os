@@ -95,12 +95,9 @@ warn_unused_ignores = true
 exclude = ["tests/", "__pycache__/", "backend/"]
 
 [tool.pytest.ini_options]
-testpaths = [
-    "services",
-    "libs",
-    "gateway/tests",
-]
+# testpaths intentionally omitted — run tests per-service (see Makefile)
 asyncio_mode = "auto"
+importmode = "importlib"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
