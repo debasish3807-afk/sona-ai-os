@@ -11,6 +11,7 @@ import com.sona.ai.features.chat.ChatScreen
 import com.sona.ai.features.files.FilePickerScreen
 import com.sona.ai.features.memory.MemoryScreen
 import com.sona.ai.features.settings.SettingsScreen
+import com.sona.ai.features.vision.VisionScreen
 import com.sona.ai.features.voice.VoiceScreen
 import com.sona.ai.ui.screens.HomeScreen
 import com.sona.ai.ui.screens.LoginScreen
@@ -111,6 +112,12 @@ fun SonaNavGraph(
 
         composable(Screen.Agents.route) {
             AgentsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Vision.route) {
+            VisionScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
