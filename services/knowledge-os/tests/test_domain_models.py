@@ -7,7 +7,7 @@ defined, instantiate properly, and enforce immutability.
 from dataclasses import FrozenInstanceError
 
 import pytest
-from domain.models import (
+from sona_knowledge.domain.models import (
     Document,
     DocumentChunk,
     DocumentType,

@@ -5,8 +5,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import ContentExtractorPort, SummarizationPort, WebSearchPort
-from domain.models import ResearchReport, SearchResult
+from sona_research.application.ports import ContentExtractorPort, SummarizationPort, WebSearchPort
+from sona_research.domain.models import ResearchReport, SearchResult
 
 
 class TestWebSearchPort:

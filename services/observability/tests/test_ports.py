@@ -5,8 +5,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import LoggingPort, MetricsPort, TracingPort
-from domain.models import LogLevel, SpanContext
+from sona_observability.application.ports import LoggingPort, MetricsPort, TracingPort
+from sona_observability.domain.models import LogLevel, SpanContext
 
 
 class TestMetricsPort:

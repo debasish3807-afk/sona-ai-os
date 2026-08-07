@@ -7,7 +7,7 @@ defined, instantiate properly, and enforce immutability.
 from dataclasses import FrozenInstanceError
 
 import pytest
-from domain.models import (
+from sona_mcp.domain.models import (
     MCPServer,
     MCPTool,
     MCPTransport,

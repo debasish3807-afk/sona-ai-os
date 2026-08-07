@@ -7,7 +7,7 @@ defined, instantiate properly, and enforce immutability.
 from dataclasses import FrozenInstanceError
 
 import pytest
-from domain.models import LogLevel, MetricType, SpanContext
+from sona_observability.domain.models import LogLevel, MetricType, SpanContext
 
 
 class TestMetricType:

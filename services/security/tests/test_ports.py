@@ -5,8 +5,8 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import AISafetyPort, AuthenticationPort, AuthorizationPort
-from domain.models import AuthToken, Permission, Role
+from sona_security.application.ports import AISafetyPort, AuthenticationPort, AuthorizationPort
+from sona_security.domain.models import AuthToken, Permission, Role
 
 
 class TestAuthenticationPort:

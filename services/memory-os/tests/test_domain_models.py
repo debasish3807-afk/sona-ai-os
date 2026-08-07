@@ -8,7 +8,7 @@ from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from domain.models import MemoryEntry, MemoryQuery, MemoryType
+from sona_memory.domain.models import MemoryEntry, MemoryQuery, MemoryType
 
 
 class TestMemoryType:

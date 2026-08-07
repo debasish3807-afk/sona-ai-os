@@ -5,8 +5,12 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
-from application.ports import MetricCollectorPort, QualityEvaluationPort, RegressionTestPort
-from domain.models import (
+from sona_evaluation.application.ports import (
+    MetricCollectorPort,
+    QualityEvaluationPort,
+    RegressionTestPort,
+)
+from sona_evaluation.domain.models import (
     EvaluationRequest,
     EvaluationType,
     MetricResult,

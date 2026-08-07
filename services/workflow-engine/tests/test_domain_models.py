@@ -7,7 +7,7 @@ defined, instantiate properly, and enforce immutability where specified.
 from dataclasses import FrozenInstanceError
 
 import pytest
-from domain.models import (
+from sona_workflow.domain.models import (
     StepStatus,
     WorkflowDefinition,
     WorkflowExecution,
