@@ -5,11 +5,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.sona.ai.features.agents.AgentsScreen
+import com.sona.ai.features.camera.CameraScreen
 import com.sona.ai.features.chat.ChatScreen
+import com.sona.ai.features.files.FilePickerScreen
+import com.sona.ai.features.memory.MemoryScreen
 import com.sona.ai.features.settings.SettingsScreen
+import com.sona.ai.features.voice.VoiceScreen
 import com.sona.ai.ui.screens.HomeScreen
 import com.sona.ai.ui.screens.LoginScreen
-import com.sona.ai.ui.screens.MemoryScreen
 import com.sona.ai.ui.screens.SplashScreen
 
 /**
@@ -83,6 +87,30 @@ fun SonaNavGraph(
 
         composable(Screen.Memory.route) {
             MemoryScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Voice.route) {
+            VoiceScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Camera.route) {
+            CameraScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Files.route) {
+            FilePickerScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Agents.route) {
+            AgentsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
