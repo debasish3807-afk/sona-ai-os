@@ -1,5 +1,7 @@
 """Tests for the health check framework."""
 
+from conftest import FakeDegradedCheck, FakeHealthyCheck, FakeUnhealthyCheck
+
 from sona_shared.health.checks import (
     HealthCheck,
     HealthCheckResult,
@@ -40,54 +42,6 @@ class TestHealthCheckResult:
         result = HealthCheckResult(name="x", status=HealthStatus.UNHEALTHY)
         assert result.latency_ms == 0.0
         assert result.message == ""
-
-
-class FakeHealthyCheck(HealthCheck):
-    """A fake health check that always returns healthy."""
-
-    @property
-    def name(self) -> str:
-        return "fake_healthy"
-
-    async def check(self) -> HealthCheckResult:
-        return HealthCheckResult(
-            name=self.name,
-            status=HealthStatus.HEALTHY,
-            latency_ms=1.0,
-            message="OK",
-        )
-
-
-class FakeUnhealthyCheck(HealthCheck):
-    """A fake health check that always returns unhealthy."""
-
-    @property
-    def name(self) -> str:
-        return "fake_unhealthy"
-
-    async def check(self) -> HealthCheckResult:
-        return HealthCheckResult(
-            name=self.name,
-            status=HealthStatus.UNHEALTHY,
-            latency_ms=5.0,
-            message="Service down",
-        )
-
-
-class FakeDegradedCheck(HealthCheck):
-    """A fake health check that always returns degraded."""
-
-    @property
-    def name(self) -> str:
-        return "fake_degraded"
-
-    async def check(self) -> HealthCheckResult:
-        return HealthCheckResult(
-            name=self.name,
-            status=HealthStatus.DEGRADED,
-            latency_ms=3.0,
-            message="Slow response",
-        )
 
 
 class TestHealthManager:
