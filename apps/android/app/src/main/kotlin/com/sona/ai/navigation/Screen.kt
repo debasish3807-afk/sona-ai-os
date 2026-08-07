@@ -28,4 +28,6 @@ sealed class Screen(val route: String) {
     data object Files : Screen("files")
 
     data object Agents : Screen("agents")
+
+    data object Vision : Screen("vision")
 }
