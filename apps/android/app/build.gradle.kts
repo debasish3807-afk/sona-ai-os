@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":features:communication"))
     implementation(project(":features:connectors"))
     implementation(project(":features:dashboard"))
+    implementation(project(":features:overlay"))
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
