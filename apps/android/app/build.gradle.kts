@@ -14,8 +14,8 @@ android {
         applicationId = "com.sona.ai"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0-alpha"
+        versionCode = 2
+        versionName = "0.1.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -66,6 +66,7 @@ dependencies {
     implementation(project(":features:connectors"))
     implementation(project(":features:dashboard"))
     implementation(project(":features:overlay"))
+    implementation(project(":features:beta"))
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
@@ -97,6 +98,14 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+
+    // Firebase BOM (ready for google-services.json)
+    val firebaseBom = platform("com.google.firebase:firebase-bom:33.1.0")
+    implementation(firebaseBom)
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-perf-ktx")
+    implementation("com.google.firebase:firebase-config-ktx")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
