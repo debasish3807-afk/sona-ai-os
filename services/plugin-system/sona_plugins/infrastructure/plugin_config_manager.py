@@ -153,4 +153,4 @@ class PluginConfigManager:
         expected_type = type_map.get(expected)
         if expected_type is None:
             return True
-        return isinstance(value, expected_type)  # type: ignore[arg-type]
+        return isinstance(value, expected_type)
