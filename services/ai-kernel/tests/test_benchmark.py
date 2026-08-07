@@ -6,6 +6,7 @@ Tests verify benchmark run, comparison, and fastest selection.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from sona_ai_kernel.infrastructure.benchmark import (
     BenchmarkResult,
     ProviderBenchmark,

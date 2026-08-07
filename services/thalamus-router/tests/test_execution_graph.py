@@ -1,6 +1,7 @@
 """Unit tests for the ExecutionGraph."""
 
 import pytest
+
 from sona_thalamus.domain.execution_plan import ExecutionStep, ExecutionStepType
 from sona_thalamus.infrastructure.execution_graph import CyclicDependencyError, ExecutionGraph
 

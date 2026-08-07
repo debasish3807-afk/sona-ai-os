@@ -6,6 +6,7 @@ Tests verify token bucket algorithm, acquire/refill, timeout, and registry.
 import asyncio
 
 import pytest
+
 from sona_ai_kernel.infrastructure.rate_limiter import (
     RateLimitConfig,
     RateLimiterRegistry,

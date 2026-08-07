@@ -4,6 +4,7 @@ Tests verify recording, stats calculation, percentiles, and error rate.
 """
 
 import pytest
+
 from sona_ai_kernel.infrastructure.metrics import (
     ProviderMetrics,
     RequestMetric,

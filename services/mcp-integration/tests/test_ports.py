@@ -5,6 +5,7 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
+
 from sona_mcp.application.ports import MCPManagerPort
 from sona_mcp.domain.models import (
     MCPServer,

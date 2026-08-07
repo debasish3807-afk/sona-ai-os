@@ -8,6 +8,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 
 import pytest
+
 from sona_ai_kernel.application.ports import AIKernelPort
 from sona_ai_kernel.domain.events import (
     InferenceCompletedEvent,

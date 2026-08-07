@@ -1,6 +1,7 @@
 """Unit tests for the RoutingEngine."""
 
 import pytest
+
 from sona_thalamus.application.ports import ThalamusRouterPort
 from sona_thalamus.domain.events import (
     ExecutionPlanCreatedEvent,

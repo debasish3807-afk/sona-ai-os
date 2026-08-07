@@ -5,13 +5,13 @@ carry the right data, and inherit from DomainEvent properly.
 """
 
 import pytest
+
 from sona_ai_kernel.domain.events import (
     InferenceCompletedEvent,
     InferenceFailedEvent,
     InferenceStartedEvent,
     ProviderHealthChangedEvent,
 )
-
 from sona_shared.domain.primitives import DomainEvent
 
 

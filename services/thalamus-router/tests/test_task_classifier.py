@@ -1,6 +1,7 @@
 """Unit tests for the TaskClassifier."""
 
 import pytest
+
 from sona_thalamus.domain.models import IntentCategory
 from sona_thalamus.infrastructure.task_classifier import (
     TaskClassifier,

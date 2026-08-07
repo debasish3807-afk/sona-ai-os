@@ -7,6 +7,7 @@ defined, instantiate properly, and enforce immutability.
 from dataclasses import FrozenInstanceError
 
 import pytest
+
 from sona_ai_engineering.domain.models import (
     CodeLanguage,
     CodeRequest,

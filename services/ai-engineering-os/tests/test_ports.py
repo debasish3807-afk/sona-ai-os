@@ -5,6 +5,7 @@ abstractness, and that concrete implementations must satisfy all methods.
 """
 
 import pytest
+
 from sona_ai_engineering.application.ports import CodeGenerationPort, CodeReviewPort, DebuggingPort
 from sona_ai_engineering.domain.models import (
     CodeLanguage,

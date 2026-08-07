@@ -7,6 +7,7 @@ and proper exception propagation.
 from unittest.mock import AsyncMock, patch
 
 import pytest
+
 from sona_ai_kernel.infrastructure.retry import RetryConfig, with_retry
 
 
