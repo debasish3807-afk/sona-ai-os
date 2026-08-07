@@ -50,7 +50,7 @@ class RedisProductionAdapter:
         for attempt in range(self._max_retries):
             try:
                 # Try importing redis.asyncio for real connection
-                import redis.asyncio as aioredis  # type: ignore[import-untyped]
+                import redis.asyncio as aioredis
 
                 pool = aioredis.ConnectionPool.from_url(
                     self._url,
