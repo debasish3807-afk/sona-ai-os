@@ -1,18 +1,27 @@
 # =============================================================================
 # Sona AI OS — Continuous Integration Pipeline
 # =============================================================================
-# Triggers: Pull requests to main/develop, pushes to main/develop
+# Triggers: Changes to backend/ only (legacy pipeline)
 # Gates:    Lint → Type Check → Security → Test → Validate Architecture
 # Policy:   All gates must pass before merge is allowed
 # =============================================================================
+# DEPRECATED: This pipeline handles the legacy backend/ directory only.
+# The authoritative CI for the monorepo is ci-monorepo.yml.
+# =============================================================================
 
-name: CI Pipeline
+name: CI Pipeline (Legacy Backend)
 
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
 
 env:
   PYTHON_VERSION: "3.12"

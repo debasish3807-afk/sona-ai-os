@@ -11,6 +11,9 @@ name: Deploy Development
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-dev.yml'
 
 env:
   PYTHON_VERSION: "3.12"
