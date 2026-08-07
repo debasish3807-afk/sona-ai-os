@@ -32,7 +32,7 @@ class TestLLMClientPort:
 
     def test_complete_implementation_is_instantiable(self) -> None:
         """Verify a full implementation can be instantiated."""
-        from typing import AsyncIterator
+        from collections.abc import AsyncIterator
 
         class ConcreteImpl(LLMClientPort):
             async def chat_completion(
@@ -74,7 +74,7 @@ class TestLLMClientPort:
     @pytest.mark.asyncio
     async def test_concrete_chat_completion(self) -> None:
         """Test that a concrete implementation's chat_completion works."""
-        from typing import AsyncIterator
+        from collections.abc import AsyncIterator
 
         class MockLLMClient(LLMClientPort):
             async def chat_completion(
@@ -116,7 +116,7 @@ class TestLLMClientPort:
     @pytest.mark.asyncio
     async def test_concrete_generate_embedding(self) -> None:
         """Test that a concrete implementation's generate_embedding works."""
-        from typing import AsyncIterator
+        from collections.abc import AsyncIterator
 
         class MockLLMClient(LLMClientPort):
             async def chat_completion(self, messages, model_config):
@@ -144,7 +144,7 @@ class TestLLMClientPort:
     @pytest.mark.asyncio
     async def test_concrete_generate_embeddings_batch(self) -> None:
         """Test that batch embedding returns one vector per input."""
-        from typing import AsyncIterator
+        from collections.abc import AsyncIterator
 
         class MockLLMClient(LLMClientPort):
             async def chat_completion(self, messages, model_config):

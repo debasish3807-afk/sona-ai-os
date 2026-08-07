@@ -4,7 +4,7 @@ Defines the data structures used for intent classification,
 request routing, and load balancing decisions.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 
 

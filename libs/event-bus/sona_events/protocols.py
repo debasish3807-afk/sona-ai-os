@@ -4,12 +4,13 @@ Defines typed event handler protocols that receive specific DomainEvent
 subtypes, enabling type-safe event subscription and dispatch.
 """
 
-from typing import Awaitable, Callable, Protocol, TypeVar, runtime_checkable
+from collections.abc import Awaitable, Callable
+from typing import Protocol, TypeVar, runtime_checkable
 
 from sona_shared.domain.primitives import DomainEvent
 
 # TypeVar for specific DomainEvent subtypes
-E = TypeVar("E", bound=DomainEvent)
+E = TypeVar("E", bound=DomainEvent, contravariant=True)
 
 
 @runtime_checkable

@@ -6,11 +6,9 @@ service-to-service communication through domain events.
 """
 
 from abc import ABC, abstractmethod
-from typing import Type
-
-from sona_shared.domain.primitives import DomainEvent
 
 from sona_events.protocols import AsyncEventHandler
+from sona_shared.domain.primitives import DomainEvent
 
 
 class EventPublisherPort(ABC):
@@ -53,7 +51,7 @@ class EventSubscriberPort(ABC):
     @abstractmethod
     def subscribe(
         self,
-        event_type: Type[DomainEvent],
+        event_type: type[DomainEvent],
         handler: AsyncEventHandler,
     ) -> None:
         """Register a handler for a specific domain event type.
@@ -70,7 +68,7 @@ class EventSubscriberPort(ABC):
     @abstractmethod
     def unsubscribe(
         self,
-        event_type: Type[DomainEvent],
+        event_type: type[DomainEvent],
         handler: AsyncEventHandler,
     ) -> None:
         """Remove a previously registered event handler.
@@ -87,7 +85,7 @@ class EventSubscriberPort(ABC):
     @abstractmethod
     def get_subscribers(
         self,
-        event_type: Type[DomainEvent],
+        event_type: type[DomainEvent],
     ) -> list[AsyncEventHandler]:
         """Retrieve all handlers registered for a specific event type.
 

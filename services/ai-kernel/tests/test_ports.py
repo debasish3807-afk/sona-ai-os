@@ -4,10 +4,9 @@ Tests verify that port interfaces are correctly defined, enforce
 abstractness, and that concrete implementations must satisfy all methods.
 """
 
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 import pytest
-
 from application.ports import AIKernelPort, ModelRouterPort, ReasoningEnginePort
 from domain.models import (
     KernelRequest,
@@ -48,6 +47,7 @@ class TestAIKernelPort:
             async def stream(self, request: KernelRequest) -> AsyncIterator[str]:
                 async def _gen():
                     yield "token"
+
                 return _gen()
 
             async def select_model(self, request: KernelRequest) -> ModelConfig:
@@ -73,6 +73,7 @@ class TestAIKernelPort:
             async def stream(self, request: KernelRequest) -> AsyncIterator[str]:
                 async def _gen():
                     yield "chunk"
+
                 return _gen()
 
             async def select_model(self, request: KernelRequest) -> ModelConfig:

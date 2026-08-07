@@ -4,7 +4,7 @@ Defines provider configuration, message, and response models used
 across all LLM provider interactions.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 
 

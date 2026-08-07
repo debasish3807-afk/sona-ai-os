@@ -5,7 +5,8 @@ to provide AI reasoning, model routing, and kernel processing capabilities.
 """
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
+from typing import Any
 
 from domain.models import KernelRequest, KernelResponse, ModelConfig, ReasoningStrategy
 
@@ -69,7 +70,7 @@ class ReasoningEnginePort(ABC):
     async def reason(
         self,
         prompt: str,
-        context: dict,
+        context: dict[str, Any],
         strategy: ReasoningStrategy,
     ) -> list[str]:
         """Execute a reasoning chain and return the reasoning trace.

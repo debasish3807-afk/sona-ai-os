@@ -5,10 +5,9 @@ used across all services in the monorepo.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Generic, TypeVar
 from uuid import UUID, uuid4
-
 
 # --- Value Objects ---
 
@@ -27,7 +26,7 @@ class EntityId:
 class Timestamp:
     """Immutable timestamp value object."""
 
-    value: datetime = field(default_factory=datetime.utcnow)
+    value: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 # --- Base Entity ---
