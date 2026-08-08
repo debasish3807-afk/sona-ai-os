@@ -9,13 +9,27 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+import app.middleware.authentication as auth_mod
+from app.main import create_app
+from app.middleware.authentication import _get_jwt_service
 
 
 @pytest.fixture
 def client() -> TestClient:
+    """Create an authenticated test client."""
+    auth_mod._jwt_service = None
+    app = create_app()
+    svc = _get_jwt_service()
+    token = svc.generate_access_token(user_id="test-user", roles=["admin"])
+    client = TestClient(app)
+    client.headers["Authorization"] = f"Bearer {token}"
+    return client
+
+
+@pytest.fixture
+def old_client() -> TestClient:
     """Create a test client for the gateway app."""
-    return TestClient(app)
+    return TestClient(create_app())
 
 
 class TestChatCompletion:
