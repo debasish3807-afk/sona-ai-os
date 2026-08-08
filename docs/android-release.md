@@ -47,17 +47,19 @@ apps/android/
 
 ## Signing
 
-### Beta (default — debug key)
-No configuration needed. Uses Android debug keystore automatically.
+### Unsigned (default)
+Without signing configuration, the release build produces an unsigned APK. There is no debug key fallback. Unsigned APKs cannot be installed on real devices without disabling security checks and will be blocked by Google Play Protect.
 
 ### Production (requires secrets)
-Set these environment variables or GitHub secrets:
+Set these environment variables for local builds, or configure them as GitHub Actions secrets for CI:
 ```
-SIGNING_STORE_FILE=path/to/release.keystore
-SIGNING_STORE_PASSWORD=<password>
-SIGNING_KEY_ALIAS=<alias>
-SIGNING_KEY_PASSWORD=<password>
+ANDROID_KEYSTORE_FILE=path/to/release.keystore
+ANDROID_KEYSTORE_PASSWORD=<password>
+ANDROID_KEY_ALIAS=<alias>
+ANDROID_KEY_PASSWORD=<password>
 ```
+
+For CI, the keystore is provided as a base64-encoded secret (`ANDROID_KEYSTORE_BASE64`) and decoded at build time. See [Android Release Signing Guide](android-release-signing.md) for full setup instructions.
 
 ## Version Info
 

@@ -23,23 +23,32 @@ android {
 
     signingConfigs {
         create("release") {
-            val storeFilePath = System.getenv("SIGNING_STORE_FILE")
-            if (storeFilePath != null && file(storeFilePath).exists()) {
+            val storeFilePath = System.getenv("ANDROID_KEYSTORE_FILE")
+            if (!storeFilePath.isNullOrEmpty() && file(storeFilePath).exists()) {
                 storeFile = file(storeFilePath)
-                storePassword = System.getenv("SIGNING_STORE_PASSWORD") ?: ""
-                keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: ""
-                keyPassword = System.getenv("SIGNING_KEY_PASSWORD") ?: ""
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
             }
+            // When ANDROID_KEYSTORE_FILE is not set, storeFile remains null.
+            // This signing config is only applied when env vars are present.
         }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false  // Disabled for beta — enables build without full ProGuard setup
-            signingConfig = if (System.getenv("SIGNING_STORE_FILE") != null) {
+            isMinifyEnabled = false  // Disabled for beta - enables build without full ProGuard setup
+            // Use release signing config only when keystore env var is configured.
+            // When not set, signingConfig is null to prevent debug key fallback.
+            // Note: In AGP 8.x, local builds without signing env vars may still
+            // produce a debug-signed APK due to AGP internal fallback behavior.
+            // The CI workflow validates the APK signature independently and fails
+            // if signed=true was requested but the APK is not properly signed.
+            val keystoreEnv = System.getenv("ANDROID_KEYSTORE_FILE")
+            signingConfig = if (!keystoreEnv.isNullOrEmpty()) {
                 signingConfigs.getByName("release")
             } else {
-                signingConfigs.getByName("debug")
+                null
             }
         }
         debug {
