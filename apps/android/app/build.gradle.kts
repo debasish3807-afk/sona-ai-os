@@ -121,13 +121,13 @@ dependencies {
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
 
-    // Firebase BOM (ready for google-services.json)
-    val firebaseBom = platform("com.google.firebase:firebase-bom:33.1.0")
-    implementation(firebaseBom)
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-perf-ktx")
-    implementation("com.google.firebase:firebase-config-ktx")
+    // Firebase BOM - uncomment when google-services.json is configured
+    // val firebaseBom = platform("com.google.firebase:firebase-bom:33.1.0")
+    // implementation(firebaseBom)
+    // implementation("com.google.firebase:firebase-crashlytics-ktx")
+    // implementation("com.google.firebase:firebase-analytics-ktx")
+    // implementation("com.google.firebase:firebase-perf-ktx")
+    // implementation("com.google.firebase:firebase-config-ktx")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
