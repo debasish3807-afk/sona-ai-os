@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class ExecutionStartedEvent(DomainEvent):  # type: ignore[misc]
+class ExecutionStartedEvent(DomainEvent):
     """Emitted when a plan begins execution.
 
     Attributes:
@@ -25,7 +25,7 @@ class ExecutionStartedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class StepCompletedEvent(DomainEvent):  # type: ignore[misc]
+class StepCompletedEvent(DomainEvent):
     """Emitted when an individual step completes successfully.
 
     Attributes:
@@ -42,7 +42,7 @@ class StepCompletedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class StepFailedEvent(DomainEvent):  # type: ignore[misc]
+class StepFailedEvent(DomainEvent):
     """Emitted when a step fails execution.
 
     Attributes:
@@ -59,7 +59,7 @@ class StepFailedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ExecutionCompletedEvent(DomainEvent):  # type: ignore[misc]
+class ExecutionCompletedEvent(DomainEvent):
     """Emitted when a plan completes execution successfully.
 
     Attributes:
@@ -76,7 +76,7 @@ class ExecutionCompletedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ExecutionFailedEvent(DomainEvent):  # type: ignore[misc]
+class ExecutionFailedEvent(DomainEvent):
     """Emitted when a plan fails execution.
 
     Attributes:

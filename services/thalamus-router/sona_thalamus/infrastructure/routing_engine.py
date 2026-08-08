@@ -319,8 +319,8 @@ class RoutingEngine(ThalamusRouterPort):
 
         except Exception as e:
             logger.error("plan_creation_failed", error=str(e))
-            event = RoutingFailedEvent(content=content, error=str(e))
-            self._events.append(event)
+            fail_event = RoutingFailedEvent(content=content, error=str(e))
+            self._events.append(fail_event)
 
             return self._rule_fallback.create_fallback_plan(
                 content=content,

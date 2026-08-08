@@ -6,7 +6,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class RepositoryIndexedEvent(DomainEvent):  # type: ignore[misc]
+class RepositoryIndexedEvent(DomainEvent):
     """Emitted when a GitHub repository has been indexed."""
 
     owner: str = ""
@@ -15,7 +15,7 @@ class RepositoryIndexedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class WorkspaceIndexedEvent(DomainEvent):  # type: ignore[misc]
+class WorkspaceIndexedEvent(DomainEvent):
     """Emitted when a workspace directory has been indexed."""
 
     path: str = ""
@@ -23,7 +23,7 @@ class WorkspaceIndexedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class NoteCreatedEvent(DomainEvent):  # type: ignore[misc]
+class NoteCreatedEvent(DomainEvent):
     """Emitted when a new note is created."""
 
     note_id: str = ""
@@ -31,7 +31,7 @@ class NoteCreatedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class TaskCreatedEvent(DomainEvent):  # type: ignore[misc]
+class TaskCreatedEvent(DomainEvent):
     """Emitted when a new task is created."""
 
     task_id: str = ""
@@ -40,7 +40,7 @@ class TaskCreatedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class KnowledgeGraphUpdatedEvent(DomainEvent):  # type: ignore[misc]
+class KnowledgeGraphUpdatedEvent(DomainEvent):
     """Emitted when the knowledge graph is updated."""
 
     nodes_added: int = 0

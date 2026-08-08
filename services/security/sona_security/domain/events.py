@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class AuthenticationSucceededEvent(DomainEvent):  # type: ignore[misc]
+class AuthenticationSucceededEvent(DomainEvent):
     """Emitted when a user successfully authenticates."""
 
     user_id: str = ""
@@ -18,7 +18,7 @@ class AuthenticationSucceededEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class AuthenticationFailedEvent(DomainEvent):  # type: ignore[misc]
+class AuthenticationFailedEvent(DomainEvent):
     """Emitted when an authentication attempt fails."""
 
     username: str = ""
@@ -27,7 +27,7 @@ class AuthenticationFailedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class TokenRevokedEvent(DomainEvent):  # type: ignore[misc]
+class TokenRevokedEvent(DomainEvent):
     """Emitted when a token is revoked."""
 
     user_id: str = ""
@@ -35,7 +35,7 @@ class TokenRevokedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class PermissionDeniedEvent(DomainEvent):  # type: ignore[misc]
+class PermissionDeniedEvent(DomainEvent):
     """Emitted when a permission check fails."""
 
     user_id: str = ""
@@ -44,7 +44,7 @@ class PermissionDeniedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class SecurityThreatEvent(DomainEvent):  # type: ignore[misc]
+class SecurityThreatEvent(DomainEvent):
     """Emitted when a security threat is detected."""
 
     threat_type: str = ""

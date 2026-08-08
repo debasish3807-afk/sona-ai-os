@@ -345,9 +345,9 @@ class BrainRuntime(BrainOrchestratorPort):
             return await self.execute_plan(new_plan, request)
 
         # RETRY_WITH_DIFFERENT_MODEL
-        new_plan = self._replanner.replan(plan, results)
-        if new_plan:
-            return await self.execute_plan(new_plan, request)
+        replanned = self._replanner.replan(plan, results)
+        if replanned:
+            return await self.execute_plan(replanned, request)
 
         # If replanning also fails, accept current response
         return response

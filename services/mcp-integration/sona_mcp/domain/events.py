@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class ToolRegisteredEvent(DomainEvent):  # type: ignore[misc]
+class ToolRegisteredEvent(DomainEvent):
     """Emitted when a new tool is registered in the tool registry."""
 
     tool_name: str = ""
@@ -18,7 +18,7 @@ class ToolRegisteredEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ToolInvokedEvent(DomainEvent):  # type: ignore[misc]
+class ToolInvokedEvent(DomainEvent):
     """Emitted after a tool call completes (success or failure)."""
 
     tool_name: str = ""
@@ -28,7 +28,7 @@ class ToolInvokedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ToolFailedEvent(DomainEvent):  # type: ignore[misc]
+class ToolFailedEvent(DomainEvent):
     """Emitted when a tool call fails with an error."""
 
     tool_name: str = ""
@@ -36,7 +36,7 @@ class ToolFailedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ServerConnectedEvent(DomainEvent):  # type: ignore[misc]
+class ServerConnectedEvent(DomainEvent):
     """Emitted when an MCP server connection is established."""
 
     server_id: str = ""
@@ -44,7 +44,7 @@ class ServerConnectedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ServerDisconnectedEvent(DomainEvent):  # type: ignore[misc]
+class ServerDisconnectedEvent(DomainEvent):
     """Emitted when an MCP server is disconnected."""
 
     server_id: str = ""

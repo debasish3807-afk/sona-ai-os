@@ -6,7 +6,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class AgentRegisteredEvent(DomainEvent):  # type: ignore[misc]
+class AgentRegisteredEvent(DomainEvent):
     """Emitted when a new agent is registered in the workforce."""
 
     agent_id: str = ""
@@ -15,7 +15,7 @@ class AgentRegisteredEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class TaskDispatchedEvent(DomainEvent):  # type: ignore[misc]
+class TaskDispatchedEvent(DomainEvent):
     """Emitted when a task is dispatched to an agent."""
 
     task_id: str = ""
@@ -24,7 +24,7 @@ class TaskDispatchedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class TaskCompletedEvent(DomainEvent):  # type: ignore[misc]
+class TaskCompletedEvent(DomainEvent):
     """Emitted when an agent completes a task."""
 
     task_id: str = ""
@@ -34,7 +34,7 @@ class TaskCompletedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class TaskFailedEvent(DomainEvent):  # type: ignore[misc]
+class TaskFailedEvent(DomainEvent):
     """Emitted when an agent fails to complete a task."""
 
     task_id: str = ""
@@ -43,7 +43,7 @@ class TaskFailedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class AgentDelegatedEvent(DomainEvent):  # type: ignore[misc]
+class AgentDelegatedEvent(DomainEvent):
     """Emitted when an agent delegates a task to another agent."""
 
     from_agent: str = ""
@@ -52,7 +52,7 @@ class AgentDelegatedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class AgentCommunicationEvent(DomainEvent):  # type: ignore[misc]
+class AgentCommunicationEvent(DomainEvent):
     """Emitted when agents communicate with each other."""
 
     from_agent: str = ""
