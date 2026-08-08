@@ -8,7 +8,11 @@ data class Memory(
     val content: String,
     val type: MemoryType,
     val importance: Float,
-    val createdAt: Long
+    val createdAt: Long,
+    val category: String = "",
+    val timestamp: Long = 0L,
+    val source: String = "",
+    val tags: List<String> = emptyList()
 )
 
 /**
