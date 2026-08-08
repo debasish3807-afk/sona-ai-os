@@ -111,7 +111,6 @@ interface SonaApi {
     @GET("api/v1/agents/executions/{executionId}")
     suspend fun getAgentExecutionStatus(
         @Path("executionId") executionId: String
-}
     ): AgentExecutionStatusDto
 
     @POST("api/v1/agents/executions/{executionId}/cancel")
@@ -119,6 +118,7 @@ interface SonaApi {
         @Path("executionId") executionId: String
     )
 
+}
 /**
  * Response from file/image analysis.
  */
