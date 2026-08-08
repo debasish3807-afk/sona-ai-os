@@ -2,6 +2,7 @@ package com.sona.ai.features.beta.diagnostics
 
 import android.content.Context
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -45,7 +46,7 @@ class DeviceInfoCollector @Inject constructor(
         val pm = context.packageManager.getPackageInfo(context.packageName, 0)
         return mapOf(
             "Version" to (pm.versionName ?: "?"),
-            "Build" to "${pm.longVersionCode}",
+            "Build" to "${PackageInfoCompat.getLongVersionCode(pm)}",
             "Package" to context.packageName
         )
     }

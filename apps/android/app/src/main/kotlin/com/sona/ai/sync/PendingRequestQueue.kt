@@ -21,7 +21,7 @@ class PendingRequestQueue @Inject constructor(
      */
     suspend fun enqueue(request: PendingRequest): String {
         val id = UUID.randomUUID().toString()
-        val entry = PendingRequestEntry(
+        val record = PendingRequestStore.PendingRequestRecord(
             id = id,
             type = request.type.name,
             endpoint = request.endpoint,
@@ -30,7 +30,7 @@ class PendingRequestQueue @Inject constructor(
             retryCount = 0,
             priority = request.priority
         )
-        pendingRequestStore.insert(entry)
+        pendingRequestStore.insert(record)
         return id
     }
 
@@ -38,7 +38,17 @@ class PendingRequestQueue @Inject constructor(
      * Gets all pending requests ordered by priority and timestamp.
      */
     suspend fun getPendingRequests(): List<PendingRequestEntry> {
-        return pendingRequestStore.getAllPending()
+        return pendingRequestStore.getAllPending().map { record ->
+            PendingRequestEntry(
+                id = record.id,
+                type = record.type,
+                endpoint = record.endpoint,
+                payload = record.payload,
+                timestamp = record.timestamp,
+                retryCount = record.retryCount,
+                priority = record.priority
+            )
+        }
     }
 
     /**

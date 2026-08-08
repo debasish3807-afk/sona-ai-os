@@ -2,6 +2,7 @@ package com.sona.ai.features.memory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sona.ai.domain.model.MemoryType
 import com.sona.ai.domain.repository.MemoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,7 +45,7 @@ class MemoryViewModel @Inject constructor(
     private fun loadMemories() {
         viewModelScope.launch {
             try {
-                val memories = memoryRepository.getMemories()
+                val memories = memoryRepository.getMemories().first()
                 _state.value = MemoryState.Success(
                     memories = memories.map { it.toMemoryItem() }
                 )
@@ -109,9 +111,10 @@ class MemoryViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val memories = if (filter == MemoryFilter.ALL) {
-                    memoryRepository.getMemories()
+                    memoryRepository.getMemories().first()
                 } else {
-                    memoryRepository.getMemoriesByCategory(filter.name.lowercase())
+                    val memoryType = filter.toMemoryType()
+                    memoryRepository.getMemoriesByType(memoryType).first()
                 }
                 _state.update { current ->
                     if (current is MemoryState.Success) {
@@ -149,6 +152,14 @@ class MemoryViewModel @Inject constructor(
     fun refresh() {
         _state.value = MemoryState.Loading
         loadMemories()
+    }
+
+    private fun MemoryFilter.toMemoryType(): MemoryType = when (this) {
+        MemoryFilter.ALL -> MemoryType.SEMANTIC
+        MemoryFilter.CONVERSATIONS -> MemoryType.EPISODIC
+        MemoryFilter.PREFERENCES -> MemoryType.PREFERENCE
+        MemoryFilter.FACTS -> MemoryType.SEMANTIC
+        MemoryFilter.TASKS -> MemoryType.PROCEDURAL
     }
 
     private fun com.sona.ai.domain.model.Memory.toMemoryItem() = MemoryItem(
