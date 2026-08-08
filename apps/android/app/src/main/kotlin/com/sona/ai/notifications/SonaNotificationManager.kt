@@ -1,5 +1,6 @@
 package com.sona.ai.notifications
 
+import android.annotation.SuppressLint
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -126,6 +127,7 @@ class SonaNotificationManager @Inject constructor(
         )
     }
 
+    @SuppressLint("MissingPermission")
     private fun showNotification(
         channelId: String,
         notificationId: Int,
@@ -152,7 +154,9 @@ class SonaNotificationManager @Inject constructor(
             .setAutoCancel(true)
             .build()
 
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        if (hasNotificationPermission()) {
+            NotificationManagerCompat.from(context).notify(notificationId, notification)
+        }
     }
 
     private fun hasNotificationPermission(): Boolean {
