@@ -18,6 +18,7 @@ android {
         versionName = "0.2.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.sona.ai"
     }
 
     signingConfigs {
