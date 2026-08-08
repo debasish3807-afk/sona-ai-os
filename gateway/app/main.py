@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI
 
+from app.middleware.authentication import AuthenticationMiddleware
 from app.middleware.cors import setup_cors
 from app.routes import chat, health, models, providers
 
@@ -31,6 +32,10 @@ def create_app() -> FastAPI:
 
     # Setup middleware
     setup_cors(app)
+    app.add_middleware(AuthenticationMiddleware)
+    from app.middleware.rate_limiting import RateLimitingMiddleware
+
+    app.add_middleware(RateLimitingMiddleware)
 
     # Register routes
     app.include_router(health.router, tags=["health"])

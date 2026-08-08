@@ -55,6 +55,7 @@ class BrainRuntime(BrainOrchestratorPort):
         metrics: ExecutionMetrics,
         default_model: str = "llama3.2",
         default_provider: str = "ollama",
+        max_replan_depth: int = 3,
     ) -> None:
         """Initialize the Brain OS runtime.
 
@@ -69,6 +70,7 @@ class BrainRuntime(BrainOrchestratorPort):
             default_model: Default model for plan generation.
             default_provider: Default provider for plan generation.
         """
+        self._max_replan_depth = max_replan_depth
         self._scheduler = scheduler
         self._reflection_engine = reflection_engine
         self._replanner = replanner

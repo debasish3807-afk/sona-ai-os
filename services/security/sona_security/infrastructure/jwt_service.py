@@ -139,6 +139,34 @@ class JWTService:
         except (ValueError, json.JSONDecodeError):
             return None
 
+    def verify_token(self, token: str) -> dict[str, object] | None:
+        """Verify token signature, expiration, and revocation status.
+
+        Returns the payload if valid, None if invalid/expired/revoked.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 3:
+                return None
+            # Verify signature
+            message = f"{parts[0]}.{parts[1]}"
+            expected_sig = self._sign(message)
+            if not hmac.compare_digest(parts[2], expected_sig):
+                return None
+            # Decode payload
+            payload_bytes = self._base64url_decode(parts[1])
+            payload = json.loads(payload_bytes)
+            # Check expiration
+            exp = payload.get("exp", 0)
+            if int(time.time()) > exp:
+                return None
+            # Check revocation
+            if self.is_revoked(token):
+                return None
+            return payload  # type: ignore[no-any-return]
+        except (ValueError, json.JSONDecodeError, KeyError, TypeError):
+            return None
+
     def revoke_token(self, token: str) -> None:
         """Add token to revocation set."""
         self._revoked_tokens.add(token)
