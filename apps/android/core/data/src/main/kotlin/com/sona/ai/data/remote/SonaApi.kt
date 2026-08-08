@@ -118,6 +118,7 @@ interface SonaApi {
         @Path("executionId") executionId: String
     )
 
+}
 /**
  * Response from file/image analysis.
  */
