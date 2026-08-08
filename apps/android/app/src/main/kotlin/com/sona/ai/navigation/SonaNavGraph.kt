@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.sona.ai.features.agents.AgentsScreen
+import com.sona.ai.features.beta.DiagnosticsScreen
+import com.sona.ai.features.beta.FeedbackScreen
 import com.sona.ai.features.camera.CameraScreen
 import com.sona.ai.features.chat.ChatScreen
 import com.sona.ai.features.communication.CommunicationScreen
@@ -153,6 +155,18 @@ fun SonaNavGraph(
 
         composable(Screen.Connectors.route) {
             ConnectorsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Feedback.route) {
+            FeedbackScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Diagnostics.route) {
+            DiagnosticsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
