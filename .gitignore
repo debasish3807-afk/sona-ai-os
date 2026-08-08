@@ -76,3 +76,7 @@ out/
 *.db
 frontend/web/node_modules/
 frontend/web/dist/
+
+# --- Android Keystores (never commit) ---
+*.jks
+*.keystore
