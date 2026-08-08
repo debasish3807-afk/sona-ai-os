@@ -115,9 +115,15 @@ jobs:
       - name: Verify APK signature
         run: |
           APK_PATH="${{ steps.apk.outputs.path }}"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::apksigner not found in $ANDROID_HOME/build-tools"
+            exit 1
+          fi
+          echo "Using apksigner: $APKSIGNER"
           echo "=== APK Signature Verification ==="
-          if $ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs "$APK_PATH" 2>&1; then
-            CERT_INFO=$($ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs "$APK_PATH" 2>&1)
+          if "$APKSIGNER" verify --print-certs "$APK_PATH" 2>&1; then
+            CERT_INFO=$("$APKSIGNER" verify --print-certs "$APK_PATH" 2>&1)
             CERT_DN=$(echo "$CERT_INFO" | grep "certificate DN" | head -1)
             CERT_SHA256=$(echo "$CERT_INFO" | grep "certificate SHA-256" | head -1 | awk '{print $NF}')
             echo "CERT_SHA256=${CERT_SHA256}" >> $GITHUB_ENV
@@ -147,8 +153,14 @@ jobs:
       - name: Verify APK metadata
         run: |
           APK_PATH="${{ steps.apk.outputs.path }}"
+          AAPT2=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f | sort -V | tail -1)
+          if [ -z "$AAPT2" ]; then
+            echo "::error::aapt2 not found in $ANDROID_HOME/build-tools"
+            exit 1
+          fi
+          echo "Using aapt2: $AAPT2"
           echo "=== APK Metadata (aapt2 dump badging) ==="
-          $ANDROID_HOME/build-tools/35.0.0/aapt2 dump badging "$APK_PATH"
+          "$AAPT2" dump badging "$APK_PATH"
 
       - name: Generate APK SHA-256 hash
         id: hash

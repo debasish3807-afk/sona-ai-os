@@ -1,4 +1,6 @@
-# Android
+# Android (DEPRECATED)
+
+> **This directory is deprecated.** The canonical Android application has moved to [`apps/android/`](../apps/android/). All active development, CI builds, and release workflows target the new location. This directory is retained only for historical reference and will be removed in a future release.
 
 The Android application for Sona AI OS, built with Kotlin and Jetpack Compose following clean architecture principles.
 
