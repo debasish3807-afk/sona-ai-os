@@ -120,7 +120,7 @@ private fun CameraPreviewContent(
                     cameraProviderFuture.addListener({
                         val cameraProvider = cameraProviderFuture.get()
                         val preview = Preview.Builder().build().also {
-                            it.surfaceProvider = this@apply.surfaceProvider
+                            it.setSurfaceProvider(this@apply.surfaceProvider)
                         }
                         try {
                             cameraProvider.unbindAll()

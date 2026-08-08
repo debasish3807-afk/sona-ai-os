@@ -26,6 +26,10 @@ case "$(uname)" in
   NonStop* ) nonstop=true ;;
 esac
 
+# Determine the project directory and APP_HOME first
+PRJ_DIR="$(cd "$(dirname "$0")" && pwd -P)"
+APP_HOME=$PRJ_DIR
+
 # Determine JAVA_HOME
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
@@ -45,12 +49,6 @@ fi
 
 # Setup classpath
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
-
-# Determine the project directory
-PRJ_DIR="$(cd "$(dirname "$0")" && pwd -P)"
-
-# Resolve APP_HOME
-APP_HOME=$PRJ_DIR
 
 # Execute Gradle
 exec "$JAVACMD" \
