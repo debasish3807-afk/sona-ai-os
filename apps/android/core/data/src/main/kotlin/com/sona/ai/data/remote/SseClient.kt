@@ -10,6 +10,7 @@ import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
 import javax.inject.Inject
+import okhttp3.MediaType.Companion.toMediaType
 import javax.inject.Singleton
 
 /**
@@ -31,7 +32,7 @@ class SseClient @Inject constructor(
      */
     fun stream(url: String, body: String, token: String): Flow<String> = callbackFlow {
         val requestBody = okhttp3.RequestBody.create(
-            okhttp3.MediaType.parse("application/json"),
+            "application/json".toMediaType(),
             body
         )
 
