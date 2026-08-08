@@ -126,7 +126,7 @@ class HTTPTransport(MCPTransportBase):
             return False
         try:
             response = await self._client.get("/health")
-            return response.status_code == 200  # type: ignore[no-any-return]
+            return response.status_code == 200
         except (httpx.HTTPError, httpx.ConnectError):
             self._connected = False
             return False

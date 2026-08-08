@@ -18,7 +18,7 @@ class Environment(StrEnum):
     PRODUCTION = "production"
 
 
-class DatabaseConfig(BaseModel):  # type: ignore[misc]
+class DatabaseConfig(BaseModel):
     """PostgreSQL database connection configuration."""
 
     host: str = "localhost"
@@ -31,7 +31,7 @@ class DatabaseConfig(BaseModel):  # type: ignore[misc]
     ssl_mode: str = "prefer"
 
 
-class RedisConfig(BaseModel):  # type: ignore[misc]
+class RedisConfig(BaseModel):
     """Redis connection configuration."""
 
     url: str = "redis://localhost:6379/0"
@@ -40,7 +40,7 @@ class RedisConfig(BaseModel):  # type: ignore[misc]
     socket_timeout: float = 5.0
 
 
-class VectorDBConfig(BaseModel):  # type: ignore[misc]
+class VectorDBConfig(BaseModel):
     """Qdrant vector database configuration."""
 
     url: str = "http://localhost:6333"
@@ -49,7 +49,7 @@ class VectorDBConfig(BaseModel):  # type: ignore[misc]
     distance_metric: str = "cosine"
 
 
-class LLMProviderConfig(BaseModel):  # type: ignore[misc]
+class LLMProviderConfig(BaseModel):
     """LLM provider connection configuration."""
 
     provider: str
@@ -61,7 +61,7 @@ class LLMProviderConfig(BaseModel):  # type: ignore[misc]
     retry_count: int = 3
 
 
-class ServiceConfig(BaseModel):  # type: ignore[misc]
+class ServiceConfig(BaseModel):
     """Root service configuration aggregating all subsystem configs."""
 
     service_name: str
@@ -76,7 +76,7 @@ class ServiceConfig(BaseModel):  # type: ignore[misc]
     log_level: str = "info"
     cors_origins: list[str] = ["http://localhost:3000"]
 
-    @field_validator("log_level")  # type: ignore[untyped-decorator]
+    @field_validator("log_level")
     @classmethod
     def validate_log_level(cls, v: str) -> str:
         """Ensure log level is a recognized value."""

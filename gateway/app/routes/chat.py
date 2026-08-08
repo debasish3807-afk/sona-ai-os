@@ -10,14 +10,14 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
 from app.deps import get_pipeline
-from app.models.chat import ChatMessage, ChatRequest, ChatResponse, TokenUsage
+from app.models.chat import ChatMessage, ChatRequest, ChatResponse, ChatRole, TokenUsage
 from app.pipeline.orchestrator import PipelineOrchestrator
 from app.pipeline.streaming import sse_generator
 
 router = APIRouter()
 
 
-@router.post("/chat/completions", response_model=ChatResponse)  # type: ignore[untyped-decorator]
+@router.post("/chat/completions", response_model=ChatResponse)
 async def create_chat_completion(
     request: ChatRequest,
     pipeline: PipelineOrchestrator = Depends(get_pipeline),
@@ -70,7 +70,7 @@ async def create_chat_completion(
     )
 
     return ChatResponse(
-        messages=[ChatMessage(role="assistant", content=result.content)],
+        messages=[ChatMessage(role=ChatRole.ASSISTANT, content=result.content)],
         model=result.model_used,
         usage=TokenUsage(
             prompt_tokens=result.tokens_input,

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
-class ProviderStatus(BaseModel):  # type: ignore[misc]
+class ProviderStatus(BaseModel):
     """Status of a configured LLM provider."""
 
     name: str
@@ -14,7 +14,7 @@ class ProviderStatus(BaseModel):  # type: ignore[misc]
     models: list[str] = []
 
 
-@router.get("/providers")  # type: ignore[untyped-decorator]
+@router.get("/providers")
 async def list_providers() -> list[ProviderStatus]:
     """List configured LLM providers and their status.
 
