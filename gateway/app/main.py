@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Sona AI OS Gateway",
         description="API Gateway for Sona AI OS services",
-        version="1.0.0",
+        version="0.2.0-beta",
         lifespan=lifespan,
     )
 
