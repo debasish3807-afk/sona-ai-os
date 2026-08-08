@@ -6,7 +6,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class PluginInstalledEvent(DomainEvent):  # type: ignore[misc]
+class PluginInstalledEvent(DomainEvent):
     """Emitted when a plugin is successfully installed."""
 
     plugin_id: str = ""
@@ -15,14 +15,14 @@ class PluginInstalledEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class PluginActivatedEvent(DomainEvent):  # type: ignore[misc]
+class PluginActivatedEvent(DomainEvent):
     """Emitted when a plugin is activated and enters running state."""
 
     plugin_id: str = ""
 
 
 @dataclass(frozen=True)
-class PluginDeactivatedEvent(DomainEvent):  # type: ignore[misc]
+class PluginDeactivatedEvent(DomainEvent):
     """Emitted when a plugin is deactivated."""
 
     plugin_id: str = ""
@@ -30,7 +30,7 @@ class PluginDeactivatedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class PluginFailedEvent(DomainEvent):  # type: ignore[misc]
+class PluginFailedEvent(DomainEvent):
     """Emitted when a plugin encounters an error."""
 
     plugin_id: str = ""
@@ -39,7 +39,7 @@ class PluginFailedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class PluginExecutedEvent(DomainEvent):  # type: ignore[misc]
+class PluginExecutedEvent(DomainEvent):
     """Emitted when a plugin action is executed."""
 
     plugin_id: str = ""

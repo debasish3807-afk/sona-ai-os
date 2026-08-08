@@ -6,7 +6,7 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
-class ModelInfo(BaseModel):
+class ModelInfo(BaseModel):  # type: ignore[misc]
     """Information about an available model."""
 
     id: str
@@ -15,7 +15,7 @@ class ModelInfo(BaseModel):
     capabilities: list[str] = []
 
 
-@router.get("/models")
+@router.get("/models")  # type: ignore[untyped-decorator]
 async def list_models() -> list[ModelInfo]:
     """List available models.
 

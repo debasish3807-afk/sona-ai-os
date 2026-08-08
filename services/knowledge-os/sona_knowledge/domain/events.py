@@ -6,7 +6,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class DocumentIngestedEvent(DomainEvent):  # type: ignore[misc]
+class DocumentIngestedEvent(DomainEvent):
     """Raised when a document is successfully ingested into a knowledge base."""
 
     document_id: str = ""
@@ -16,14 +16,14 @@ class DocumentIngestedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class DocumentDeletedEvent(DomainEvent):  # type: ignore[misc]
+class DocumentDeletedEvent(DomainEvent):
     """Raised when a document is deleted from a knowledge base."""
 
     document_id: str = ""
 
 
 @dataclass(frozen=True)
-class QueryExecutedEvent(DomainEvent):  # type: ignore[misc]
+class QueryExecutedEvent(DomainEvent):
     """Raised when a RAG query is executed."""
 
     query: str = ""
@@ -32,7 +32,7 @@ class QueryExecutedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class IndexingCompletedEvent(DomainEvent):  # type: ignore[misc]
+class IndexingCompletedEvent(DomainEvent):
     """Raised when indexing of a knowledge base is completed."""
 
     kb_id: str = ""

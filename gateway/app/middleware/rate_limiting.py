@@ -8,7 +8,7 @@ from starlette.responses import Response
 logger = structlog.get_logger()
 
 
-class RateLimitingMiddleware(BaseHTTPMiddleware):
+class RateLimitingMiddleware(BaseHTTPMiddleware):  # type: ignore[misc]
     """Middleware for request rate limiting.
 
     Scaffolding implementation - will integrate with Redis

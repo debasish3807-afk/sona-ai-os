@@ -17,7 +17,7 @@ from app.pipeline.streaming import sse_generator
 router = APIRouter()
 
 
-@router.post("/chat/completions", response_model=ChatResponse)
+@router.post("/chat/completions", response_model=ChatResponse)  # type: ignore[untyped-decorator]
 async def create_chat_completion(
     request: ChatRequest,
     pipeline: PipelineOrchestrator = Depends(get_pipeline),

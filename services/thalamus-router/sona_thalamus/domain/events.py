@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class IntentClassifiedEvent(DomainEvent):  # type: ignore[misc]
+class IntentClassifiedEvent(DomainEvent):
     """Emitted when an intent has been successfully classified.
 
     Attributes:
@@ -25,7 +25,7 @@ class IntentClassifiedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class ExecutionPlanCreatedEvent(DomainEvent):  # type: ignore[misc]
+class ExecutionPlanCreatedEvent(DomainEvent):
     """Emitted when an execution plan has been successfully created.
 
     Attributes:
@@ -42,7 +42,7 @@ class ExecutionPlanCreatedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class RoutingFailedEvent(DomainEvent):  # type: ignore[misc]
+class RoutingFailedEvent(DomainEvent):
     """Emitted when routing fails for any reason.
 
     Attributes:

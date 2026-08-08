@@ -41,13 +41,13 @@ def _get_health_manager() -> HealthManager:
     return _health_manager
 
 
-@router.get("/health")
+@router.get("/health")  # type: ignore[untyped-decorator]
 async def health_check() -> dict[str, str]:
     """Basic liveness probe - returns 200 if process is running."""
     return {"status": "healthy", "service": "sona-gateway"}
 
 
-@router.get("/ready")
+@router.get("/ready")  # type: ignore[untyped-decorator]
 async def readiness_check() -> JSONResponse:
     """Readiness probe - returns 200 only if all dependencies are connected."""
     manager = _get_health_manager()
@@ -58,7 +58,7 @@ async def readiness_check() -> JSONResponse:
     return JSONResponse(content=readiness, status_code=status_code)
 
 
-@router.get("/health/detailed")
+@router.get("/health/detailed")  # type: ignore[untyped-decorator]
 async def detailed_health() -> JSONResponse:
     """Detailed health with per-dependency status."""
     manager = _get_health_manager()

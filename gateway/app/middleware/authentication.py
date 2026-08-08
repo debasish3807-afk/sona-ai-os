@@ -11,7 +11,7 @@ logger = structlog.get_logger()
 PUBLIC_PATHS = {"/health", "/docs", "/openapi.json", "/redoc"}
 
 
-class AuthenticationMiddleware(BaseHTTPMiddleware):
+class AuthenticationMiddleware(BaseHTTPMiddleware):  # type: ignore[misc]
     """Middleware that validates API keys on protected endpoints."""
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:

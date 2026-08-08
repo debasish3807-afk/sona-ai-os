@@ -10,7 +10,7 @@ from sona_shared.domain.primitives import DomainEvent
 
 
 @dataclass(frozen=True)
-class MetricRecordedEvent(DomainEvent):  # type: ignore[misc]
+class MetricRecordedEvent(DomainEvent):
     """Emitted when a metric value is recorded."""
 
     name: str = ""
@@ -19,7 +19,7 @@ class MetricRecordedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class SpanStartedEvent(DomainEvent):  # type: ignore[misc]
+class SpanStartedEvent(DomainEvent):
     """Emitted when a new tracing span is started."""
 
     trace_id: str = ""
@@ -28,7 +28,7 @@ class SpanStartedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class SpanEndedEvent(DomainEvent):  # type: ignore[misc]
+class SpanEndedEvent(DomainEvent):
     """Emitted when a tracing span is completed."""
 
     trace_id: str = ""
@@ -38,7 +38,7 @@ class SpanEndedEvent(DomainEvent):  # type: ignore[misc]
 
 
 @dataclass(frozen=True)
-class AlertTriggeredEvent(DomainEvent):  # type: ignore[misc]
+class AlertTriggeredEvent(DomainEvent):
     """Emitted when a metric crosses a configured alert threshold."""
 
     metric_name: str = ""

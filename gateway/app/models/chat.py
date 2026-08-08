@@ -18,13 +18,13 @@ class ChatRole(StrEnum):
     SYSTEM = "system"
 
 
-class ChatMessage(BaseModel):
+class ChatMessage(BaseModel):  # type: ignore[misc]
     """A single message in a chat conversation."""
 
     role: ChatRole
     content: str = Field(min_length=1, max_length=100000)
 
-    @field_validator("role", mode="before")
+    @field_validator("role", mode="before")  # type: ignore[untyped-decorator]
     @classmethod
     def validate_role(cls, v: str) -> str:
         """Ensure role is one of the allowed values."""
@@ -34,7 +34,7 @@ class ChatMessage(BaseModel):
         return str(v).lower()
 
 
-class ChatRequest(BaseModel):
+class ChatRequest(BaseModel):  # type: ignore[misc]
     """Incoming chat completion request."""
 
     messages: list[ChatMessage] = Field(min_length=1)
@@ -45,7 +45,7 @@ class ChatRequest(BaseModel):
     user_id: str | None = None
 
 
-class TokenUsage(BaseModel):
+class TokenUsage(BaseModel):  # type: ignore[misc]
     """Token usage statistics for a response."""
 
     prompt_tokens: int = Field(default=0, ge=0)
@@ -53,7 +53,7 @@ class TokenUsage(BaseModel):
     total_tokens: int = Field(default=0, ge=0)
 
 
-class ChatResponse(BaseModel):
+class ChatResponse(BaseModel):  # type: ignore[misc]
     """Chat completion response."""
 
     id: UUID = Field(default_factory=uuid4)
