@@ -17,7 +17,6 @@ class PendingRequestStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    // In-memory cache backed by file storage
     private val pendingRequests = MutableStateFlow<MutableList<PendingRequestRecord>>(mutableListOf())
 
     data class PendingRequestRecord(
@@ -26,64 +25,29 @@ class PendingRequestStore @Inject constructor(
         val endpoint: String,
         val payload: String,
         val timestamp: Long,
-        val retryCount: Int,
-        val priority: Int
+        val retryCount: Int = 0,
+        val priority: Int = 0
     )
 
-    /**
-     * Inserts a new pending request.
-     */
-    suspend fun insert(entry: com.sona.ai.sync.PendingRequestEntry) {
-        val record = PendingRequestRecord(
-            id = entry.id,
-            type = entry.type,
-            endpoint = entry.endpoint,
-            payload = entry.payload,
-            timestamp = entry.timestamp,
-            retryCount = entry.retryCount,
-            priority = entry.priority
-        )
+    suspend fun insert(record: PendingRequestRecord) {
         pendingRequests.value = pendingRequests.value.toMutableList().apply { add(record) }
     }
 
-    /**
-     * Gets all pending requests sorted by priority (desc) then timestamp (asc).
-     */
-    suspend fun getAllPending(): List<com.sona.ai.sync.PendingRequestEntry> {
+    suspend fun getAllPending(): List<PendingRequestRecord> {
         return pendingRequests.value
             .sortedWith(compareByDescending<PendingRequestRecord> { it.priority }.thenBy { it.timestamp })
-            .map { record ->
-                com.sona.ai.sync.PendingRequestEntry(
-                    id = record.id,
-                    type = record.type,
-                    endpoint = record.endpoint,
-                    payload = record.payload,
-                    timestamp = record.timestamp,
-                    retryCount = record.retryCount,
-                    priority = record.priority
-                )
-            }
     }
 
-    /**
-     * Observes the count of pending requests.
-     */
     fun observeCount(): Flow<Int> {
         return pendingRequests.map { it.size }
     }
 
-    /**
-     * Deletes a pending request by ID (marks it complete).
-     */
     suspend fun delete(id: String) {
         pendingRequests.value = pendingRequests.value.toMutableList().apply {
             removeAll { it.id == id }
         }
     }
 
-    /**
-     * Increments retry count for a failed request.
-     */
     suspend fun incrementRetry(id: String) {
         pendingRequests.value = pendingRequests.value.toMutableList().apply {
             val index = indexOfFirst { it.id == id }
@@ -93,18 +57,12 @@ class PendingRequestStore @Inject constructor(
         }
     }
 
-    /**
-     * Removes requests that have exceeded the maximum retry count.
-     */
     suspend fun deleteExceededRetries(maxRetries: Int) {
         pendingRequests.value = pendingRequests.value.toMutableList().apply {
             removeAll { it.retryCount >= maxRetries }
         }
     }
 
-    /**
-     * Clears all pending requests.
-     */
     suspend fun clearAll() {
         pendingRequests.value = mutableListOf()
     }
