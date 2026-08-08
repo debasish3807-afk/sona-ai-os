@@ -58,7 +58,7 @@ jobs:
 
       - name: Build Release APK (signed)
         if: inputs.signed == 'true'
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew :app:assembleRelease --no-daemon
         working-directory: apps/android
         env:
           SIGNING_STORE_FILE: release.keystore
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build Release APK (unsigned/debug-signed)
         if: inputs.signed != 'true'
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew :app:assembleRelease --no-daemon
         working-directory: apps/android
 
       - name: Verify APK exists

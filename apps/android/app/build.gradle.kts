@@ -23,33 +23,24 @@ android {
 
     signingConfigs {
         create("release") {
-            // CI: signing secrets via environment variables
-            // Local: use debug signing for beta builds
             val storeFilePath = System.getenv("SIGNING_STORE_FILE")
             if (storeFilePath != null && file(storeFilePath).exists()) {
                 storeFile = file(storeFilePath)
                 storePassword = System.getenv("SIGNING_STORE_PASSWORD") ?: ""
                 keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("SIGNING_KEY_PASSWORD") ?: ""
-            } else {
-                // Fallback to debug signing for unsigned beta distribution
-                storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
             }
         }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false  // Disabled for beta — enables build without full ProGuard setup
+            signingConfig = if (System.getenv("SIGNING_STORE_FILE") != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             isMinifyEnabled = false
@@ -117,7 +108,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.core:core-splashscreen:1.0.1")
 
-    // WorkManager for background sync
+    // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
