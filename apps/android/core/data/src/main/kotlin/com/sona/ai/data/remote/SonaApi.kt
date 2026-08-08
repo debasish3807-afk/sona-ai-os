@@ -76,4 +76,52 @@ interface SonaApi {
 
     @GET("api/v1/health")
     suspend fun healthCheck(): Response<Unit>
-}
+
+    // ─── Files ──────────────────────────────────────────────────────────
+
+    @POST("api/v1/files/upload")
+    suspend fun uploadFile(
+        @Query("fileName") fileName: String,
+        @Query("mimeType") mimeType: String,
+        @Body content: ByteArray
+    ): FileAnalysisResponse
+
+    @POST("api/v1/files/text")
+    suspend fun uploadTextContent(
+        @Query("fileName") fileName: String,
+        @Body content: String
+    ): FileAnalysisResponse
+
+    @POST("api/v1/vision/analyze")
+    suspend fun analyzeImage(
+        @Query("imagePath") imagePath: String
+    ): FileAnalysisResponse
+
+    // ─── Agents ─────────────────────────────────────────────────────────
+
+    @GET("api/v1/agents")
+    suspend fun getAgents(): List<AgentDto>
+
+    @POST("api/v1/agents/{agentId}/execute")
+    suspend fun executeAgent(
+        @Path("agentId") agentId: String,
+        @Body request: AgentExecuteRequest
+    ): AgentExecuteResponse
+
+    @GET("api/v1/agents/executions/{executionId}")
+    suspend fun getAgentExecutionStatus(
+        @Path("executionId") executionId: String
+    ): AgentExecutionStatusDto
+
+    @POST("api/v1/agents/executions/{executionId}/cancel")
+    suspend fun cancelAgentExecution(
+        @Path("executionId") executionId: String
+    )
+
+/**
+ * Response from file/image analysis.
+ */
+data class FileAnalysisResponse(
+    val analysis: String,
+    val fileName: String? = null
+)
